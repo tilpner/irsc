@@ -3,98 +3,76 @@ use std::io::{
     TcpStream,
     IoError
 };
-use std::ascii::StrAsciiExt;
-use std::comm;
-use std::comm::{ Sender, Receiver };
-use std::collections::HashMap;
 
-use std::str::UnicodeStrSlice;
+use std::sync::Arc;
+use std::sync::Mutex;
 
-use events::*;
-
-use ident::Ident;
-
-fn parse_msg(v: Vec<&str>, from: uint) -> String {
-    let mut msg = if v[from].chars().next().unwrap() == ':' {
-        v[from][1..].into_string()
-    } else { v[from].into_string() };
-    for m in v.iter().skip(from + 1) {
-        msg.push_str(" ");
-        msg.push_str(m.trim_right());
-    }
-    msg
-}
+use callback::Callback;
+use event::Event;
 
 #[deriving(Show, PartialEq, Eq, Clone)]
 pub enum Failure {
+    AlreadyConnected,
     NotConnected,
     Io(IoError)
 }
 
-pub struct Context<'a> {
-    prefix: &'a str,
-    command: &'a str,
-    parts: [&'a str]
+#[deriving(Clone)]
+pub struct Server {
+    stream: Arc<Mutex<Option<TcpStream>>>,
+    pub events: Arc<Mutex<Callback<(Server, Event)>>>,
 }
 
-pub struct Server<'a> {
-    host: String,
-    port: u16,
-    stream: Option<TcpStream>,
-    event_sender: Option<Sender<Event>>,
-    event_types: HashMap<String, &'a Fn<Context<'a>, Event> + 'a>
-}
-
-impl<'a> Server<'a> {
-    pub fn new(host: String, port: u16) -> Server<'a> {
+impl Server {
+    pub fn new() -> Server {
         Server {
-            host: host,
-            port: port,
-            stream: None,
-            event_sender: None,
-            event_types: HashMap::new()
+            stream: Arc::new(Mutex::new(None)),
+            events: {
+                let mut c = Callback::new();
+                c.register(&Server::handle_event);
+                Arc::new(Mutex::new(c))
+            }
         }
     }
 
-    pub fn events(&mut self) -> Receiver<Event> {
-        let (tx, rx) = comm::channel();
-        self.events = Some(tx);
-        rx
+    fn handle_event(arg: (Server, Event)) {
+        let (mut server, event) = arg;
+        match event.command[] {
+            "PING" => {
+                server.sendraw(format!("PONG {}", event.content).as_slice(), true).unwrap();
+            }
+            _ => ()
+        }
     }
 
-    fn fire_event(&mut self, event: Event) {
-        self.events.as_ref().map(|s| s.send(event.clone()));
-    }
-
-    pub fn connect(&mut self) -> Result<(), Failure> {
-        self.stream = match TcpStream::connect(self.host.as_slice(), self.port) {
+    pub fn connect(&mut self, host: String, port: u16) -> Result<(), Failure> {
+        let mut s = self.stream.lock();
+        match *s { Some(_) => return Err(AlreadyConnected), _ => () };
+        *s = match TcpStream::connect(host.as_slice(), port) {
             Ok(tcp) => Some(tcp),
             Err(e) => return Err(Io(e))
         };
 
-        let mut s = self.clone();
-        spawn(proc() {
-            s.listen();
-        });
         Ok(())
     }
 
     #[inline]
     fn sendraw(&mut self, s: &str, newline: bool) -> Result<(), Failure> {
         println!("{}", s);
-        if self.stream.is_some() {
-            let mut st = self.stream.clone().unwrap();
-            match st.write_str(s) {
-                Ok(_) => match st.flush() {
-                    Ok(_) if newline => match st.write_str("\r\n") {
-                        Ok(_) => Ok(()),
+        let mut locked_stream = self.stream.lock();
+        if locked_stream.is_some() {
+            locked_stream.as_mut().map(|stream| {
+                match stream.write_str(s) {
+                    Ok(_) => match { if newline { stream.write_str("\r\n") } else { Ok(()) } } {
+                        Ok(_) =>  match stream.flush() {
+                            Ok(_) => Ok(()),
+                            Err(e) => return Err(Io(e))
+                        },
                         Err(e) => return Err(Io(e))
                     },
-                    Ok(_) => Ok(()),
                     Err(e) => return Err(Io(e))
-                },
-                Err(e) => return Err(Io(e))
-            }
+                }
+            }).unwrap()
         } else {
             Err(NotConnected)
         }
@@ -120,11 +98,15 @@ impl<'a> Server<'a> {
         self.sendraw(format!("PRIVMSG {} :{}", target, message).as_slice(), true)
     }
 
-    fn listen(&mut self) {
-        let stream = match self.stream {
-            Some(ref s) => s.clone(),
-            None => return
+    pub fn listen(&mut self) -> Result<(), Failure> {
+        let stream = {
+            let lock = self.stream.lock();
+            match *lock {
+                Some(ref s) => s.clone(),
+                None => return Err(NotConnected)
+            }
         };
+
         let mut reader = BufferedReader::new(stream);
         loop {
             let line = reader.read_line().unwrap();
@@ -139,30 +121,26 @@ impl<'a> Server<'a> {
                 parts.remove(0).unwrap()
             } else { "" };
 
-            let cmd = parts.remove(0).unwrap();
-            let context = Context { prefix: prefix, cmd: cmd, parts: parts };
-            self.events.entry(cmd).call(&context);
 
-            /*match parts[0].to_ascii_upper().as_slice() {
-                "001" => {
-                    self.fire_event(RplWelcome(box Welcome {
-                        source: prefix.into_string(),
-                        target: parts[1].into_string(),
-                        msg: parse_msg(parts, 2)
-                    }))
-                },
-                "PING" => {
-                    let _ = self.sendraw(format!("PONG {}", parts.get(1)).as_slice(), true);
-                    continue;
+            fn join(v: Vec<&str>, from: uint) -> String {
+                let mut msg = if v[from].chars().next().unwrap() == ':' {
+                    v[from][1..].into_string()
+                } else { v[from].into_string() };
+                    for m in v.iter().skip(from + 1) {
+                    msg.push_str(" ");
+                    msg.push_str(m.trim_right());
                 }
-                "PRIVMSG" => {
-                    let from = Ident::parse(prefix).unwrap();
-                    let to = parts[1];
-                    let msg = parse_msg(parts, 2);
-                    self.fire_event(PrivMsg(from, to.into_string(), msg))
-                },
-                _ => ()
-            }*/
+                msg
+            }
+
+            let cmd = parts.remove(0).unwrap();
+            let event = Event {
+                prefix: prefix.into_string(),
+                command: cmd.into_string(),
+                content: join(parts, 0)
+            };
+
+            self.events.lock().fire(&(self.clone(), event));
         }
     }
 }

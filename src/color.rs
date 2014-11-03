@@ -17,9 +17,6 @@ pub const LIGHT_GREY: &'static str = "15";
 
 pub const TRANSPARENT: &'static str = "99";
 
-
-
-
 pub fn normal(s: &str) -> String {
     format!("\x0F{}\x0F", s)
 }
