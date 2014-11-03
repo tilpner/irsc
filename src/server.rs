@@ -8,6 +8,7 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 use callback::Callback;
+use event;
 use event::Event;
 
 #[deriving(Show, PartialEq, Eq, Clone)]
@@ -38,7 +39,7 @@ impl Server {
     fn handle_event(arg: (Server, Event)) {
         let (mut server, event) = arg;
         match event.command[] {
-            "PING" => {
+            event::PING => {
                 server.sendraw(format!("PONG {}", event.content).as_slice(), true).unwrap();
             }
             _ => ()
@@ -121,23 +122,11 @@ impl Server {
                 parts.remove(0).unwrap()
             } else { "" };
 
-
-            fn join(v: Vec<&str>, from: uint) -> String {
-                let mut msg = if v[from].chars().next().unwrap() == ':' {
-                    v[from][1..].into_string()
-                } else { v[from].into_string() };
-                    for m in v.iter().skip(from + 1) {
-                    msg.push_str(" ");
-                    msg.push_str(m.trim_right());
-                }
-                msg
-            }
-
             let cmd = parts.remove(0).unwrap();
             let event = Event {
                 prefix: prefix.into_string(),
                 command: cmd.into_string(),
-                content: join(parts, 0)
+                content: parts.iter().map(|p| p.into_string()).collect()
             };
 
             self.events.lock().fire(&(self.clone(), event));
