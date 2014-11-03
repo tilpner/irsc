@@ -13,6 +13,8 @@ This library is supposed to be a thin layer over the IRC protocol, doing all the
 
 ## Example
 
+Compiles and works with `rustc 0.13.0-nightly (3327ecca4 2014-11-01 22:41:48 +0000)` and `11b12ad` of this library.
+
 ```rust
 #![feature(globs, slicing_syntax)]
 
