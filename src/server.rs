@@ -49,7 +49,7 @@ impl Server {
     pub fn connect(&mut self, host: String, port: u16) -> Result<(), Failure> {
         let mut s = self.stream.lock();
         match *s { Some(_) => return Err(AlreadyConnected), _ => () };
-        *s = match TcpStream::connect(host.as_slice(), port) {
+        *s = match TcpStream::connect((host.as_slice(), port)) {
             Ok(tcp) => Some(tcp),
             Err(e) => return Err(Io(e))
         };
@@ -59,7 +59,7 @@ impl Server {
 
     #[inline]
     fn sendraw(&mut self, s: &str, newline: bool) -> Result<(), Failure> {
-        println!("{}", s);
+        info!("OUT: {}", s);
         let mut locked_stream = self.stream.lock();
         if locked_stream.is_some() {
             locked_stream.as_mut().map(|stream| {
@@ -112,7 +112,9 @@ impl Server {
         loop {
             let line = reader.read_line().unwrap();
             let mut parts = line.as_slice().split(' ').collect::<Vec<&str>>();
-            println!("{}", parts);
+
+            info!("IN: {}", line);
+
             if parts.len() == 0 {
                 continue;
             }
