@@ -48,10 +48,10 @@ impl Server {
 
     pub fn connect(&mut self, host: String, port: u16) -> Result<(), Failure> {
         let mut s = self.stream.lock();
-        match *s { Some(_) => return Err(AlreadyConnected), _ => () };
+        match *s { Some(_) => return Err(Failure::AlreadyConnected), _ => () };
         *s = match TcpStream::connect((host.as_slice(), port)) {
             Ok(tcp) => Some(tcp),
-            Err(e) => return Err(Io(e))
+            Err(e) => return Err(Failure::Io(e))
         };
 
         Ok(())
@@ -67,15 +67,15 @@ impl Server {
                     Ok(_) => match { if newline { stream.write_str("\r\n") } else { Ok(()) } } {
                         Ok(_) =>  match stream.flush() {
                             Ok(_) => Ok(()),
-                            Err(e) => return Err(Io(e))
+                            Err(e) => return Err(Failure::Io(e))
                         },
-                        Err(e) => return Err(Io(e))
+                        Err(e) => return Err(Failure::Io(e))
                     },
-                    Err(e) => return Err(Io(e))
+                    Err(e) => return Err(Failure::Io(e))
                 }
             }).unwrap()
         } else {
-            Err(NotConnected)
+            Err(Failure::NotConnected)
         }
     }
 
@@ -104,7 +104,7 @@ impl Server {
             let lock = self.stream.lock();
             match *lock {
                 Some(ref s) => s.clone(),
-                None => return Err(NotConnected)
+                None => return Err(Failure::NotConnected)
             }
         };
 

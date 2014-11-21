@@ -29,7 +29,7 @@ fn main() {
     s.user(NAME, "*", "*", DESC).unwrap();
     s.join("#botzoo").unwrap();
 
-    s.msg("flan3002", "Hey!").unwrap();
+    s.msg("flan3002", "Hey, I'm your example bot!").unwrap();
 
     s.events.lock().register(&callback);
 
