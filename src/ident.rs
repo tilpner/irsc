@@ -16,9 +16,9 @@ impl Ident {
             None => return None
         };
         Some(Ident {
-            nickname: c.at(1).into_string(),
-            user: c.at(2).into_string(),
-            host: c.at(3).into_string()
+            nickname: c.at(1).unwrap_or("").into_string(),
+            user: c.at(2).unwrap_or("").into_string(),
+            host: c.at(3).unwrap_or("").into_string()
         })
     }
 }
