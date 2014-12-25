@@ -30,7 +30,7 @@ impl Server {
             stream: Arc::new(Mutex::new(None)),
             events: {
                 let mut c = Callback::new();
-                c.register(&Server::handle_event);
+                c.register(&(Server::handle_event as fn((Server,Event))));
                 Arc::new(Mutex::new(c))
             }
         }

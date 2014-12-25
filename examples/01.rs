@@ -24,14 +24,14 @@ fn callback(arg: (Server, Event)) {
 
 fn main() {
     let mut s = Server::new();
-    s.connect("irc.freenode.org".into_string(), 6667).unwrap();
+    s.connect("irc.aberwiki.org".into_string(), 6667).unwrap();
     s.nick(NAME).unwrap();
     s.user(NAME, "*", "*", DESC).unwrap();
     s.join("#botzoo").unwrap();
 
     s.msg("flan3002", "Hey, I'm your example bot!").unwrap();
 
-    s.events.lock().register(&callback);
+    s.events.lock().register(&(callback as fn((Server,Event))));
 
     // Dedicate this thread to listening and event processing
     s.listen().unwrap();
