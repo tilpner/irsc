@@ -7,6 +7,8 @@ use std::io::{
 use std::sync::Arc;
 use std::sync::Mutex;
 
+use std::borrow::ToOwned;
+
 use callback::Callback;
 use event;
 use event::Event;
@@ -126,8 +128,8 @@ impl Server {
 
             let cmd = parts.remove(0).unwrap();
             let event = Event {
-                prefix: prefix.into_string(),
-                command: cmd.into_string(),
+                prefix: prefix.to_owned(),
+                command: cmd.to_owned(),
                 content: parts.iter().map(|p| p.into_string()).collect()
             };
 
