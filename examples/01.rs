@@ -31,7 +31,7 @@ fn main() {
 
     s.msg("flan3002", "Hey, I'm your example bot!").unwrap();
 
-    s.events.lock().register(&callback);
+    s.events.lock().register(&(callback as fn((Server,Event))));
 
     // Dedicate this thread to listening and event processing
     s.listen().unwrap();

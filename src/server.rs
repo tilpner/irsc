@@ -7,6 +7,8 @@ use std::io::{
 use std::sync::Arc;
 use std::sync::Mutex;
 
+use std::borrow::ToOwned;
+
 use callback::Callback;
 use event;
 use event::Event;
@@ -30,7 +32,7 @@ impl Server {
             stream: Arc::new(Mutex::new(None)),
             events: {
                 let mut c = Callback::new();
-                c.register(&Server::handle_event);
+                c.register(&(Server::handle_event as fn((Server,Event))));
                 Arc::new(Mutex::new(c))
             }
         }
@@ -126,9 +128,9 @@ impl Server {
 
             let cmd = parts.remove(0).unwrap();
             let event = Event {
-                prefix: prefix.into_string(),
-                command: cmd.into_string(),
-                content: parts.iter().map(|p| p.into_string()).collect()
+                prefix: prefix.to_owned(),
+                command: cmd.to_owned(),
+                content: parts.into_iter().map(|s| s.to_owned()).collect()
             };
 
             self.events.lock().fire(&(self.clone(), event));
