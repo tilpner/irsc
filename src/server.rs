@@ -130,7 +130,7 @@ impl Server {
             let event = Event {
                 prefix: prefix.to_owned(),
                 command: cmd.to_owned(),
-                content: parts.iter().map(|p| p.into_string()).collect()
+                content: parts.into_iter().map(|s| s.to_owned()).collect()
             };
 
             self.events.lock().fire(&(self.clone(), event));

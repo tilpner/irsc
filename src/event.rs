@@ -1,5 +1,7 @@
 use ident::Ident;
 
+use std::borrow::ToOwned;
+
 #[deriving(Clone)]
 pub struct Event {
     pub prefix: String,
@@ -17,7 +19,7 @@ pub const PRIVMSG: &'static str = "PRIVMSG";
 
 fn join(v: Vec<String>, from: uint) -> String {
     let mut msg = if v[from].chars().next().unwrap() == ':' {
-        v[from][][1..].into_string()
+        v[from][][1..].to_owned()
     } else { v[from].clone() };
     for m in v.iter().skip(from + 1) {
         msg.push_str(" ");
