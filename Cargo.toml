@@ -1,9 +1,9 @@
 [package]
 
 name = "irsc"
-version = "0.0.1"
+version = "0.0.3"
 authors = ["Till Hoeppner <hoeppner.till@gmail.com>"]
 description = "A lightweight library for building IRC bots."
 repository = "https://github.com/hoeppnertill/irsc"
-keywords = ["irc", "internet", "protocol", "useless tags"]
-license = "No decision yet."
+keywords = ["irc", "internet", "protocol"]
+license = "WTFPL"
