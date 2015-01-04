@@ -7,3 +7,10 @@ description = "A lightweight library for building IRC bots."
 repository = "https://github.com/hoeppnertill/irsc"
 keywords = ["irc", "internet", "protocol"]
 license = "WTFPL"
+
+[features]
+ssl = ["openssl"]
+
+[dependencies.openssl]
+version = "*"
+optional = true

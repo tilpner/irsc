@@ -11,4 +11,4 @@ pub mod server;
 pub mod color;
 pub mod ident;
 pub mod callback;
-pub mod event;
+pub mod message;

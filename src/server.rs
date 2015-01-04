@@ -1,70 +1,120 @@
 use std::io::{
     BufferedReader,
     TcpStream,
-    IoError
+    IoError,
+    IoResult
 };
-
-use std::sync::Arc;
-use std::sync::Mutex;
-
-use std::borrow::ToOwned;
+use std::mem;
 
 use callback::Callback;
-use event;
-use event::Event;
+use message;
+use message::{ Command, Message };
 
-#[deriving(Show, PartialEq, Eq, Clone)]
+#[cfg(feature = "ssl")]
+use openssl::ssl::{ SslContext, SslMethod, SslStream };
+
+#[derive(Show, PartialEq, Eq, Clone)]
 pub enum Failure {
     AlreadyConnected,
     NotConnected,
     Io(IoError)
 }
 
-#[deriving(Clone)]
-pub struct Server {
-    stream: Arc<Mutex<Option<TcpStream>>>,
-    pub events: Arc<Mutex<Callback<(Server, Event)>>>,
+/// Yes, I don't like the name either, but it's private, so...
+enum StreamKind {
+    Plain(TcpStream),
+    #[cfg(feature = "ssl")]
+    Ssl(SslStream)
 }
 
-impl Server {
-    pub fn new() -> Server {
+impl Writer for StreamKind {
+    fn write(&mut self, buf: &[u8]) -> IoResult<()> {
+        match *self {
+            StreamKind::Plain(ref mut s) => s.write(buf),
+            #[cfg(feature = "ssl")]
+            StreamKind::Ssl(ref mut s) => s.write(buf)
+        }
+    }
+}
+
+impl Reader for StreamKind {
+    fn read(&mut self, buf: &mut [u8]) -> IoResult<uint> {
+        match *self {
+            StreamKind::Plain(ref mut s) => s.read(buf),
+            #[cfg(feature = "ssl")]
+            StreamKind::Ssl(ref mut s) => s.read(buf)
+        }
+    }
+}
+
+pub struct Event<'a> {
+    pub server: &'a mut Server<'a>,
+    pub message: &'a Message
+}
+
+pub struct Server<'a> {
+    stream: Option<StreamKind>,
+    pub events: Callback<Event<'a>>,
+}
+
+impl<'a> Server<'a> {
+    pub fn new() -> Server<'a> {
         Server {
-            stream: Arc::new(Mutex::new(None)),
+            stream: None,
             events: {
                 let mut c = Callback::new();
-                c.register(&(Server::handle_event as fn((Server,Event))));
-                Arc::new(Mutex::new(c))
+                c.register(Server::handle_event);
+                c
             }
         }
     }
 
-    fn handle_event(arg: (Server, Event)) {
-        let (mut server, event) = arg;
-        match event.command[] {
-            event::PING => {
-                server.sendraw(format!("PONG {}", event.content).as_slice(), true).unwrap();
+    fn handle_event(e: &mut Event) {
+        match e.message.command {
+            Command::PING => {
+                e.server.sendraw(format!("PONG :{}", message::join(e.message.content.clone(), 0)).as_slice(), true).unwrap();
             }
             _ => ()
         }
     }
 
     pub fn connect(&mut self, host: String, port: u16) -> Result<(), Failure> {
-        let mut s = self.stream.lock();
+        let s = &mut self.stream;
         match *s { Some(_) => return Err(Failure::AlreadyConnected), _ => () };
         *s = match TcpStream::connect((host.as_slice(), port)) {
-            Ok(tcp) => Some(tcp),
+            Ok(tcp) => Some(StreamKind::Plain(tcp)),
             Err(e) => return Err(Failure::Io(e))
         };
 
         Ok(())
     }
 
+    #[cfg(feature = "ssl")]
+    pub fn connect_ssl(&mut self, host: String, port: u16) -> Result<(), Failure> {
+        let mut s = self.stream.lock();
+        match *s { Some(_) => return Err(Failure::AlreadyConnected), _ => () };
+        let tcp_stream = match TcpStream::connect((host.as_slice(), port)) {
+            Ok(tcp) => Some(tcp),
+            Err(e) => return Err(Failure::Io(e))
+        };
+
+        let ssl = SslContext::new(SslMethod::Tlsv1);
+        let ssl_stream = SslStream::new(&ssl, tcp_stream);
+        *s = ssl_stream;
+
+        Ok(())
+
+    }
+
     #[inline]
     fn sendraw(&mut self, s: &str, newline: bool) -> Result<(), Failure> {
-        info!("OUT: {}", s);
-        let mut locked_stream = self.stream.lock();
-        if locked_stream.is_some() {
-            locked_stream.as_mut().map(|stream| {
+        info!(">> {}", s);
+        if cfg!(not(ndebug)) && s.len() > 510 {
+            panic!("Message too long, kitties will die if this runs in release mode. Msg: {}", s)
+        }
+        let stream = &mut self.stream;
+        if stream.is_some() {
+            stream.as_mut().map(|stream| {
                 match stream.write_str(s) {
                     Ok(_) => match { if newline { stream.write_str("\r\n") } else { Ok(()) } } {
                         Ok(_) =>  match stream.flush() {
@@ -81,8 +131,16 @@ impl Server {
         }
     }
 
+    pub fn send(&mut self, msg: message::Message) -> Result<(), Failure> {
+        self.sendraw(msg.format()[], true)
+    }
+
     pub fn join(&mut self, channel: &str) -> Result<(), Failure> {
         self.sendraw(format!("JOIN {}", channel).as_slice(), true)
+    }
+
+    pub fn part(&mut self, channel: &str) -> Result<(), Failure> {
+        self.sendraw(format!("PART {}", channel).as_slice(), true)
     }
 
     pub fn nick(&mut self, nick: &str) -> Result<(), Failure> {
@@ -103,37 +161,29 @@ impl Server {
 
     pub fn listen(&mut self) -> Result<(), Failure> {
         let stream = {
-            let lock = self.stream.lock();
-            match *lock {
+            match self.stream {
                 Some(ref s) => s.clone(),
                 None => return Err(Failure::NotConnected)
             }
         };
 
-        let mut reader = BufferedReader::new(stream);
+        let mut reader = BufferedReader::new(match *stream {
+            StreamKind::Plain(ref s) => (*s).clone(),
+            #[cfg(feature = "ssl")]
+            StreamKind::Ssl(ref s) => (*s).clone()
+        });
+
         loop {
             let line = reader.read_line().unwrap();
-            let mut parts = line.as_slice().split(' ').collect::<Vec<&str>>();
+            info!("<< {}", line);
 
-            info!("IN: {}", line);
-
-            if parts.len() == 0 {
-                continue;
+            if let Some(msg) = Message::parse(line[]) {
+                let mut e = self.events;
+                e.fire(&mut Event {
+                    server: self,
+                    message: &msg
+                });
             }
-
-            // if message has a prefix
-            let prefix = if parts[0].chars().next().unwrap() == ':' {
-                parts.remove(0).unwrap()
-            } else { "" };
-
-            let cmd = parts.remove(0).unwrap();
-            let event = Event {
-                prefix: prefix.to_owned(),
-                command: cmd.to_owned(),
-                content: parts.into_iter().map(|s| s.to_owned()).collect()
-            };
-
-            self.events.lock().fire(&(self.clone(), event));
         }
     }
 }
