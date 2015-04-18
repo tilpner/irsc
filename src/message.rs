@@ -77,10 +77,14 @@ impl<'a> FromStr for Message<'a> {
             .and_then(|s| s.chars().next()) == Some('\u{1}') { MsgType::Ctcp } else { MsgType::Irc };
 
         command.map(move |c|
-            Ok(Message::new(prefix.map(|p| Cow::Owned(p)),
+            Ok(Message::new(prefix.map(Cow::Owned),
                 c.unwrap(),
                 content,
-                suffix.map(|s| Cow::Owned(s)),
+                // strip \{1} if CTCP message
+                match msg_type {
+                    MsgType::Irc => suffix.map(Cow::Owned),
+                    MsgType::Ctcp => suffix.map(|s| s[1..s.len() - 1].to_string()).map(Cow::Owned)
+                },
                 msg_type
             ))
         ).unwrap()
@@ -107,11 +111,12 @@ impl<'a> ToString for Message<'a> {
 
         if let Some(ref p) = self.suffix {
             s.push(':');
+            if let MsgType::Ctcp = self.msg_type { s.push('\u{1}') }
             s.push_str(&p);
+            if let MsgType::Ctcp = self.msg_type { s.push('\u{1}') }
         }
 
         s
-
     }
 }
 
@@ -1198,7 +1203,7 @@ mod test {
             Some(Cow::Owned("d".to_owned())),
             Cow::Owned("PRIVMSG".to_owned()),
             vec![Cow::Owned("You".to_owned())],
-            Some(Cow::Owned("\u{1}ACTION sends you funny pictures of cats!\u{1}".to_owned())),
+            Some(Cow::Owned("ACTION sends you funny pictures of cats!".to_owned())),
             MsgType::Ctcp
         );
         assert_eq!(b.parse::<Message>().unwrap(), b2.clone());
