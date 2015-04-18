@@ -22,6 +22,7 @@ Session.vim
 *.so
 *.rlib
 *.dll
+Cargo.lock
 
 # Executables
 *.exe

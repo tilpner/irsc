@@ -81,9 +81,10 @@ impl<'a> FromStr for Message<'a> {
                 c.unwrap(),
                 content,
                 // strip \{1} if CTCP message
+                // strip \r\n for each line, relying on their existence
                 match msg_type {
-                    MsgType::Irc => suffix.map(Cow::Owned),
-                    MsgType::Ctcp => suffix.map(|s| s[1..s.len() - 1].to_string()).map(Cow::Owned)
+                    MsgType::Irc => suffix.map(|s| s[0..s.len() - 2].to_string()).map(Cow::Owned),
+                    MsgType::Ctcp => suffix.map(|s| s[1..s.len() - 3].to_string()).map(Cow::Owned)
                 },
                 msg_type
             ))
@@ -116,6 +117,7 @@ impl<'a> ToString for Message<'a> {
             if let MsgType::Ctcp = self.msg_type { s.push('\u{1}') }
         }
 
+        s.push_str("\r\n");
         s
     }
 }
@@ -1186,7 +1188,7 @@ mod test {
 
     #[test]
     fn parse_message() {
-        let a = ":a.b.c NOTICE AUTH :*** Looking up your hostname...";
+        let a = ":a.b.c NOTICE AUTH :*** Looking up your hostname...\r\n";
         // I'm not even kidding...
         let a2 = Message::new(
             Some(Cow::Owned("a.b.c".to_owned())),
@@ -1198,7 +1200,7 @@ mod test {
         assert_eq!(a.parse::<Message>().unwrap(), a2.clone());
         assert_eq!(a2.to_string(), a);
 
-        let b = ":d PRIVMSG You :\u{1}ACTION sends you funny pictures of cats!\u{1}";
+        let b = ":d PRIVMSG You :\u{1}ACTION sends you funny pictures of cats!\u{1}\r\n";
         let b2 = Message::new(
             Some(Cow::Owned("d".to_owned())),
             Cow::Owned("PRIVMSG".to_owned()),
