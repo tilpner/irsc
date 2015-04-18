@@ -1,14 +1,30 @@
-#![feature(globs, phase, slicing_syntax, macro_rules, unboxed_closures)]
+#![feature(plugin, slicing_syntax, unboxed_closures)]
+#![allow(unstable)]
 
-#[phase(plugin)]
-extern crate regex_macros;
+#![plugin(regex_macros)]
 extern crate regex;
 
-#[phase(plugin, link)]
+#[macro_use]
 extern crate log;
+
+extern crate eventual;
 
 pub mod server;
 pub mod color;
 pub mod ident;
 pub mod callback;
 pub mod message;
+
+use std::io;
+use std::result;
+
+#[derive(Debug)]
+pub enum IrscError {
+    Io(io::Error),
+    AlreadyConnected,
+    NotConnected
+}
+
+pub type Result<T> = result::Result<T, IrscError>;
+
+pub const DEBUG: bool = cfg!(not(ndebug));

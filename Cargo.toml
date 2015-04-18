@@ -12,6 +12,7 @@ license = "MIT"
 log = "*"
 regex = "*"
 regex_macros = "*"
+eventual = "*"
 
 [features]
 ssl = ["openssl"]

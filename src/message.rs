@@ -1,183 +1,258 @@
 #![allow(non_camel_case_types)]
 
 use std::str::FromStr;
-use std::borrow::ToOwned;
+use std::string::{ ToString };
+use std::borrow::{ Cow, ToOwned };
 
-#[derive(Clone)]
-pub struct Message {
-    pub prefix: Option<String>,
-    pub command: Command,
-    pub content: Vec<String>,
-    pub suffix: Option<String>
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+pub enum MsgType {
+    /// Plain old IRC messages, as defined in [rfc2812][rfc]
+    /// rfc: http://tools.ietf.org/html/rfc2812
+    Irc,
+    /// Ctcp messages, wrapped in \u{1}
+    Ctcp
 }
 
-impl Message {
-    pub fn new(prefix: Option<String>, command: Command, content: Vec<String>, suffix: Option<String>) -> Message {
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+pub struct Message<'a> {
+    pub prefix: Option<Cow<'a, String>>,
+    pub command: Cow<'a, String>,
+    pub content: Vec<Cow<'a, String>>,
+    pub suffix: Option<Cow<'a, String>>,
+    pub msg_type: MsgType
+}
+
+impl<'a> Message<'a> {
+    pub fn new(prefix: Option<Cow<'a, String>>, command: Cow<'a, String>, content: Vec<Cow<'a, String>>, suffix: Option<Cow<'a, String>>, msg_type: MsgType) -> Message<'a> {
         Message {
             prefix: prefix,
             command: command,
             content: content,
-            suffix: suffix
+            suffix: suffix,
+            msg_type: msg_type
         }
     }
+}
 
-    pub fn parse(i: &str) -> Option<Message> {
+impl<'a> FromStr for Message<'a> {
+    type Err = ::IrscError;
+    fn from_str(i: &str) -> Result<Message<'a>, ::IrscError> {
+        info!("Attempting to parse message: {}", i);
         let len = i.len();
         let mut s = i;
+
+        let msg_type = if s.char_at(0) == '\u{1}' { MsgType::Ctcp } else { MsgType::Irc };
+
         let prefix = if len >= 1 && s.char_at(0) == ':' {
             s.find(' ').map(|i| {
                 let p = s.slice_chars(1, i).to_owned();
-                s = s[i..];
+                s = &s[i + 1..];
                 p
             })
         } else { None };
 
         let command = s.find(' ').map(|i| {
             let p = s.slice_chars(0, i).to_owned();
-            s = s[i..];
+            s = &s[i..];
             p
-        }).and_then(|c| c.parse());
+        }).map(|c| c.parse()).map(|c| Some(Cow::Owned(c)));
 
+        // TODO: Parse last non-suffix argument as suffix if no suffix
+        // with colon is available.
         let mut content = Vec::with_capacity(15);
         let mut suffix = None;
         while s.len() > 0 {
             if s.char_at(0) == ':' {
-                suffix = Some(s.slice_from(1).to_owned());
+                suffix = Some(s[1..].to_owned());
                 break
             }
             s.find(' ').map(|i| {
-                content.push(s.slice_chars(0, i).to_owned());
-                s = s[i..];
+                if i > 0 {
+                    content.push(Cow::Owned(s.slice_chars(0, i).to_owned()));
+                    s = &s[i..];
+                }
             });
+            if s.char_at(0) == ' ' { s = &s[1..] };
         }
 
-        command.map(move |c| Message::new(prefix, c, content, suffix))
-    }
+        command.and_then(move |Ok(c)|
+            Ok(Message::new(prefix.map(|p| Cow::Owned(p)),
+                c,
+                content,
+                suffix.map(|s| Cow::Owned(s)),
+                msg_type
+            ))
+        )
 
-    pub fn format(&self) -> String {
+    }
+}
+
+impl<'a> ToString for Message<'a> {
+    fn to_string(&self) -> String {
         let mut s = String::with_capacity(512);
         if let Some(ref p) = self.prefix {
             s.push(':');
-            s.push_str(p[]);
+            s.push_str(&p);
             s.push(' ');
         }
 
-        s.push_str(format!("{} ", self.command)[]);
+        s.push_str(&self.command);
+        s.push(' ');
+
+        for part in self.content.iter() {
+            s.push_str(&part);
+            s.push(' ');
+        }
 
         if let Some(ref p) = self.suffix {
             s.push(':');
-            s.push_str(p[]);
+            s.push_str(&p);
         }
 
         s
+
     }
 }
 
-#[derive(Copy, Clone, Show, PartialEq, Eq, Hash)]
-pub enum Command {
-    PASS,
-    NICK,
-    USER,
-    OPER,
-    MODE,
-    SERVICE,
-    QUIT,
-    SQUIT,
-    JOIN,
-    PART,
-    TOPIC,
-    NAMES,
-    LIST,
-    INVITE,
-    KICK,
-    PRIVMSG,
-    NOTICE,
-    MOTD,
-    LUSERS,
-    VERSION,
-    STATS,
-    LINKS,
-    TIME,
-    CONNECT,
-    TRACE,
-    ADMIN,
-    INFO,
-    SERVLIST,
-    SQUERY,
-    WHO,
-    WHOIS,
-    WHOWAS,
-    KILL,
-    PING,
-    PONG,
-    ERROR,
-    AWAY,
-    REHASH,
-    DIE,
-    RESTART,
-    SUMMON,
-    USERS,
-    WALLOPS,
-    USERHOST,
-    ISON
+/*
+pub trait Command {
+    fn name(&self) -> String;
+    fn to_message(&self) -> Message;
+    fn from_message(msg: &Message) -> Option<Self>
 }
 
-impl FromStr for Command {
-    fn from_str(s: &str) -> Option<Command> {
-        use self::Command::*;
-        match s {
-            "PASS" => Some(PASS),
-            "NICK" => Some(NICK),
-            "USER" => Some(USER),
-            "OPER" => Some(OPER),
-            "MODE" => Some(MODE),
-            "SERVICE" => Some(SERVICE),
-            "QUIT" => Some(QUIT),
-            "SQUIT" => Some(SQUIT),
-            "JOIN" => Some(JOIN),
-            "PART" => Some(PART),
-            "TOPIC" => Some(TOPIC),
-            "NAMES" => Some(NAMES),
-            "LIST" => Some(LIST),
-            "INVITE" => Some(INVITE),
-            "KICK" => Some(KICK),
-            "PRIVMSG" => Some(PRIVMSG),
-            "NOTICE" => Some(NOTICE),
-            "MOTD" => Some(MOTD),
-            "LUSERS" => Some(LUSERS),
-            "VERSION" => Some(VERSION),
-            "STATS" => Some(STATS),
-            "LINKS" => Some(LINKS),
-            "TIME" => Some(TIME),
-            "CONNECT" => Some(CONNECT),
-            "TRACE" => Some(TRACE),
-            "ADMIN" => Some(ADMIN),
-            "INFO" => Some(INFO),
-            "SERVLIST" => Some(SERVLIST),
-            "SQUERY" => Some(SQUERY),
-            "WHO" => Some(WHO),
-            "WHOIS" => Some(WHOIS),
-            "WHOWAS" => Some(WHOWAS),
-            "KILL" => Some(KILL),
-            "PING" => Some(PING),
-            "PONG" => Some(PONG),
-            "ERROR" => Some(ERROR),
-            "AWAY" => Some(AWAY),
-            "REHASH" => Some(REHASH),
-            "DIE" => Some(DIE),
-            "RESTART" => Some(RESTART),
-            "SUMMON" => Some(SUMMON),
-            "USERS" => Some(USERS),
-            "WALLOPS" => Some(WALLOPS),
-            "USERHOST" => Some(USERHOST),
-            "ISON" => Some(ISON),
-            _ => None
+macro_rules! command (
+    ($name: ident { $($field: ident: $t: ty),* } to $to_msg: expr; from $from_msg: expr;) => (
+        pub struct $name {
+            $(pub $field: $t),*
         }
-    }
+
+        impl Command for $name {
+            fn name(&self) -> String { stringify!($name).to_owned() }
+            fn to_message(&self) -> Message { ($to_msg)(self) }
+            fn from_message(msg: &Message) -> Option<$name> { ($from_msg)(msg) }
+        }
+    )
+);*/
+
+/*
+command!(Pass { password: String }
+         to |&:s: &Pass| Message::new(None, "PASS".to_owned(), Vec::new(), Some(s.password.clone()));
+         from |&:msg: &Message| msg.clone().suffix.map(|s| Pass { password: s }););
+
+command!(Ping { server1: Option<String>, server2: Option<String> }
+         to |&:s :&Ping| {
+             let mut v = Vec::new();
+             if let Some(ref s) = s.server1 { v.push(s.clone()) }
+             if let Some(ref s) = s.server2 { v.push(s.clone()) }
+             Message::new(None, "PING".to_owned(), v, None)
+         };
+         from |&:msg: &Message| {
+             let mut c = msg.content.clone();
+             Some(Ping { server2: c.pop(), server1: c.pop() }) }; );
+
+command!(Pong { server1: Option<String>, server2: Option<String> }
+         to |&:s: &Pong| {
+             let mut v = Vec::new();
+             if let Some(ref s) = s.server1 { v.push(s.clone()) }
+             if let Some(ref s) = s.server2 { v.push(s.clone()) }
+             Message::new(None, "PONG".to_owned(), v, None)
+         };
+         from |&:msg: &Message| {
+             let mut c = msg.content.clone();
+             Some(Pong { server2: c.pop(), server1: c.pop() })
+         }; );
+
+command!(PrivMsg { from: Option<String>, to: String, content: String }
+         to |&:s: &PrivMsg| {
+             Message::new(s.from.clone(), "PRIVMSG".to_owned(), vec![s.to.clone()], Some(s.content.clone()))
+         };
+         from |&:msg: &Message| {
+             msg.content.clone().pop().map(
+                 |c| PrivMsg {
+                     from: msg.prefix.clone(),
+                     to: c,
+                     content: msg.suffix.clone().unwrap_or(String::new())
+                 })
+         }; );
+*/
+
+#[derive(Clone, PartialEq, Eq, Hash)]
+pub enum Mode {
+    Away,
+    Invisible,
+    Wallops,
+    Restricted,
+    Operator,
+    LocalOperator,
+    ServerNotices,
+    Custom(String)
 }
 
-#[derive(Show, Copy, PartialEq, Eq)]
-pub enum Response {
+#[derive(Copy, Clone, PartialEq, Eq, Hash)]
+pub enum SetMode {
+    Plus,
+    Minus
+}
+
+#[derive(Clone, PartialEq, Eq, Hash)]
+pub enum Command<'a> {
+    Pass { password: Cow<'a, String> },
+    Nick { nickname: Cow<'a, String> },
+    User { user: Cow<'a, String>, mode: Cow<'a, String>, unused: Cow<'a, String>, realname: Cow<'a, String> },
+    Oper { name: Cow<'a, String>, password: Cow<'a, String> },
+    Mode { nickname: Cow<'a, String>, mode: &'a [(SetMode, Mode)] },
+    Service { nickname: Cow<'a, String>, reserved: Cow<'a, String>, distribution: Cow<'a, String>, service_type: Cow<'a, String>, reserved2: Cow<'a, String>, info: Cow<'a, String> },
+    Quit { message: Option<Cow<'a, String>> },
+    SQuit { server: Cow<'a, String>, comment: Cow<'a, String> },
+    Join { channels: &'a [(Cow<'a, String>, Option<Cow<'a, String>>)] },
+    Join_leave_all,
+    Part { channels: &'a [Cow<'a, String>], message: Cow<'a, String> },
+    /*
+    Topic = 1011,
+    Names = 1012,
+    List = 1013,
+    Invite = 1014,
+    Kick = 1015,
+    */
+    PrivMsg { from: Option<Cow<'a, String>>, to: Cow<'a, String>, content: Cow<'a, String> },
+    Notice { to: Cow<'a, String>, content: Cow<'a, String> },
+    /*
+    Motd = 1018,
+    LUsers = 1019,
+    Version = 1020,
+    Stats = 1021,
+    Links = 1022,
+    Time = 1023,
+    Connect = 1024,
+    Trace = 1025,
+    Admin = 1026,
+    Info = 1027,
+    ServList = 1028,
+    SQuery = 1029,
+    Who = 1030,
+    WhoIs = 1031,
+    WhoWas = 1032,
+    Kill = 1033,
+    */
+    Ping { server1: Option<Cow<'a, String>>, server2: Option<Cow<'a, String>> },
+    Pong { server1: Option<Cow<'a, String>>, server2: Option<Cow<'a, String>> },
+    /*
+    Error = 1036,
+    Away = 1037,
+    Rehash = 1038,
+    Die = 1039,
+    Restart = 1040,
+    Summon = 1041,
+    Users = 1042,
+    Wallops = 1043,
+    Userhost = 1044,
+    Ison = 1045,*/
+
+    Ctcp { command: Cow<'a, String> },
+
+    /*
+
     /// "Welcome to the Internet Relay Network <nick>!<user>@<host>"
     RPL_WELCOME = 001,
     /// "Your host is <servername>, running version <ver>"
@@ -678,12 +753,12 @@ pub enum Response {
     /// ":USERS has been disabled"
     /// - Returned as a response to the USERS command.  MUST be
     ///   returned by any server which does not implement it.
-    ERR_USERSDISABLED = 446,
+    ERR_USERSDISABLED = 446,*/
     /// ":You have not registered"
     /// - Returned by the server to indicate that the client
     ///   MUST be registered before the server will allow it
     ///   to be parsed in detail.
-    ERR_NOTREGISTERED = 451,
+    ErrNotRegistered,/*
     /// "<command> :Not enough parameters"
     /// - Returned by the server by numerous commands to
     ///   indicate to the client that it didn't supply enough
@@ -770,17 +845,305 @@ pub enum Response {
     /// ":Cannot change mode for other users"
     /// - Error sent to any user trying to view or change the
     ///   user mode for a user other than themselves.
-    ERR_USERSDONTMATCH = 502,
+    ERR_USERSDONTMATCH = 502
+        */
 }
 
-impl Response {
-    pub fn is_reply(&self) -> bool { let i = *self as uint; i >= 200 && i <= 399 }
-    pub fn is_error(&self) -> bool { let i = *self as uint; i >= 400 && i <= 599 }
+/*
+impl ToString for Command {
+    fn to_string(&self) -> String {
+        match self {
+            PASS => "PING",
+            NICK => "NICK",
+            USER => "USER",
+            OPER => "1004",
+            MODE => "1005",
+            SERVICE => "1006",
+            QUIT => "1007",
+            SQUIT => "1008",
+            JOIN => "1009",
+            PART => "1010",
+            TOPIC => "1011",
+            NAMES => "1012",
+            LIST => "1013",
+            INVITE => "1014",
+            KICK => "1015",
+            PRIVMSG => "1016",
+            NOTICE => "1017",
+            MOTD => "1018",
+            LUSERS => "1019",
+            VERSION => "1020",
+            STATS => "1021",
+            LINKS => "1022",
+            TIME => "1023",
+            CONNECT => "1024",
+            TRACE => "1025",
+            ADMIN => "1026",
+            INFO => "1027",
+            SERVLIST => "1028",
+            SQUERY => "1029",
+            WHO => "1030",
+            WHOIS => "1031",
+            WHOWAS => "1032",
+            KILL => "1033",
+            PING => "1034",
+            PONG => "1035",
+            ERROR => "1036",
+            AWAY => "1037",
+            REHASH => "1038",
+            DIE => "1039",
+            RESTART => "1040",
+            SUMMON => "1041",
+            USERS => "1042",
+            WALLOPS => "1043",
+            USERHOST => "1044",
+            ISON => "1045",
+
+            RPL_WELCOME => "001",
+            RPL_YOURHOST => "002",
+            RPL_CREATED => "003",
+            RPL_MYINFO => "004",
+            RPL_BOUNCE => "005",
+            RPL_USERHOST => "302",
+            RPL_ISON => "303",
+            RPL_AWAY => "301",
+            RPL_UNAWAY => "305",
+            RPL_NOWAWAY => "306",
+            RPL_WHOISUSER => "311",
+            RPL_WHOISSERVER => "312",
+            RPL_WHOISOPERATOR => "313",
+            RPL_WHOISIDLE => "317",
+            RPL_ENDOFWHOIS => "318",
+            RPL_WHOISCHANNELS => "319",
+            RPL_WHOWASUSER => "314",
+            RPL_ENDOFWHOWAS => "369",
+            RPL_LISTSTART => "321",
+            RPL_LIST => "322",
+            RPL_LISTEND => "323",
+            RPL_UNIQOPIS => "325",
+            RPL_CHANNELMODEIS => "324",
+            RPL_NOTOPIC => "331",
+            RPL_TOPIC => "332",
+            RPL_INVITING => "341",
+            RPL_SUMMONING => "342",
+            RPL_INVITELIST => "346",
+            RPL_ENDOFINVITELIST => "347",
+            RPL_EXCEPTLIST => "348",
+            RPL_ENDOFEXCEPTLIST => "349",
+            RPL_VERSION => "351",
+            RPL_WHOREPLY => "352",
+            RPL_ENDOFWHO => "315",
+            RPL_NAMREPLY => "353",
+            RPL_ENDOFNAMES => "366",
+            RPL_LINKS => "364",
+            RPL_ENDOFLINKS => "365",
+            RPL_BANLIST => "367",
+            RPL_ENDOFBANLIST => "368",
+            RPL_INFO => "371",
+            RPL_ENDOFINFO => "374",
+            RPL_MOTDSTART => "375",
+            RPL_MOTD => "372",
+            RPL_ENDOFMOTD => "376",
+            RPL_YOUREOPER => "381",
+            RPL_REHASHING => "382",
+            RPL_YOURESERVICE => "383",
+            RPL_TIME => "391",
+            RPL_USERSSTART => "392",
+            RPL_USERS => "393",
+            RPL_ENDOFUSERS => "394",
+            RPL_NOUSERS => "395",
+            RPL_TRACELINK => "200",
+            RPL_TRACECONNECTING => "201",
+            RPL_TRACEHANDSHAKE => "202",
+            RPL_TRACEUNKNOWN => "203",
+            RPL_TRACEOPERATOR => "204",
+            RPL_TRACEUSER => "205",
+            RPL_TRACESERVER => "206",
+            RPL_TRACESERVICE => "207",
+            RPL_TRACENEWTYPE => "208",
+            RPL_TRACECLASS => "209",
+            RPL_TRACERECONNECT => "210",
+            RPL_TRACELOG => "261",
+            RPL_TRACEEND => "262",
+            RPL_STATSLINKINFO => "211",
+            RPL_STATSCOMMAND => "212",
+            RPL_ENDOFSTATS => "219",
+            RPL_STATSUPTIME => "242",
+            RPL_STATSOLINE => "243",
+            RPL_UMODEIS => "221",
+            RPL_SERVLIST => "234",
+            RPL_SERVLISTEND => "235",
+            RPL_LUSERCLIENT => "251",
+            RPL_LUSEROP => "252",
+            RPL_LUSERUNKNOWN => "253",
+            RPL_LUSERCHANNELS => "254",
+            RPL_LUSERME => "255",
+            RPL_ADMINME => "256",
+            RPL_ADMINLOC1 => "257",
+            RPL_ADMINLOC2 => "258",
+            RPL_ADMINEMAIL => "259",
+            RPL_TRYAGAIN => "263",
+
+            ERR_NOSUCHNICK => "401",
+            ERR_NOSUCHSERVER => "402",
+            ERR_NOSUCHCHANNEL => "403",
+            ERR_CANNOTSENDTOCHAN => "404",
+            ERR_TOOMANYCHANNELS => "405",
+            ERR_WASNOSUCHNICK => "406",
+            ERR_TOOMANYTARGETS => "407",
+            ERR_NOSUCHSERVICE => "408",
+            ERR_NOORIGIN => "409",
+            ERR_NORECIPIENT => "411",
+            ERR_NOTEXTTOSEND => "412",
+            ERR_NOTOPLEVEL => "413",
+            ERR_WILDTOPLEVEL => "414",
+            ERR_BADMASK => "415",
+            ERR_UNKNOWNCOMMAND => "421",
+            ERR_NOMOTD => "422",
+            ERR_NOADMININFO => "423",
+            ERR_FILEERROR => "424",
+            ERR_NONICKNAMEGIVEN => "431",
+            ERR_ERRONEUSNICKNAME => "432",
+            ERR_NICKNAMEINUSE => "433",
+            ERR_NICKCOLLISION => "436",
+            ERR_UNAVAILRESOURCE => "437",
+            ERR_USERNOTINCHANNEL => "441",
+            ERR_NOTONCHANNEL => "442",
+            ERR_USERONCHANNEL => "443",
+            ERR_NOLOGIN => "444",
+            ERR_SUMMONDISABLED => "445",
+            ERR_USERSDISABLED => "446",
+            ERR_NOTREGISTERED => "451",
+            ERR_NEEDMOREPARAMS => "461",
+            ERR_ALREADYREGISTERED => "462",
+            ERR_NOPERMFORHOST => "463",
+            ERR_PASSWDMISMATCH => "464",
+            ERR_YOUREBANNEDCREEP => "465",
+            ERR_YOUWILLBEBANNED => "466",
+            ERR_KEYSET => "467",
+            ERR_CHANNELISFULL => "471",
+            ERR_UNKNOWNMODE => "472",
+            ERR_INVITEONLYCHAN => "473",
+            ERR_BANNEDFROMCHAN => "474",
+            ERR_BADCHANNELKEY => "475",
+            ERR_BADCHANMASK => "476",
+            ERR_NOCHANMODES => "477",
+            ERR_BANLISTFULL => "478",
+            ERR_NOPRIVILEGES => "481",
+            ERR_CHANOPRIVSNEEDED => "482",
+            ERR_CANTKILLSERVER => "483",
+            ERR_RESTRICTED => "484",
+            ERR_UNIQOPPRIVSNEEDED => "485",
+            ERR_NOOPERHOST => "491",
+            ERR_UMODEUNKNOWNFLAG => "501",
+        }.to_owned()
+    }
+}*/
+
+
+/*
+impl FromStr for Command {
+    fn from_str(s: &str) -> Option<Command> {
+        use self::Command::*;
+        match s {
+            "PASS" => Some(PASS),
+            "NICK" => Some(NICK),
+            "USER" => Some(USER),
+            "OPER" => Some(OPER),
+            "MODE" => Some(MODE),
+            "SERVICE" => Some(SERVICE),
+            "QUIT" => Some(QUIT),
+            "SQUIT" => Some(SQUIT),
+            "JOIN" => Some(JOIN),
+            "PART" => Some(PART),
+            "TOPIC" => Some(TOPIC),
+            "NAMES" => Some(NAMES),
+            "LIST" => Some(LIST),
+            "INVITE" => Some(INVITE),
+            "KICK" => Some(KICK),
+            "PRIVMSG" => Some(PRIVMSG),
+            "NOTICE" => Some(NOTICE),
+            "MOTD" => Some(MOTD),
+            "LUSERS" => Some(LUSERS),
+            "VERSION" => Some(VERSION),
+            "STATS" => Some(STATS),
+            "LINKS" => Some(LINKS),
+            "TIME" => Some(TIME),
+            "CONNECT" => Some(CONNECT),
+            "TRACE" => Some(TRACE),
+            "ADMIN" => Some(ADMIN),
+            "INFO" => Some(INFO),
+            "SERVLIST" => Some(SERVLIST),
+            "SQUERY" => Some(SQUERY),
+            "WHO" => Some(WHO),
+            "WHOIS" => Some(WHOIS),
+            "WHOWAS" => Some(WHOWAS),
+            "KILL" => Some(KILL),
+            "PING" => Some(PING),
+            "PONG" => Some(PONG),
+            "ERROR" => Some(ERROR),
+            "AWAY" => Some(AWAY),
+            "REHASH" => Some(REHASH),
+            "DIE" => Some(DIE),
+            "RESTART" => Some(RESTART),
+            "SUMMON" => Some(SUMMON),
+            "USERS" => Some(USERS),
+            "WALLOPS" => Some(WALLOPS),
+            "USERHOST" => Some(USERHOST),
+            "ISON" => Some(ISON),
+            _ => None
+        }
+    }
+}*/
+
+/// If you hoped it couldn't get any uglier... I'm sorry, it does.
+/// Why a giant match? API.
+///
+/// I tried structuring it as a bunch of structs that impl a `Command` trait,
+/// but the user would have to use Any and lots of cats. Also, extensibility isn't
+/// really a goal; the IRC protocol doesn't seem to evolve very fast.
+///
+/// Granted, I *could* have used a phf-map to map to functions to parse this, which
+/// - while more readable - shouldn't have resulted in performance gains.
+///
+/// Please don't cry.
+
+impl<'a> Command<'a> {
+    pub fn from_message(msg: &'a Message) -> Option<Command<'a>> {
+        match &msg.command {
+            "NOTICE" => msg.content.get(0).and_then(|c| msg.content.get(1).map(|t|
+                Command::Notice { to: Cow::Borrowed(&t), content: Cow::Borrowed(&c) })),
+            "PING" => msg.content.get(0).and_then(|s1| msg.content.get(1).map(|s2|
+                Command::Ping { server1: Some(Cow::Borrowed(&s1)), server2: Some(Cow::Borrowed(&s2)) })),
+            "451" => Some(Command::ErrNotRegistered),
+            _ => unimplemented!()
+        }
+    }
+    pub fn to_message(&'a self) -> Message {
+        match self {
+            &Command::Ping { ref server1, ref server2 } => {
+                let mut c = Vec::new();
+                if let &Some(ref s) = server1 { c.push(s.clone()) }
+                if let &Some(ref s) = server2 { c.push(s.clone()) }
+                Message::new(None, Cow::Owned("PING".to_owned()), c, None, MsgType::Irc)
+            },
+            &Command::Pong { ref server1, ref server2 } => {
+                let mut c = Vec::new();
+                if let &Some(ref s) = server1 { c.push(s.clone()) }
+                if let &Some(ref s) = server2 { c.push(s.clone()) }
+                Message::new(None, Cow::Owned("PONG".to_owned()), c, None, MsgType::Irc)
+            },
+            _ => unimplemented!()
+        }
+    }
+
+    //pub fn is_reply(&self) -> bool { let i = *self as uint; i >= 200 && i <= 399 }
+    //pub fn is_error(&self) -> bool { let i = *self as uint; i >= 400 && i <= 599 }
 }
 
-pub fn join(v: Vec<String>, from: uint) -> String {
+pub fn join(v: Vec<String>, from: usize) -> String {
     let mut msg = if v[from].chars().next().unwrap() == ':' {
-        v[from][][1..].to_owned()
+        v[from][1..].to_owned()
     } else { v[from].clone() };
     for m in v.iter().skip(from + 1) {
         msg.push_str(" ");
@@ -809,3 +1172,36 @@ impl ParseResult for PrivMsg {
         }
     }
 }*/
+
+#[cfg(test)]
+mod test {
+    use std::borrow::{ Cow, ToOwned };
+    use message::{ Message, MsgType };
+
+    #[test]
+    fn parse_message() {
+        let a = ":a.b.c NOTICE AUTH :*** Looking up your hostname...";
+        // I'm not even kidding...
+        let a2 = Message::new(
+            Some(Cow::Owned("a.b.c".to_owned())),
+            Cow::Owned("NOTICE".to_owned()),
+            vec![Cow::Owned("AUTH".to_owned())],
+            Some(Cow::Owned("*** Looking up your hostname...".to_owned())),
+            MsgType::Irc
+        );
+        assert_eq!(a.parse(), Some(a2.clone()));
+        assert_eq!(a2.to_string(), a);
+
+        let b = ":d PRIVMSG You :\u{1}ACTION sends you funny pictures of cats!\u{1}";
+        let b2 = Message::new(
+            Some(Cow::Owned("d".to_owned())),
+            Cow::Owned("PRIVMSG".to_owned()),
+            vec![Cow::Owned("You".to_owned())],
+            Some(Cow::Owned("\u{1}ACTION sends you funny pictures of cats!\u{1}".to_owned())),
+            MsgType::Ctcp
+        );
+        assert_eq!(b.parse(), Some(b2.clone()));
+        assert_eq!(b2.to_string(), b);
+    }
+
+}
