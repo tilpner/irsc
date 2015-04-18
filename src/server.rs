@@ -2,7 +2,7 @@ use std::io::{
     self,
     Write,
     Read,
-//    BufRead,
+    BufRead,
     BufReader,
 };
 
@@ -154,7 +154,7 @@ impl Server {
             None => return Err(::IrscError::NotConnected)
         });
 
-        /*for line in reader.lines() {
+        for line in reader.lines() {
             let line = line.unwrap().parse();
 
             if let Ok(msg) = line {
@@ -164,7 +164,7 @@ impl Server {
                     e(self, &msg)
                 }
             }
-        }*/
+        }
         Ok(())
     }
 }

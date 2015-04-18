@@ -1189,7 +1189,7 @@ mod test {
             Some(Cow::Owned("*** Looking up your hostname...".to_owned())),
             MsgType::Irc
         );
-        assert_eq!(a.parse(), Some(a2.clone()));
+        assert_eq!(a.parse::<Message>().unwrap(), a2.clone());
         assert_eq!(a2.to_string(), a);
 
         let b = ":d PRIVMSG You :\u{1}ACTION sends you funny pictures of cats!\u{1}";
@@ -1200,7 +1200,7 @@ mod test {
             Some(Cow::Owned("\u{1}ACTION sends you funny pictures of cats!\u{1}".to_owned())),
             MsgType::Ctcp
         );
-        assert_eq!(b.parse(), Some(b2.clone()));
+        assert_eq!(b.parse::<Message>().unwrap(), b2.clone());
         assert_eq!(b2.to_string(), b);
     }
 

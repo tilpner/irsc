@@ -1,5 +1,4 @@
-#![allow(unstable)]
-#![feature(plugin, slicing_syntax)]
+#![feature(plugin)]
 #![plugin(regex_macros)]
 
 extern crate irsc;
@@ -10,7 +9,6 @@ use std::sync::{Once, ONCE_INIT};
 
 use irsc::server::Server;
 use irsc::color::bold;
-use irsc::message;
 use irsc::message::{ Message, Command };
 
 static NAME: &'static str = "rusticbot";
@@ -30,8 +28,6 @@ fn callback(server: &mut Server, msg: &Message) {
     /*
         "001" => {
             START.call_once(|| {
-                server.msg("Nalfon", "Hey, I'm poking you! *pokes you*").unwrap();
-                //server.msg("Xasin", "Hey, I'm poking you! *pokes you*").unwrap();
             })
         },
         _ => ()
@@ -40,7 +36,7 @@ fn callback(server: &mut Server, msg: &Message) {
 
 fn main() {
     let mut s = Server::new();
-    s.connect("irc.furnet.org".to_owned(), 6667).unwrap();
+    s.connect("irc.mozilla.org".to_owned(), 6667).unwrap();
     s.nick(NAME).unwrap();
     s.user(NAME, "*", "*", DESC).unwrap();
     s.join("#botzoo").unwrap();
