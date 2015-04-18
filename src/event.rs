@@ -2,7 +2,7 @@ use ident::Ident;
 
 use std::borrow::ToOwned;
 
-#[deriving(Clone)]
+#[derive(Clone)]
 pub struct Event {
     pub prefix: String,
     pub command: String,
@@ -17,9 +17,9 @@ pub const PING: &'static str = "PING";
 
 pub const PRIVMSG: &'static str = "PRIVMSG";
 
-fn join(v: Vec<String>, from: uint) -> String {
+fn join(v: Vec<String>, from: usize) -> String {
     let mut msg = if v[from].chars().next().unwrap() == ':' {
-        v[from][][1..].to_owned()
+        v[from][1..].to_owned()
     } else { v[from].clone() };
     for m in v.iter().skip(from + 1) {
         msg.push_str(" ");
@@ -36,7 +36,7 @@ pub struct PrivMsg {
 
 impl ParseResult for PrivMsg {
     fn parse(event: Event) -> Option<PrivMsg> {
-        let from = Ident::parse(event.prefix[]);
+        let from = Ident::parse(&event.prefix);
         let to = event.content[0].clone();
         match from {
             Some(from) => Some(PrivMsg {

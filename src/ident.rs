@@ -3,7 +3,7 @@ use std::borrow::ToOwned;
 
 static PATTERN: Regex = regex!(":(.*)!(.*)@(.*)");
 
-#[deriving(Show, Clone)]
+#[derive(Debug, Clone)]
 pub struct Ident {
     pub nickname: String,
     pub user: String,
