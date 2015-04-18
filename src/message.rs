@@ -1203,5 +1203,4 @@ mod test {
         assert_eq!(b.parse::<Message>().unwrap(), b2.clone());
         assert_eq!(b2.to_string(), b);
     }
-
 }

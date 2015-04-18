@@ -1,13 +1,13 @@
-irsc
+# irsc
+
 [![travis-ci.org](https://travis-ci.org/tilpner/irsc.svg?branch=master)](https://travis-ci.org/tilpner/irsc)
 [![crates.io](http://meritbadge.herokuapp.com/irsc)](https://crates.io/crates/irsc)
-=========
 
 *This repository contains code that has not been properly tested yet, continue
 at the risk of doing stupid things while discovering parts of this library
 don't work.*
 
-## Introduction
+## Overview
 
 Want to build an IRC bot with low resource consumption? You might want to have a look at this library (maybe later, though).
 
