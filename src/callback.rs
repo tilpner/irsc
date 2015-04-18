@@ -1,15 +1,15 @@
-pub struct Callback<A: Sized + Send> {
-    items: Vec<fn(A)>
+pub struct Callback<A: Sized> {
+    items: Vec<fn(&mut A)>
 }
 
-impl<A: Sized + Clone + Send> Callback<A> {
+impl<A: Sized> Callback<A> {
     pub fn new() -> Callback<A> {
         Callback { items: Vec::new() }
     }
-    pub fn register(&mut self, f: &fn(A)) {
-        self.items.push(*f)
+    pub fn register(&mut self, f: fn(&mut A)) {
+        self.items.push(f)
     }
-    pub fn fire(&self, v: &A) {
-        for _ in self.items.iter().map(|&c| c(v.clone())) {}
+    pub fn fire(&self, v: &mut A) {
+        for _ in self.items.iter().map(|&c| c(v)) {}
     }
 }

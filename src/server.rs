@@ -1,139 +1,170 @@
 use std::io::{
-    BufferedReader,
-    TcpStream,
-    IoError
+    self,
+    Write,
+    Read,
+    BufRead,
+    BufReader,
 };
 
-use std::sync::Arc;
-use std::sync::Mutex;
+use std::net::TcpStream;
 
-use std::borrow::ToOwned;
+use message;
+use message::{ Command, Message };
 
-use callback::Callback;
-use event;
-use event::Event;
+#[cfg(feature = "ssl")]
+use openssl::ssl::{ SslContext, SslMethod, SslStream };
 
-#[deriving(Show, PartialEq, Eq, Clone)]
-pub enum Failure {
-    AlreadyConnected,
-    NotConnected,
-    Io(IoError)
+/// Yes, I don't like the name either, but it's private, so...
+enum StreamKind {
+    Plain(TcpStream),
+    #[cfg(feature = "ssl")]
+    Ssl(SslStream)
 }
 
-#[deriving(Clone)]
+impl Write for StreamKind {
+    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
+        match *self {
+            StreamKind::Plain(ref mut s) => s.write(buf),
+            #[cfg(feature = "ssl")]
+            StreamKind::Ssl(ref mut s) => s.write(buf)
+        }
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        match *self {
+            StreamKind::Plain(ref mut s) => s.flush(),
+            #[cfg(feature = "ssl")]
+            StreamKind::Ssl(ref mut s) => s.flush()
+        }
+    }
+}
+
+impl Read for StreamKind {
+    fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
+        match *self {
+            StreamKind::Plain(ref mut s) => s.read(buf),
+            #[cfg(feature = "ssl")]
+            StreamKind::Ssl(ref mut s) => s.read(buf)
+        }
+    }
+}
+
 pub struct Server {
-    stream: Arc<Mutex<Option<TcpStream>>>,
-    pub events: Arc<Mutex<Callback<(Server, Event)>>>,
+    stream: Option<StreamKind>,
 }
 
 impl Server {
     pub fn new() -> Server {
         Server {
-            stream: Arc::new(Mutex::new(None)),
-            events: {
-                let mut c = Callback::new();
-                c.register(&(Server::handle_event as fn((Server,Event))));
-                Arc::new(Mutex::new(c))
-            }
+            stream: None
         }
     }
 
-    fn handle_event(arg: (Server, Event)) {
-        let (mut server, event) = arg;
-        match event.command[] {
-            event::PING => {
-                server.sendraw(format!("PONG {}", event.content).as_slice(), true).unwrap();
-            }
-            _ => ()
+    fn handle_event(&mut self, msg: &message::Message) {
+        if *msg.command == "PING" {
+            let _ = self.send(Command::Pong { server1: msg.suffix.clone(), server2: None }.to_message());
         }
     }
 
-    pub fn connect(&mut self, host: String, port: u16) -> Result<(), Failure> {
-        let mut s = self.stream.lock();
-        match *s { Some(_) => return Err(Failure::AlreadyConnected), _ => () };
-        *s = match TcpStream::connect((host.as_slice(), port)) {
-            Ok(tcp) => Some(tcp),
-            Err(e) => return Err(Failure::Io(e))
+    pub fn connect(&mut self, host: String, port: u16) -> ::Result<()> {
+        let s = &mut self.stream;
+        match *s { Some(_) => return Err(::IrscError::AlreadyConnected), _ => () };
+        *s = match TcpStream::connect((host.as_ref(), port)) {
+            Ok(tcp) => Some(StreamKind::Plain(tcp)),
+            Err(e) => return Err(::IrscError::Io(e))
         };
 
         Ok(())
     }
 
+    #[cfg(feature = "ssl")]
+    pub fn connect_ssl(&mut self, host: String, port: u16) -> ::Result<()> {
+        let mut s = self.stream.lock();
+        match *s { Some(_) => return Err(::IrscError::AlreadyConnected), _ => () };
+        let tcp_stream = match TcpStream::connect((host.as_ref(), port)) {
+            Ok(tcp) => Some(tcp),
+            Err(e) => return Err(::IrscError::Io(e))
+        };
+
+        let ssl = SslContext::new(SslMethod::Tlsv1);
+        let ssl_stream = SslStream::new(&ssl, tcp_stream);
+        *s = ssl_stream;
+
+        Ok(())
+    }
+
     #[inline]
-    fn sendraw(&mut self, s: &str, newline: bool) -> Result<(), Failure> {
-        info!("OUT: {}", s);
-        let mut locked_stream = self.stream.lock();
-        if locked_stream.is_some() {
-            locked_stream.as_mut().map(|stream| {
-                match stream.write_str(s) {
-                    Ok(_) => match { if newline { stream.write_str("\r\n") } else { Ok(()) } } {
-                        Ok(_) =>  match stream.flush() {
-                            Ok(_) => Ok(()),
-                            Err(e) => return Err(Failure::Io(e))
+    fn sendraw(&mut self, s: &str, newline: bool) -> ::Result<usize> {
+        info!(">> {}", s);
+        if ::DEBUG && s.len() > 510 {
+            panic!("Message too long, kitties will die if this runs in release mode. Msg: {}", s)
+        }
+        let stream = &mut self.stream;
+        if stream.is_some() {
+            stream.as_mut().map(|stream| {
+                match stream.write(s.as_bytes()) {
+                    Ok(a) => match { if newline { stream.write(b"\r\n").map(|s| s + a) } else { Ok(a) } } {
+                        Ok(b) =>  match stream.flush() {
+                            Ok(_) => Ok(b),
+                            Err(e) => return Err(::IrscError::Io(e))
                         },
-                        Err(e) => return Err(Failure::Io(e))
+                        Err(e) => return Err(::IrscError::Io(e))
                     },
-                    Err(e) => return Err(Failure::Io(e))
+                    Err(e) => return Err(::IrscError::Io(e))
                 }
             }).unwrap()
         } else {
-            Err(Failure::NotConnected)
+            Err(::IrscError::NotConnected)
         }
     }
 
-    pub fn join(&mut self, channel: &str) -> Result<(), Failure> {
-        self.sendraw(format!("JOIN {}", channel).as_slice(), true)
+    pub fn send(&mut self, msg: message::Message) -> ::Result<usize> {
+        self.sendraw(&msg.to_string(), true)
     }
 
-    pub fn nick(&mut self, nick: &str) -> Result<(), Failure> {
-        self.sendraw(format!("NICK {}", nick).as_slice(), true)
+    pub fn join(&mut self, channel: &str) -> ::Result<usize> {
+        self.sendraw(format!("JOIN {}", channel).as_ref(), true)
     }
 
-    pub fn user(&mut self, username: &str, hostname: &str, servername: &str, realname: &str) -> Result<(), Failure> {
-        self.sendraw(format!("USER {} {} {} :{}", username, hostname, servername, realname).as_slice(), true)
+    pub fn part(&mut self, channel: &str) -> ::Result<usize> {
+        self.sendraw(format!("PART {}", channel).as_ref(), true)
     }
 
-    pub fn password(&mut self, password: &str) -> Result<(), Failure> {
-        self.sendraw(format!("PASS {}", password).as_slice(), true)
+    pub fn nick(&mut self, nick: &str) -> ::Result<usize> {
+        self.sendraw(format!("NICK {}", nick).as_ref(), true)
     }
 
-    pub fn msg(&mut self, target: &str, message: &str) -> Result<(), Failure> {
-        self.sendraw(format!("PRIVMSG {} :{}", target, message).as_slice(), true)
+    pub fn user(&mut self, username: &str, hostname: &str, servername: &str, realname: &str) -> ::Result<usize> {
+        self.sendraw(format!("USER {} {} {} :{}", username, hostname, servername, realname).as_ref(), true)
     }
 
-    pub fn listen(&mut self) -> Result<(), Failure> {
-        let stream = {
-            let lock = self.stream.lock();
-            match *lock {
-                Some(ref s) => s.clone(),
-                None => return Err(Failure::NotConnected)
+    pub fn password(&mut self, password: &str) -> ::Result<usize> {
+        self.sendraw(format!("PASS {}", password).as_ref(), true)
+    }
+
+    pub fn msg(&mut self, target: &str, message: &str) -> ::Result<usize> {
+        self.sendraw(format!("PRIVMSG {} :{}", target, message).as_ref(), true)
+    }
+
+    pub fn listen(&mut self, events: &[fn(&mut Server, &Message)]) -> ::Result<()> {
+        let mut reader = BufReader::new(match self.stream {
+            Some(StreamKind::Plain(ref s)) => (*s).try_clone().unwrap(),
+            #[cfg(feature = "ssl")]
+            Some(StreamKind::Ssl(ref s)) => (*s).try_clone().unwrap(),
+            None => return Err(::IrscError::NotConnected)
+        });
+
+        for line in reader.lines() {
+            let line = line.unwrap().parse();
+
+            if let Ok(msg) = line {
+                println!("{:?}", msg);
+                self.handle_event(&msg);
+                for e in events.iter() {
+                    e(self, &msg)
+                }
             }
-        };
-
-        let mut reader = BufferedReader::new(stream);
-        loop {
-            let line = reader.read_line().unwrap();
-            let mut parts = line.as_slice().split(' ').collect::<Vec<&str>>();
-
-            info!("IN: {}", line);
-
-            if parts.len() == 0 {
-                continue;
-            }
-
-            // if message has a prefix
-            let prefix = if parts[0].chars().next().unwrap() == ':' {
-                parts.remove(0).unwrap()
-            } else { "" };
-
-            let cmd = parts.remove(0).unwrap();
-            let event = Event {
-                prefix: prefix.to_owned(),
-                command: cmd.to_owned(),
-                content: parts.into_iter().map(|s| s.to_owned()).collect()
-            };
-
-            self.events.lock().fire(&(self.clone(), event));
         }
+        Ok(())
     }
 }

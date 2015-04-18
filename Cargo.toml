@@ -1,9 +1,22 @@
 [package]
 
 name = "irsc"
-version = "0.0.3"
-authors = ["Till Hoeppner <hoeppner.till@gmail.com>"]
+version = "0.1.0"
+authors = ["Till Hoeppner <till@hoeppner.ws>"]
 description = "A lightweight library for building IRC bots."
-repository = "https://github.com/hoeppnertill/irsc"
+repository = "https://github.com/tilpner/irsc"
 keywords = ["irc", "internet", "protocol"]
-license = "WTFPL"
+license = "MIT"
+
+[dependencies]
+log = "*"
+regex = "*"
+regex_macros = "*"
+eventual = "*"
+
+[features]
+ssl = ["openssl"]
+
+[dependencies.openssl]
+version = "*"
+optional = true

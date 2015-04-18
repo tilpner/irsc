@@ -1,38 +1,46 @@
-#![feature(globs, slicing_syntax)]
+#![feature(plugin)]
+#![plugin(regex_macros)]
 
 extern crate irsc;
 
+use std::borrow::ToOwned;
+
+use std::sync::{Once, ONCE_INIT};
+
 use irsc::server::Server;
 use irsc::color::bold;
-use irsc::event;
-use irsc::event::{ Event, ParseResult, PrivMsg };
+use irsc::message::{ Message, Command };
 
 static NAME: &'static str = "rusticbot";
 static DESC: &'static str = "A bot, written in Rust.";
 
-fn callback(arg: (Server, Event)) {
-    let (mut server, event) = arg;
-    match event.command[] {
-        event::PRIVMSG => {
-            let privmsg: PrivMsg = ParseResult::parse(event).unwrap();
-            let response = format!("You wrote: {}", bold(privmsg.content[]));
-            server.msg(privmsg.from.nickname[], response[]).unwrap();
+static START: Once = ONCE_INIT;
+
+fn callback(server: &mut Server, msg: &Message) {
+    match Command::from_message(msg) {
+        Some(Command::PrivMsg { from, content, .. }) => {
+            let response = format!("You wrote: {}", bold(&content));
+            server.msg(&from.unwrap(), &response).unwrap();
+        },
+        _ => {}
+    }
+
+    /*
+        "001" => {
+            START.call_once(|| {
+            })
         },
         _ => ()
-    }
+    }*/
 }
 
 fn main() {
     let mut s = Server::new();
-    s.connect("irc.freenode.org".into_string(), 6667).unwrap();
+    s.connect("irc.mozilla.org".to_owned(), 6667).unwrap();
     s.nick(NAME).unwrap();
     s.user(NAME, "*", "*", DESC).unwrap();
     s.join("#botzoo").unwrap();
 
-    s.msg("flan3002", "Hey, I'm your example bot!").unwrap();
-
-    s.events.lock().register(&(callback as fn((Server,Event))));
-
     // Dedicate this thread to listening and event processing
-    s.listen().unwrap();
+    s.listen(&[callback]).unwrap();
 }
