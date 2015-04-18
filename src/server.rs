@@ -2,7 +2,7 @@ use std::io::{
     self,
     Write,
     Read,
-    BufRead,
+//    BufRead,
     BufReader,
 };
 
@@ -69,7 +69,7 @@ impl Server {
     pub fn connect(&mut self, host: String, port: u16) -> ::Result<()> {
         let s = &mut self.stream;
         match *s { Some(_) => return Err(::IrscError::AlreadyConnected), _ => () };
-        *s = match TcpStream::connect((host.as_slice(), port)) {
+        *s = match TcpStream::connect((host.as_ref(), port)) {
             Ok(tcp) => Some(StreamKind::Plain(tcp)),
             Err(e) => return Err(::IrscError::Io(e))
         };
@@ -81,7 +81,7 @@ impl Server {
     pub fn connect_ssl(&mut self, host: String, port: u16) -> ::Result<()> {
         let mut s = self.stream.lock();
         match *s { Some(_) => return Err(::IrscError::AlreadyConnected), _ => () };
-        let tcp_stream = match TcpStream::connect((host.as_slice(), port)) {
+        let tcp_stream = match TcpStream::connect((host.as_ref(), port)) {
             Ok(tcp) => Some(tcp),
             Err(e) => return Err(::IrscError::Io(e))
         };
@@ -123,27 +123,27 @@ impl Server {
     }
 
     pub fn join(&mut self, channel: &str) -> ::Result<usize> {
-        self.sendraw(format!("JOIN {}", channel).as_slice(), true)
+        self.sendraw(format!("JOIN {}", channel).as_ref(), true)
     }
 
     pub fn part(&mut self, channel: &str) -> ::Result<usize> {
-        self.sendraw(format!("PART {}", channel).as_slice(), true)
+        self.sendraw(format!("PART {}", channel).as_ref(), true)
     }
 
     pub fn nick(&mut self, nick: &str) -> ::Result<usize> {
-        self.sendraw(format!("NICK {}", nick).as_slice(), true)
+        self.sendraw(format!("NICK {}", nick).as_ref(), true)
     }
 
     pub fn user(&mut self, username: &str, hostname: &str, servername: &str, realname: &str) -> ::Result<usize> {
-        self.sendraw(format!("USER {} {} {} :{}", username, hostname, servername, realname).as_slice(), true)
+        self.sendraw(format!("USER {} {} {} :{}", username, hostname, servername, realname).as_ref(), true)
     }
 
     pub fn password(&mut self, password: &str) -> ::Result<usize> {
-        self.sendraw(format!("PASS {}", password).as_slice(), true)
+        self.sendraw(format!("PASS {}", password).as_ref(), true)
     }
 
     pub fn msg(&mut self, target: &str, message: &str) -> ::Result<usize> {
-        self.sendraw(format!("PRIVMSG {} :{}", target, message).as_slice(), true)
+        self.sendraw(format!("PRIVMSG {} :{}", target, message).as_ref(), true)
     }
 
     pub fn listen(&mut self, events: &[fn(&mut Server, &Message)]) -> ::Result<()> {

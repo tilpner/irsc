@@ -1,12 +1,9 @@
-#![feature(plugin, slicing_syntax, unboxed_closures)]
-#![allow(unstable)]
-
+#![feature(plugin, collections)]
 #![plugin(regex_macros)]
-extern crate regex;
 
+extern crate regex;
 #[macro_use]
 extern crate log;
-
 extern crate eventual;
 
 pub mod server;

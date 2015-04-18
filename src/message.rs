@@ -2,7 +2,7 @@
 
 use std::str::FromStr;
 use std::string::{ ToString };
-use std::borrow::{ Cow, ToOwned };
+use std::borrow::{ Cow, Borrow, ToOwned };
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MsgType {
@@ -41,9 +41,9 @@ impl<'a> FromStr for Message<'a> {
         let len = i.len();
         let mut s = i;
 
-        let msg_type = if s.char_at(0) == '\u{1}' { MsgType::Ctcp } else { MsgType::Irc };
+        let msg_type = if s.chars().next() == Some('\u{1}') { MsgType::Ctcp } else { MsgType::Irc };
 
-        let prefix = if len >= 1 && s.char_at(0) == ':' {
+        let prefix = if len >= 1 && s.chars().next() == Some(':') {
             s.find(' ').map(|i| {
                 let p = s.slice_chars(1, i).to_owned();
                 s = &s[i + 1..];
@@ -55,14 +55,14 @@ impl<'a> FromStr for Message<'a> {
             let p = s.slice_chars(0, i).to_owned();
             s = &s[i..];
             p
-        }).map(|c| c.parse()).map(|c| Some(Cow::Owned(c)));
+        }).map(|c| c.parse()).map(|c| Some(Cow::Owned(c.unwrap())));
 
         // TODO: Parse last non-suffix argument as suffix if no suffix
         // with colon is available.
         let mut content = Vec::with_capacity(15);
         let mut suffix = None;
         while s.len() > 0 {
-            if s.char_at(0) == ':' {
+            if s.chars().next() == Some(':') {
                 suffix = Some(s[1..].to_owned());
                 break
             }
@@ -72,17 +72,17 @@ impl<'a> FromStr for Message<'a> {
                     s = &s[i..];
                 }
             });
-            if s.char_at(0) == ' ' { s = &s[1..] };
+            if s.chars().next() == Some(' ') { s = &s[1..] };
         }
 
-        command.and_then(move |Ok(c)|
+        command.map(move |c|
             Ok(Message::new(prefix.map(|p| Cow::Owned(p)),
-                c,
+                c.unwrap(),
                 content,
                 suffix.map(|s| Cow::Owned(s)),
                 msg_type
             ))
-        )
+        ).unwrap()
 
     }
 }
@@ -1110,7 +1110,7 @@ impl FromStr for Command {
 
 impl<'a> Command<'a> {
     pub fn from_message(msg: &'a Message) -> Option<Command<'a>> {
-        match &msg.command {
+        match &msg.command.as_ref()[..] {
             "NOTICE" => msg.content.get(0).and_then(|c| msg.content.get(1).map(|t|
                 Command::Notice { to: Cow::Borrowed(&t), content: Cow::Borrowed(&c) })),
             "PING" => msg.content.get(0).and_then(|s1| msg.content.get(1).map(|s2|
