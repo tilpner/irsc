@@ -41,8 +41,6 @@ impl<'a> FromStr for Message<'a> {
         let len = i.len();
         let mut s = i;
 
-        let msg_type = if s.chars().next() == Some('\u{1}') { MsgType::Ctcp } else { MsgType::Irc };
-
         let prefix = if len >= 1 && s.chars().next() == Some(':') {
             s.find(' ').map(|i| {
                 let p = s.slice_chars(1, i).to_owned();
@@ -74,6 +72,9 @@ impl<'a> FromStr for Message<'a> {
             });
             if s.chars().next() == Some(' ') { s = &s[1..] };
         }
+
+        let msg_type = if suffix.as_ref()
+            .and_then(|s| s.chars().next()) == Some('\u{1}') { MsgType::Ctcp } else { MsgType::Irc };
 
         command.map(move |c|
             Ok(Message::new(prefix.map(|p| Cow::Owned(p)),
