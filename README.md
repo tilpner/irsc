@@ -1,4 +1,6 @@
-irsc [![Build Status](https://travis-ci.org/hoeppnertill/irsc.svg)](https://travis-ci.org/hoeppnertill/irsc)
+irsc
+[![travis-ci.org](https://travis-ci.org/tilpner/irsc.svg?branch=master)](https://travis-ci.org/tilpner/irsc)
+[![crates.io](http://meritbadge.herokuapp.com/irsc)](https://crates.io/crates/irsc)
 =========
 
 *This repository contains code that has not been properly tested yet, continue
