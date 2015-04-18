@@ -5,7 +5,7 @@ extern crate irsc;
 
 use std::borrow::ToOwned;
 
-use std::sync::{Once, ONCE_INIT};
+// use std::sync::{Once, ONCE_INIT};
 
 use irsc::server::Server;
 use irsc::color::bold;
@@ -14,7 +14,7 @@ use irsc::message::{ Message, Command };
 static NAME: &'static str = "rusticbot";
 static DESC: &'static str = "A bot, written in Rust.";
 
-static START: Once = ONCE_INIT;
+// static START: Once = ONCE_INIT;
 
 fn callback(server: &mut Server, msg: &Message) {
     match Command::from_message(msg) {
