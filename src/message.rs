@@ -2,7 +2,7 @@
 
 use std::str::FromStr;
 use std::string::{ ToString };
-use std::borrow::{ Cow, Borrow, ToOwned };
+use std::borrow::{ Cow, ToOwned };
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MsgType {

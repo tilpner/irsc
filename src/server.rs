@@ -10,6 +10,8 @@ use std::net::TcpStream;
 
 use message;
 use message::{ Command, Message };
+use ::{ DEBUG, Result, IrscError };
+
 
 #[cfg(feature = "ssl")]
 use openssl::ssl::{ SslContext, SslMethod, SslStream };
@@ -66,24 +68,24 @@ impl Server {
         }
     }
 
-    pub fn connect(&mut self, host: String, port: u16) -> ::Result<()> {
+    pub fn connect(&mut self, host: String, port: u16) -> Result<()> {
         let s = &mut self.stream;
-        match *s { Some(_) => return Err(::IrscError::AlreadyConnected), _ => () };
+        match *s { Some(_) => return Err(IrscError::AlreadyConnected), _ => () };
         *s = match TcpStream::connect((host.as_ref(), port)) {
             Ok(tcp) => Some(StreamKind::Plain(tcp)),
-            Err(e) => return Err(::IrscError::Io(e))
+            Err(e) => return Err(IrscError::Io(e))
         };
 
         Ok(())
     }
 
     #[cfg(feature = "ssl")]
-    pub fn connect_ssl(&mut self, host: String, port: u16) -> ::Result<()> {
+    pub fn connect_ssl(&mut self, host: String, port: u16) -> Result<()> {
         let mut s = self.stream.lock();
-        match *s { Some(_) => return Err(::IrscError::AlreadyConnected), _ => () };
+        match *s { Some(_) => return Err(IrscError::AlreadyConnected), _ => () };
         let tcp_stream = match TcpStream::connect((host.as_ref(), port)) {
             Ok(tcp) => Some(tcp),
-            Err(e) => return Err(::IrscError::Io(e))
+            Err(e) => return Err(IrscError::Io(e))
         };
 
         let ssl = SslContext::new(SslMethod::Tlsv1);
@@ -94,64 +96,53 @@ impl Server {
     }
 
     #[inline]
-    fn sendraw(&mut self, s: &str, newline: bool) -> ::Result<usize> {
+    fn sendraw(&mut self, s: &str) -> Result<()> {
         info!(">> {}", s);
-        if ::DEBUG && s.len() > 510 {
-            panic!("Message too long, kitties will die if this runs in release mode. Msg: {}", s)
+        if DEBUG && s.len() > 512 {
+            panic!("Message too long, kittens will die if this runs in release mode. Msg: {}", s)
         }
-        let stream = &mut self.stream;
-        if stream.is_some() {
-            stream.as_mut().map(|stream| {
-                match stream.write(s.as_bytes()) {
-                    Ok(a) => match { if newline { stream.write(b"\r\n").map(|s| s + a) } else { Ok(a) } } {
-                        Ok(b) =>  match stream.flush() {
-                            Ok(_) => Ok(b),
-                            Err(e) => return Err(::IrscError::Io(e))
-                        },
-                        Err(e) => return Err(::IrscError::Io(e))
-                    },
-                    Err(e) => return Err(::IrscError::Io(e))
-                }
-            }).unwrap()
-        } else {
-            Err(::IrscError::NotConnected)
-        }
+
+        self.stream.as_mut()
+            .ok_or(IrscError::NotConnected)
+            .and_then(|mut stream| stream.write_all(s.as_bytes())
+                                         .and_then(|_| stream.flush())
+                                         .map_err(IrscError::Io))
     }
 
-    pub fn send(&mut self, msg: message::Message) -> ::Result<usize> {
-        self.sendraw(&msg.to_string(), true)
+    pub fn send(&mut self, msg: message::Message) -> Result<()> {
+        self.sendraw(&msg.to_string())
     }
 
-    pub fn join(&mut self, channel: &str) -> ::Result<usize> {
-        self.sendraw(format!("JOIN {}", channel).as_ref(), true)
+    pub fn join(&mut self, channel: &str) -> Result<()> {
+        self.sendraw(format!("JOIN {}", channel).as_ref())
     }
 
-    pub fn part(&mut self, channel: &str) -> ::Result<usize> {
-        self.sendraw(format!("PART {}", channel).as_ref(), true)
+    pub fn part(&mut self, channel: &str) -> Result<()> {
+        self.sendraw(format!("PART {}", channel).as_ref())
     }
 
-    pub fn nick(&mut self, nick: &str) -> ::Result<usize> {
-        self.sendraw(format!("NICK {}", nick).as_ref(), true)
+    pub fn nick(&mut self, nick: &str) -> Result<()> {
+        self.sendraw(format!("NICK {}", nick).as_ref())
     }
 
-    pub fn user(&mut self, username: &str, hostname: &str, servername: &str, realname: &str) -> ::Result<usize> {
-        self.sendraw(format!("USER {} {} {} :{}", username, hostname, servername, realname).as_ref(), true)
+    pub fn user(&mut self, username: &str, hostname: &str, servername: &str, realname: &str) -> Result<()> {
+        self.sendraw(format!("USER {} {} {} :{}", username, hostname, servername, realname).as_ref())
     }
 
-    pub fn password(&mut self, password: &str) -> ::Result<usize> {
-        self.sendraw(format!("PASS {}", password).as_ref(), true)
+    pub fn password(&mut self, password: &str) -> Result<()> {
+        self.sendraw(format!("PASS {}", password).as_ref())
     }
 
-    pub fn msg(&mut self, target: &str, message: &str) -> ::Result<usize> {
-        self.sendraw(format!("PRIVMSG {} :{}", target, message).as_ref(), true)
+    pub fn msg(&mut self, target: &str, message: &str) -> Result<()> {
+        self.sendraw(format!("PRIVMSG {} :{}", target, message).as_ref())
     }
 
-    pub fn listen(&mut self, events: &[fn(&mut Server, &Message)]) -> ::Result<()> {
-        let mut reader = BufReader::new(match self.stream {
+    pub fn listen(&mut self, events: &[fn(&mut Server, &Message)]) -> Result<()> {
+        let reader = BufReader::new(match self.stream {
             Some(StreamKind::Plain(ref s)) => (*s).try_clone().unwrap(),
             #[cfg(feature = "ssl")]
             Some(StreamKind::Ssl(ref s)) => (*s).try_clone().unwrap(),
-            None => return Err(::IrscError::NotConnected)
+            None => return Err(IrscError::NotConnected)
         });
 
         for line in reader.lines() {
