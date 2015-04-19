@@ -6,7 +6,10 @@ after_success: |
   echo "<meta http-equiv=refresh content=0;url=`echo $TRAVIS_REPO_SLUG | cut -d '/' -f 2`/index.html>" > target/doc/index.html &&
   sudo pip install ghp-import &&
   ghp-import -n target/doc &&
-  git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
+  git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages &&
+  cargo login &&
+  cargo publish
 env:
   global:
-    secure: QesmFK+1DtDlYx8bnAC7nKKo/OeZziH+XTDjJFwPiKu7+fHk7bbO7pkd7jPLQTMR037nmvyIr0OwXlZQqA6pE6OyLd/4gUHzUfRP2NNCWIJIh1gqpOZDu29qW79RjKFHdEzuJLsKppJ8cnMlN2P9h/JpZuQBZZoRtFNFmi2OvNE=
+  - secure: QesmFK+1DtDlYx8bnAC7nKKo/OeZziH+XTDjJFwPiKu7+fHk7bbO7pkd7jPLQTMR037nmvyIr0OwXlZQqA6pE6OyLd/4gUHzUfRP2NNCWIJIh1gqpOZDu29qW79RjKFHdEzuJLsKppJ8cnMlN2P9h/JpZuQBZZoRtFNFmi2OvNE=
+  - secure: SWDhZyNJBApqivpcqHVihIY10D5ODEJ1h8N0uQN6D1iUAvLSehEN/mTLIx/r7BFWY/23tKMpK0eimWFtD9cy6i0Eg3BICVv4e6EVob3dtLz7aj1CsANZnN9pCFKzDcEdpSBh5Wa1E1vE4QPpQF2m5WLHBw59C+jt6bFxJrtc5Pw=
