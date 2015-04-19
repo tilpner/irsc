@@ -1,6 +1,6 @@
 language: rust
 after_success:
-    -|
+    - |
         [ $TRAVIS_BRANCH = master ] &&
         [ $TRAVIS_PULL_REQUEST = false ] &&
         cargo doc &&
@@ -8,10 +8,10 @@ after_success:
         sudo pip install ghp-import &&
         ghp-import -n target/doc &&
         git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
-    -|
+    - |
         [ $TRAVIS_BRANCH = master ] &&
         [ $TRAVIS_PULL_REQUEST = false ] &&
-        cargo publish --publish ${CRATESIO-TOKEN}
+        cargo publish --token ${CRATESIO-TOKEN}
 
 env:
   global:

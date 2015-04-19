@@ -70,7 +70,8 @@ impl<'a> FromStr for Message<'a> {
                     s = &s[i..];
                 }
             });
-            if s.chars().next() == Some(' ') { s = &s[1..] };
+            // if s.chars().next() == Some(' ') { s = &s[1..] };
+            s = &s[1..]
         }
 
         let msg_type = if suffix.as_ref()
@@ -259,17 +260,16 @@ pub enum Command<'a> {
 
     Ctcp { command: Cow<'a, String> },
 
-    /*
 
     /// "Welcome to the Internet Relay Network <nick>!<user>@<host>"
-    RPL_WELCOME = 001,
+    RPL_WELCOME,
     /// "Your host is <servername>, running version <ver>"
-    RPL_YOURHOST = 002,
+    RPL_YOURHOST,
     /// "This server was created <date>"
-    RPL_CREATED = 003,
+    RPL_CREATED,
     /// "<servername> <version> <available user modes> <available channel modes>"
-    RPL_MYINFO = 004,
-    /// "Try server <server name>, port <port number>"
+    RPL_MYINFO,
+    /*/// "Try server <server name>, port <port number>"
     /// Sent by the server to a user to suggest an alternative
     /// server.  This is often used when the connection is
     /// refused because the server is already full.
@@ -1123,6 +1123,10 @@ impl<'a> Command<'a> {
                 Command::Notice { to: Cow::Borrowed(&t), content: Cow::Borrowed(&c) })),
             "PING" => msg.content.get(0).and_then(|s1| msg.content.get(1).map(|s2|
                 Command::Ping { server1: Some(Cow::Borrowed(&s1)), server2: Some(Cow::Borrowed(&s2)) })),
+            "001" => Some(Command::RPL_WELCOME),
+            "002" => Some(Command::RPL_YOURHOST),
+            "003" => Some(Command::RPL_CREATED),
+            "004" => Some(Command::RPL_MYINFO),
             "451" => Some(Command::ErrNotRegistered),
             _ => unimplemented!()
         }

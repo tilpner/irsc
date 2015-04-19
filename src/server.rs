@@ -114,27 +114,27 @@ impl Server {
     }
 
     pub fn join(&mut self, channel: &str) -> Result<()> {
-        self.sendraw(format!("JOIN {}", channel).as_ref())
+        self.sendraw(format!("JOIN {}\r\n", channel).as_ref())
     }
 
     pub fn part(&mut self, channel: &str) -> Result<()> {
-        self.sendraw(format!("PART {}", channel).as_ref())
+        self.sendraw(format!("PART {}\r\n", channel).as_ref())
     }
 
     pub fn nick(&mut self, nick: &str) -> Result<()> {
-        self.sendraw(format!("NICK {}", nick).as_ref())
+        self.sendraw(format!("NICK {}\r\n", nick).as_ref())
     }
 
     pub fn user(&mut self, username: &str, hostname: &str, servername: &str, realname: &str) -> Result<()> {
-        self.sendraw(format!("USER {} {} {} :{}", username, hostname, servername, realname).as_ref())
+        self.sendraw(format!("USER {} {} {} :{}\r\n", username, hostname, servername, realname).as_ref())
     }
 
     pub fn password(&mut self, password: &str) -> Result<()> {
-        self.sendraw(format!("PASS {}", password).as_ref())
+        self.sendraw(format!("PASS {}\r\n", password).as_ref())
     }
 
     pub fn msg(&mut self, target: &str, message: &str) -> Result<()> {
-        self.sendraw(format!("PRIVMSG {} :{}", target, message).as_ref())
+        self.sendraw(format!("PRIVMSG {} :{}\r\n", target, message).as_ref())
     }
 
     pub fn listen(&mut self, events: &[fn(&mut Server, &Message)]) -> Result<()> {
