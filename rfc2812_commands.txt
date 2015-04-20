@@ -241,25 +241,6 @@
                                    "cm22.eng.umd.edu" from the net with
                                    comment "Server out of control".
 
-3.2 Channel operations
-
-   This group of messages is concerned with manipulating channels, their
-   properties (channel modes), and their contents (typically users).
-   For this reason, these messages SHALL NOT be made available to
-   services.
-
-   All of these messages are requests which will or will not be granted
-   by the server.  The server MUST send a reply informing the user
-   whether the request was granted, denied or generated an error.  When
-   the server grants the request, the message is typically sent back
-   (eventually reformatted) to the user with the prefix set to the user
-   itself.
-
-   The rules governing how channels are managed are enforced by the
-   servers.  These rules are beyond the scope of this document.  More
-   details are found in "Internet Relay Chat: Channel Management" [IRC-
-   CHAN].
-
 3.2.1 Join message
 
       Command: JOIN
@@ -601,15 +582,6 @@
                                    ; KICK message on channel #Finnish
                                    from WiZ to remove John from channel
 
-3.3 Sending messages
-
-   The main purpose of the IRC protocol is to provide a base for clients
-   to communicate with each other.  PRIVMSG, NOTICE and SQUERY
-   (described in Section 3.5 on Service Query and Commands) are the only
-   messages available which actually perform delivery of a text message
-   from one client to another - the rest just make it possible and try
-   to ensure it happens in a reliable and structured manner.
-
 3.3.1 Private messages
 
       Command: PRIVMSG
@@ -695,19 +667,6 @@
    either an AI or other interactive program controlling their actions).
 
    See PRIVMSG for more details on replies and examples.
-
-3.4 Server queries and commands
-
-   The server query group of commands has been designed to return
-   information about any server which is connected to the network.
-
-   In these queries, where a parameter appears as <target>, wildcard
-   masks are usually valid.  For each parameter, however, only one query
-   and set of replies is to be generated.  In most cases, if a nickname
-   is given, it will mean the server to which the user is connected.
-
-   These messages typically have little value for services, it is
-   therefore RECOMMENDED to forbid services from using them.
 
 3.4.1 Motd message
 
@@ -989,11 +948,6 @@
    INFO Angel                      ; request info from the server that
                                    Angel is connected to.
 
-3.5 Service Query and Commands
-
-   The service query group of commands has been designed to return
-   information about any service which is connected to the network.
-
 3.5.1 Servlist message
 
       Command: SERVLIST
@@ -1028,18 +982,6 @@
    SQUERY dict@irc.fr :fr2en blaireau
                                    ; Message to the service with name
                                    dict@irc.fr.
-
-3.6 User based queries
-
-   User queries are a group of commands which are primarily concerned
-   with finding details on a particular user or group users.  When using
-   wildcards with any of these commands, if they match, they will only
-   return information on users who are 'visible' to you.  The visibility
-   of a user is determined as a combination of the user's mode and the
-   common set of channels you are both on.
-
-   Although services SHOULD NOT be using this class of message, they are
-   allowed to.
 
 3.6.1 Who query
 
@@ -1146,11 +1088,6 @@
    WHOWAS Trillian 1 *.edu         ; return the most recent history for
                                    "Trillian" from the first server
                                    found to match "*.edu".
-
-3.7 Miscellaneous messages
-
-   Messages in this category do not fit into any of the above categories
-   but are nonetheless still a part of and REQUIRED by the protocol.
 
 3.7.1 Kill message
 
@@ -1291,19 +1228,6 @@
    NOTICE WiZ :ERROR from csd.bu.edu -- Server *.fi already exists
                                    ; Same ERROR message as above but
                                    sent to user WiZ on the other server.
-
-4. Optional features
-
-   This section describes OPTIONAL messages.  They are not required in a
-   working server implementation of the protocol described herein.  In
-   the absence of the feature, an error reply message MUST be generated
-   or an unknown command error.  If the message is destined for another
-   server to answer then it MUST be passed on (elementary parsing
-   REQUIRED) The allocated numerics for this are listed with the
-   messages below.
-
-   From this section, only the USERHOST and ISON messages are available
-   to services.
 
 4.1 Away
 
