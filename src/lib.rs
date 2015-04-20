@@ -1,4 +1,4 @@
-#![feature(plugin, collections)]
+#![feature(plugin, collections, custom_derive)]
 #![plugin(regex_macros)]
 
 extern crate regex;
@@ -11,7 +11,8 @@ pub mod color;
 pub mod ident;
 pub mod callback;
 pub mod message;
-// pub mod command;
+pub mod command;
+pub mod reply;
 
 use std::io;
 use std::result;
@@ -20,7 +21,8 @@ use std::result;
 pub enum IrscError {
     Io(io::Error),
     AlreadyConnected,
-    NotConnected
+    NotConnected,
+    NotFound
 }
 
 pub type Result<T> = result::Result<T, IrscError>;

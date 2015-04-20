@@ -1,4 +1,4 @@
-use std::borrow::{ ToOwned, Cow };
+#![allow(non_camel_case_types)]
 
 use message::{ Message, MsgType };
 
@@ -1530,54 +1530,55 @@ pub enum Command<'a> {
     USERHOST(Vec<&'a str>),
 }
 
-impl<'a> Command<'a> {
-    fn to_name(&self) -> &'static str {
+/*impl<'a> Command<'a> {
+    pub fn to_name(&self) -> &'static str {
+        use self::Command::*;
         match self {
-            PASS => "PING",
-            NICK => "NICK",
-            USER => "USER",
-            OPER => "1004",
-            MODE => "1005",
-            SERVICE => "1006",
-            QUIT => "1007",
-            SQUIT => "1008",
-            JOIN => "1009",
-            PART => "1010",
-            TOPIC => "1011",
-            NAMES => "1012",
-            LIST => "1013",
-            INVITE => "1014",
-            KICK => "1015",
-            PRIVMSG => "1016",
-            NOTICE => "1017",
-            MOTD => "1018",
-            LUSERS => "1019",
-            VERSION => "1020",
-            STATS => "1021",
-            LINKS => "1022",
-            TIME => "1023",
-            CONNECT => "1024",
-            TRACE => "1025",
-            ADMIN => "1026",
-            INFO => "1027",
-            SERVLIST => "1028",
-            SQUERY => "1029",
-            WHO => "1030",
-            WHOIS => "1031",
-            WHOWAS => "1032",
-            KILL => "1033",
-            PING => "1034",
-            PONG => "1035",
-            ERROR => "1036",
-            AWAY => "1037",
-            REHASH => "1038",
-            DIE => "1039",
-            RESTART => "1040",
-            SUMMON => "1041",
-            USERS => "1042",
-            WALLOPS => "1043",
-            USERHOST => "1044",
-            ISON => "1045",
+            &PASS => "PING",
+            &NICK => "NICK",
+            &USER => "USER",
+            &OPER => "1004",
+            &MODE => "1005",
+            &SERVICE => "1006",
+            &QUIT => "1007",
+            &SQUIT => "1008",
+            &JOIN => "1009",
+            &PART => "1010",
+            &TOPIC => "1011",
+            &NAMES => "1012",
+            &LIST => "1013",
+            &INVITE => "1014",
+            &KICK => "1015",
+            &PRIVMSG => "1016",
+            &NOTICE => "1017",
+            &MOTD => "1018",
+            &LUSERS => "1019",
+            &VERSION => "1020",
+            &STATS => "1021",
+            &LINKS => "1022",
+            &TIME => "1023",
+            &CONNECT => "1024",
+            &TRACE => "1025",
+            &ADMIN => "1026",
+            &INFO => "1027",
+            &SERVLIST => "1028",
+            &SQUERY => "1029",
+            &WHO => "1030",
+            &WHOIS => "1031",
+            &WHOWAS => "1032",
+            &KILL => "1033",
+            &PING => "1034",
+            &PONG => "1035",
+            &ERROR => "1036",
+            &AWAY => "1037",
+            &REHASH => "1038",
+            &DIE => "1039",
+            &RESTART => "1040",
+            &SUMMON => "1041",
+            &USERS => "1042",
+            &WALLOPS => "1043",
+            &USERHOST => "1044",
+            &ISON => "1045",
 /*
             RPL_WELCOME => "001",
             RPL_YOURHOST => "002",
@@ -1718,37 +1719,32 @@ impl<'a> Command<'a> {
             ERR_UMODEUNKNOWNFLAG => "501",*/
         }
     }
-}
+}*/
 
 impl<'a> Command<'a> {
     pub fn from_message(msg: &'a Message) -> Option<Command<'a>> {
-        match &msg.command.as_ref()[..] {
-            "NOTICE" => msg.content.get(0).and_then(|c| msg.content.get(1).map(|t|
-                Command::NOTICE { to: Cow::Borrowed(&t), content: Cow::Borrowed(&c) })),
-            "PING" => msg.content.get(0).and_then(|s1| msg.content.get(1).map(|s2|
-                Command::PING { server1: Some(Cow::Borrowed(&s1)), server2: Some(Cow::Borrowed(&s2)) })),
-            "001" => Some(Command::RPL_WELCOME),
-            "002" => Some(Command::RPL_YOURHOST),
-            "003" => Some(Command::RPL_CREATED),
-            "004" => Some(Command::RPL_MYINFO),
-            "451" => Some(Command::ErrNotRegistered),
+        match msg.command() {
+            "NOTICE" => msg.content().get(0).and_then(|c| msg.content().get(1).map(|t|
+                Command::NOTICE(t, c))),
+            "PING" => msg.content().get(0).map(|s1|
+                Command::PING(&s1, msg.content().get(1).map(|&s| s))),
             _ => unimplemented!()
         }
     }
 
     pub fn to_message(&'a self) -> Message {
         match self {
-            &Command::PING { ref server1, ref server2 } => {
+            &Command::PING(ref server1, ref server2) => {
                 let mut c = Vec::new();
-                if let &Some(ref s) = server1 { c.push(s.clone()) }
+                c.push(server1.clone());
                 if let &Some(ref s) = server2 { c.push(s.clone()) }
-                Message::new(None, Cow::Owned("PING".to_owned()), c, None, MsgType::Irc)
+                Message::format(None, "PING", c, None, MsgType::Irc)
             },
-            &Command::PONG { ref server1, ref server2 } => {
+            &Command::PONG(ref server1, ref server2) => {
                 let mut c = Vec::new();
-                if let &Some(ref s) = server1 { c.push(s.clone()) }
+                c.push(server1.clone());
                 if let &Some(ref s) = server2 { c.push(s.clone()) }
-                Message::new(None, Cow::Owned("PONG".to_owned()), c, None, MsgType::Irc)
+                Message::format(None, "PONG", c, None, MsgType::Irc)
             },
             _ => unimplemented!()
         }
