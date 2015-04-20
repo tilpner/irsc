@@ -6,7 +6,7 @@ extern crate regex;
 extern crate log;
 extern crate eventual;
 
-// pub mod server;
+pub mod server;
 pub mod color;
 pub mod ident;
 pub mod callback;

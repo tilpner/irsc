@@ -62,8 +62,8 @@ impl Server {
     }
 
     fn handle_event(&mut self, msg: &Message) {
-        if *msg.command == "PING" {
-            let _ = self.send(Command::PONG(msg.suffix, None).to_message());
+        if msg.command() == "PING" {
+            let _ = self.send(Command::PONG(msg.suffix().unwrap_or(""), None).to_message());
         }
     }
 
