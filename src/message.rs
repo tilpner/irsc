@@ -153,96 +153,8 @@ impl FromStr for Message {
 impl ToString for Message {
     fn to_string(&self) -> String {
         self.source.clone()
-        /*
-        let mut s = String::with_capacity(512);
-        if let Some(ref p) = self.prefix() {
-            s.push(':');
-            s.push_str(p);
-            s.push(' ');
-        }
-
-        s.push_str(self.command());
-        s.push(' ');
-
-        for part in self.content.iter() {
-            s.push_str(self.range(&part));
-            s.push(' ');
-        }
-
-        if let Some(ref p) = self.suffix() {
-            s.push(':');
-            if let MsgType::Ctcp = self.msg_type { s.push('\u{1}') }
-            s.push_str(p);
-            if let MsgType::Ctcp = self.msg_type { s.push('\u{1}') }
-        }
-
-        s.push_str("\r\n");
-        s*/
     }
 }
-
-/*
-pub trait Command {
-    fn name(&self) -> String;
-    fn to_message(&self) -> Message;
-    fn from_message(msg: &Message) -> Option<Self>
-}
-
-macro_rules! command (
-    ($name: ident { $($field: ident: $t: ty),* } to $to_msg: expr; from $from_msg: expr;) => (
-        pub struct $name {
-            $(pub $field: $t),*
-        }
-
-        impl Command for $name {
-            fn name(&self) -> String { stringify!($name).to_owned() }
-            fn to_message(&self) -> Message { ($to_msg)(self) }
-            fn from_message(msg: &Message) -> Option<$name> { ($from_msg)(msg) }
-        }
-    )
-);*/
-
-/*
-command!(Pass { password: String }
-         to |&:s: &Pass| Message::new(None, "PASS".to_owned(), Vec::new(), Some(s.password.clone()));
-         from |&:msg: &Message| msg.clone().suffix.map(|s| Pass { password: s }););
-
-command!(Ping { server1: Option<String>, server2: Option<String> }
-         to |&:s :&Ping| {
-             let mut v = Vec::new();
-             if let Some(ref s) = s.server1 { v.push(s.clone()) }
-             if let Some(ref s) = s.server2 { v.push(s.clone()) }
-             Message::new(None, "PING".to_owned(), v, None)
-         };
-         from |&:msg: &Message| {
-             let mut c = msg.content.clone();
-             Some(Ping { server2: c.pop(), server1: c.pop() }) }; );
-
-command!(Pong { server1: Option<String>, server2: Option<String> }
-         to |&:s: &Pong| {
-             let mut v = Vec::new();
-             if let Some(ref s) = s.server1 { v.push(s.clone()) }
-             if let Some(ref s) = s.server2 { v.push(s.clone()) }
-             Message::new(None, "PONG".to_owned(), v, None)
-         };
-         from |&:msg: &Message| {
-             let mut c = msg.content.clone();
-             Some(Pong { server2: c.pop(), server1: c.pop() })
-         }; );
-
-command!(PrivMsg { from: Option<String>, to: String, content: String }
-         to |&:s: &PrivMsg| {
-             Message::new(s.from.clone(), "PRIVMSG".to_owned(), vec![s.to.clone()], Some(s.content.clone()))
-         };
-         from |&:msg: &Message| {
-             msg.content.clone().pop().map(
-                 |c| PrivMsg {
-                     from: msg.prefix.clone(),
-                     to: c,
-                     content: msg.suffix.clone().unwrap_or(String::new())
-                 })
-         }; );
-*/
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub enum Mode {
@@ -273,38 +185,6 @@ pub enum SetMode {
 /// - while more readable - shouldn't have resulted in performance gains.
 ///
 /// Please don't cry.
-
-/*pub fn join(v: Vec<String>, from: usize) -> String {
-    let mut msg = if v[from].chars().next().unwrap() == ':' {
-        v[from][1..].to_owned()
-    } else { v[from].clone() };
-    for m in v.iter().skip(from + 1) {
-        msg.push_str(" ");
-        msg.push_str(m.trim_right());
-    }
-    msg
-}*/
-
-/*pub struct PrivMsg {
-    pub from: Ident,
-    pub to: String,
-    pub content: String
-}
-
-impl ParseResult for PrivMsg {
-    fn parse(message: Message) -> Option<PrivMsg> {
-        let from = Ident::parse(message.prefix.unwrap()[]);
-        let to = message.content[0].clone();
-        match from {
-            Some(from) => Some(PrivMsg {
-                from: from,
-                to: to,
-                content: join(message.content, 1)
-            }),
-            None => None
-        }
-    }
-}*/
 
 #[cfg(test)]
 mod test {
