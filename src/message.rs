@@ -100,12 +100,12 @@ impl FromStr for Message {
         let mut s = 0;
 
         let prefix = if len >= 1 && i[s..].chars().next() == Some(':') {
-            i[s..].find(' ').map(|i| 1u16..i as u16)
+            i[s..].find(' ').map(|i| { let n = 1u16..(s + i) as u16; s += i + 1; n })
         } else { None };
 
         let command = i[s..].find(' ').map(|n| {
-            let p = s as u16..n as u16;
-            s = n;
+            let p = s as u16..(s + n) as u16;
+            s += n;
             p
         });
 
@@ -113,7 +113,7 @@ impl FromStr for Message {
         // with colon is available.
         let mut content = Vec::with_capacity(15);
         let mut suffix = None;
-        while i[s..].len() > 0 {
+        while s < len - 3 {
             if i[s..].chars().next() == Some(':') {
                 suffix = Some(s as u16 + 1 as u16..i.len() as u16);
                 break
@@ -121,7 +121,7 @@ impl FromStr for Message {
             i[s..].find(' ').map(|i| {
                 if i > 0 {
                     content.push(s as u16..(s + i) as u16);
-                    s = i;
+                    s += i;
                 }
             });
             // if s.chars().next() == Some(' ') { s = &s[1..] };
@@ -192,20 +192,7 @@ mod test {
     use message::{ Message, MsgType };
 
     #[test]
-    fn parse_message() {
-        /*let a = ":a.b.c NOTICE AUTH :*** Looking up your hostname...\r\n";
-        // I'm not even kidding...
-        let a2 = Message::new(
-            a.to_owned(),
-            Some(Cow::Owned("a.b.c".to_owned())),
-            Cow::Owned("NOTICE".to_owned()),
-            vec![Cow::Owned("AUTH".to_owned())],
-            Some(Cow::Owned("*** Looking up your hostname...".to_owned())),
-            MsgType::Irc
-        );
-        assert_eq!(a.parse::<Message>().unwrap(), a2.clone());
-        assert_eq!(a2.to_string(), a);*/
-
+    fn parse_message1() {
         let b = ":d PRIVMSG You :\u{1}ACTION sends you funny pictures of cats!\u{1}\r\n";
         let b2 = Message::new(
             b.to_owned(),
@@ -218,5 +205,28 @@ mod test {
 
         assert_eq!(b.parse::<Message>().unwrap(), b2.clone());
         assert_eq!(b2.to_string(), b);
+    }
+
+    #[test]
+    fn parse_message2() {
+        let a = ":a.b.c NOTICE AUTH :*** Looking up your hostname...\r\n";
+        // I'm not even kidding...
+        let a2 = Message::new(
+            a.to_owned(),
+            Some(1..6),
+            7..13,
+            vec![14..18],
+            Some(20..51),
+            MsgType::Irc
+        );
+        assert_eq!(a.parse::<Message>().unwrap(), a2.clone());
+        assert_eq!(a2.to_string(), a);
+    }
+
+    #[test]
+    fn format_message() {
+        let a = Message::format(Some("a.b.c"), "NOTICE", vec!["AUTH"], Some("*** Looking up your hostname..."), MsgType::Irc);
+        let a2 = ":a.b.c NOTICE AUTH :*** Looking up your hostname...\r\n";
+        assert_eq!(a.to_string(), a2);
     }
 }
