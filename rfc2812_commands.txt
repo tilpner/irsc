@@ -96,7 +96,7 @@
 
 3.1.5 User mode message
 
-      Command: MODE
+      Command: UMODE
    Parameters: <nickname>
                *( ( "+" / "-" ) *( "i" / "w" / "o" / "O" / "r" ) )
 
