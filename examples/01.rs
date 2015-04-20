@@ -1,7 +1,7 @@
 #![feature(plugin)]
 #![plugin(regex_macros)]
 
-extern crate irsc;
+/*extern crate irsc;
 
 use std::borrow::ToOwned;
 
@@ -33,14 +33,14 @@ fn callback(server: &mut Server, msg: &Message) {
         _ => ()
     }*/
 }
-
+*/
 fn main() {
-    let mut s = Server::new();
+    /*let mut s = Server::new();
     s.connect("irc.mozilla.org".to_owned(), 6667).unwrap();
     s.nick(NAME).unwrap();
     s.user(NAME, "*", "*", DESC).unwrap();
     s.join("#botzoo").unwrap();
 
     // Dedicate this thread to listening and event processing
-    s.listen(&[callback]).unwrap();
+    s.listen(&[callback]).unwrap();*/
 }

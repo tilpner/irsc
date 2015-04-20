@@ -8,10 +8,9 @@ use std::io::{
 
 use std::net::TcpStream;
 
-use message;
-use message::{ Command, Message };
+use message::Message;
+use command::Command;
 use ::{ DEBUG, Result, IrscError };
-
 
 #[cfg(feature = "ssl")]
 use openssl::ssl::{ SslContext, SslMethod, SslStream };
@@ -62,9 +61,9 @@ impl Server {
         }
     }
 
-    fn handle_event(&mut self, msg: &message::Message) {
+    fn handle_event(&mut self, msg: &Message) {
         if *msg.command == "PING" {
-            let _ = self.send(Command::Pong { server1: msg.suffix.clone(), server2: None }.to_message());
+            let _ = self.send(Command::PONG(msg.suffix, None).to_message());
         }
     }
 
@@ -109,7 +108,7 @@ impl Server {
                                          .map_err(IrscError::Io))
     }
 
-    pub fn send(&mut self, msg: message::Message) -> Result<()> {
+    pub fn send(&mut self, msg: Message) -> Result<()> {
         self.sendraw(&msg.to_string())
     }
 
