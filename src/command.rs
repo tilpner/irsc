@@ -1574,59 +1574,6 @@ pub enum Command<'a> {
 }
 
 impl<'a> Command<'a> {
-    pub fn to_name(&self) -> &'static str {
-        use self::Command::*;
-        match self {
-            &PASS => "PASS",
-            &NICK => "NICK",
-            &USER => "USER",
-            &OPER => "OPER",
-            &MODE => "MODE",
-            &SERVICE => "SERVICE",
-            &QUIT => "QUIT",
-            &SQUIT => "SQUIT",
-            &JOIN => "JOIN",
-            &PART => "PART",
-            &TOPIC => "TOPIC",
-            &NAMES => "NAMES",
-            &LIST => "LIST",
-            &INVITE => "INVITE",
-            &KICK => "KICK",
-            &PRIVMSG => "PRIVMSG",
-            &NOTICE => "NOTICE",
-            &MOTD => "MOTD",
-            &LUSERS => "LUSERS",
-            &VERSION => "VERSION",
-            &STATS => "STATS",
-            &LINKS => "LINKS",
-            &TIME => "TIME",
-            &CONNECT => "CONNECT",
-            &TRACE => "TRACE",
-            &ADMIN => "ADMIN",
-            &INFO => "INFO",
-            &SERVLIST => "SERVLIST",
-            &SQUERY => "SQUERY",
-            &WHO => "WHO",
-            &WHOIS => "WHOIS",
-            &WHOWAS => "WHOWAS",
-            &KILL => "KILL",
-            &PING(_, _) => "PING",
-            &PONG(_, _) => "PONG",
-            &ERROR(_) => "ERROR",
-            &AWAY(_) => "AWAY",
-            &REHASH => "REHASH",
-            &DIE => "DIE",
-            &RESTART => "RESTART",
-            &SUMMON(_, _) => "SUMMON",
-            &USERS(_) => "USERS",
-            &WALLOPS(_) => "WALLOPS",
-            &USERHOST(_) => "USERHOST",
-            &ISON => "ISON",
-        }
-    }
-}
-
-impl<'a> Command<'a> {
     pub fn from_message(msg: &'a Message) -> Option<Command<'a>> {
         match msg.command() {
             "NOTICE" => msg.content().get(0).and_then(|c| msg.content().get(1).map(|t|
