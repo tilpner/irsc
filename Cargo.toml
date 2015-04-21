@@ -4,13 +4,13 @@ name = "irsc"
 version = "0.0.3"
 authors = ["Till Hoeppner <till@hoeppner.ws>"]
 description = "A lightweight library for building IRC bots."
+documentation = "https://tilpner.github.io/irsc"
 repository = "https://github.com/tilpner/irsc"
 keywords = ["irc", "internet", "protocol"]
 license = "MIT"
 
 [dependencies]
 log = "*"
-env_logger = "*"
 regex = "*"
 regex_macros = "*"
 
@@ -20,3 +20,6 @@ ssl = ["openssl"]
 [dependencies.openssl]
 version = "*"
 optional = true
+
+[dev-dependencies]
+env_logger = "*"
