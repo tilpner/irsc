@@ -4,7 +4,6 @@
 extern crate regex;
 #[macro_use]
 extern crate log;
-extern crate eventual;
 
 pub mod client;
 pub mod color;

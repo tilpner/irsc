@@ -10,9 +10,9 @@ license = "MIT"
 
 [dependencies]
 log = "*"
+env_logger = "*"
 regex = "*"
 regex_macros = "*"
-eventual = "*"
 
 [features]
 ssl = ["openssl"]
