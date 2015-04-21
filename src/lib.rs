@@ -1,4 +1,4 @@
-#![feature(plugin, collections, custom_derive)]
+#![feature(plugin, collections, custom_derive, slice_patterns)]
 #![plugin(regex_macros)]
 
 extern crate regex;

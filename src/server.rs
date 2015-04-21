@@ -7,6 +7,7 @@ use std::io::{
 };
 
 use std::net::TcpStream;
+use std::borrow::Cow;
 
 use message::Message;
 use command::Command;
@@ -63,7 +64,7 @@ impl Server {
 
     fn handle_event(&mut self, msg: &Message) {
         if msg.command() == "PING" {
-            let _ = self.send(Command::PONG(msg.suffix().unwrap_or(""), None).to_message());
+            let _ = self.send(Command::PONG(Cow::Borrowed(msg.suffix().unwrap_or("")), None).to_message());
         }
     }
 

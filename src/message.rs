@@ -3,7 +3,7 @@
 use std::str::FromStr;
 use std::string::{ ToString };
 use std::borrow::{ ToOwned };
-use std::ops::Range;
+use std::ops::{ Deref, Range };
 
 use ::IrscError;
 
@@ -39,7 +39,7 @@ impl Message {
     }
 
     #[allow(unused_assignments)]
-    pub fn format(prefix: Option<&str>, command: &str, content: Vec<&str>, suffix: Option<&str>, msg_type: MsgType) -> Message {
+    pub fn format<T: Deref<Target=str>>(prefix: Option<T>, command: T, content: Vec<T>, suffix: Option<T>, msg_type: MsgType) -> Message {
         let mut s = String::with_capacity(512);
         let mut i = 0;
 
@@ -53,7 +53,7 @@ impl Message {
         }
 
         let i_command = i as u16..(i + command.len()) as u16;
-        s.push_str(command);
+        s.push_str(&*command);
         s.push(' ');
         i += 1 + command.len();
 
@@ -90,6 +90,7 @@ impl Message {
     pub fn command(&self) -> &str { self.range(&self.command) }
     pub fn content(&self) -> Vec<&str> { self.content.iter().map(|r| self.range(&r)).collect() }
     pub fn suffix(&self) -> Option<&str> { self.suffix.as_ref().map(|r| self.range(r)) }
+    pub fn elements(&self) -> Vec<&str> { let mut s = self.content(); self.suffix().map(|f| s.push(f)); s }
 }
 
 impl FromStr for Message {
