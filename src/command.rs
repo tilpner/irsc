@@ -5,6 +5,7 @@ use message::{ Message, MsgType };
 #[derive(Debug, Hash, PartialEq, Eq)]
 #[doc(disables)]
 pub enum Command<'a> {
+    /// ```text
     /// 3.1.1 Password message
     ///
     /// Command: PASS
@@ -22,9 +23,10 @@ pub enum Command<'a> {
     /// Example:
     ///
     ///    PASS secretpasswordhere
-    ///
+    /// ```
     PASS(&'a str),
 
+    /// ```text
     /// 3.1.2 Nick message
     ///
     /// Command: NICK
@@ -48,9 +50,10 @@ pub enum Command<'a> {
     ///    :WiZ!jto@tolsun.oulu.fi NICK Kilroy
     ///                            ; Server telling that WiZ changed his
     ///                            nickname to Kilroy.
-    ///
+    /// ```
     NICK(&'a str),
 
+    /// ```text
     /// 3.1.3 User message
     ///
     /// Command: USER
@@ -82,9 +85,10 @@ pub enum Command<'a> {
     ///                                    username of "guest" and real name
     ///                                    "Ronnie Reagan", and asking to be set
     ///                                    invisible.
-    ///
+    /// ```
     USER(&'a str, &'a str, &'a str, &'a str),
 
+    /// ```text
     /// 3.1.4 Oper message
     ///
     /// Command: OPER
@@ -105,9 +109,10 @@ pub enum Command<'a> {
     ///    OPER foo bar                    ; Attempt to register as an operator
     ///                                    using a username of "foo" and "bar"
     ///                                    as the password.
-    ///
+    /// ```
     OPER(&'a str, &'a str),
 
+    /// ```text
     /// 3.1.5 User mode message
     ///
     /// Command: MODE
@@ -169,9 +174,10 @@ pub enum Command<'a> {
     ///
     ///    MODE WiZ -o                     ; WiZ 'deopping' (removing operator
     ///                                    status).
-    ///
+    /// ```
     UMODE(&'a str),
 
+    /// ```text
     /// 3.1.6 Service message
     ///
     /// Command: SERVICE
@@ -204,9 +210,10 @@ pub enum Command<'a> {
     ///                                    itself with a name of "dict".  This
     ///                                    service will only be available on
     ///                                    servers which name matches "*.fr".
-    ///
+    /// ```
     SERVICE(&'a str, &'a str, &'a str, &'a str, &'a str, &'a str),
 
+    /// ```text
     /// 3.1.7 Quit
     ///
     /// Command: QUIT
@@ -225,9 +232,10 @@ pub enum Command<'a> {
     ///
     ///    :syrk!kalt@millennium.stealth.net QUIT :Gone to have lunch ; User
     ///                                    syrk has quit IRC to have lunch.
-    ///
+    /// ```
     QUIT(Option<&'a str>),
 
+    /// ```text
     /// 3.1.8 Squit
     ///
     /// Command: SQUIT
@@ -260,9 +268,10 @@ pub enum Command<'a> {
     ///                                    from Trillian from to disconnect
     ///                                    "cm22.eng.umd.edu" from the net with
     ///                                    comment "Server out of control".
-    ///
+    /// ```
     SQUIT(&'a str, &'a str),
 
+    /// ```text
     /// 3.2.1 Join message
     ///
     /// Command: JOIN
@@ -322,9 +331,10 @@ pub enum Command<'a> {
     ///
     ///    :WiZ!jto@tolsun.oulu.fi JOIN #Twilight_zone ; JOIN message from WiZ
     ///                                    on channel #Twilight_zone
-    ///
+    /// ```
     JOIN(Vec<&'a str>, Vec<&'a str>),
 
+    /// ```text
     /// 3.2.2 Part message
     ///
     /// Command: PART
@@ -357,9 +367,10 @@ pub enum Command<'a> {
     ///                                    ; User WiZ leaving channel
     ///                                    "#playzone" with the message "I
     ///                                    lost".
-    ///
+    /// ```
     PART(Vec<&'a str>, Option<&'a str>),
 
+    /// ```text
     /// 3.2.3 Channel mode message
     ///
     /// Command: MODE
@@ -441,9 +452,10 @@ pub enum Command<'a> {
     ///
     ///    MODE !12345ircd O               ; Command to ask who the channel
     ///                                    creator for "!12345ircd" is
-    ///
+    /// ```
     MODE(&'a str, &'a str /* *( ( "-" / "+" ) *<modes> *<modeparams> ) */),
 
+    /// ```text```
     /// 3.2.4 Topic message
     ///
     /// Command: TOPIC
@@ -475,9 +487,10 @@ pub enum Command<'a> {
     ///
     ///    TOPIC #test                     ; Command to check the topic for
     ///                                    #test.
-    ///
+    /// ```
     TOPIC(&'a str, Option<&'a str>),
 
+    /// ```text
     /// 3.2.5 Names message
     ///
     /// Command: NAMES
@@ -511,9 +524,10 @@ pub enum Command<'a> {
     ///
     ///    NAMES                           ; Command to list all visible
     ///                                    channels and users
-    ///
+    /// ```
     NAMES(Option<(Vec<&'a str>, Option<&'a str>)>),
 
+    /// ```text
     /// 3.2.6 List message
     ///
     /// Command: LIST
@@ -539,9 +553,10 @@ pub enum Command<'a> {
     ///
     ///    LIST #twilight_zone,#42         ; Command to list channels
     ///                                    #twilight_zone and #42
-    ///
+    /// ```
     LIST(Option<(Vec<&'a str>, Option<&'a str>)>),
 
+    /// ```text
     /// 3.2.7 Invite message
     ///
     /// Command: INVITE
@@ -576,9 +591,10 @@ pub enum Command<'a> {
     ///
     ///    INVITE Wiz #Twilight_Zone       ; Command to invite WiZ to
     ///                                    #Twilight_zone
-    ///
+    /// ```
     INVITE(&'a str, &'a str),
 
+    /// ```text
     /// 3.2.8 Kick command
     ///
     /// Command: KICK
@@ -616,9 +632,10 @@ pub enum Command<'a> {
     ///    :WiZ!jto@tolsun.oulu.fi KICK #Finnish John
     ///                                    ; KICK message on channel #Finnish
     ///                                    from WiZ to remove John from channel
-    ///
+    /// ```
     KICK(Vec<&'a str>, Vec<&'a str>, Option<&'a str>),
 
+    /// ```text
     /// 3.3.1 Private messages
     ///
     /// Command: PRIVMSG
@@ -684,9 +701,10 @@ pub enum Command<'a> {
     ///                                    ; Message to all users who come from
     ///                                    a host which has a name matching
     ///                                    *.edu.
-    ///
+    /// ```
     PRIVMSG(&'a str, &'a str),
 
+    /// ```text
     /// 3.3.2 Notice
     ///
     /// Command: NOTICE
@@ -706,9 +724,10 @@ pub enum Command<'a> {
     /// either an AI or other interactive program controlling their actions).
     ///
     /// See PRIVMSG for more details on replies and examples.
-    ///
+    /// ```
     NOTICE(&'a str, &'a str),
 
+    /// ```text
     /// 3.4.1 Motd message
     ///
     /// Command: MOTD
@@ -722,9 +741,10 @@ pub enum Command<'a> {
     /// Numeric Replies:
     ///    RPL_MOTDSTART                   RPL_MOTD
     ///    RPL_ENDOFMOTD                   ERR_NOMOTD
-    ///
+    /// ```
     MOTD(Option<&'a str>),
 
+    /// ```text
     /// 3.4.2 Lusers message
     ///
     /// Command: LUSERS
@@ -744,9 +764,10 @@ pub enum Command<'a> {
     ///    RPL_LUSERCLIENT                 RPL_LUSEROP
     ///    RPL_LUSERUNKOWN                 RPL_LUSERCHANNELS
     ///    RPL_LUSERME                     ERR_NOSUCHSERVER
-    ///
+    /// ```
     LUSERS(Option<(&'a str, Option<&'a str>)>),
 
+    /// ```text
     /// 3.4.3 Version message
     ///
     /// Command: VERSION
@@ -766,9 +787,10 @@ pub enum Command<'a> {
     ///
     ///    VERSION tolsun.oulu.fi          ; Command to check the version of
     ///                                    server "tolsun.oulu.fi".
-    ///
+    /// ```
     VERSION(Option<&'a str>),
 
+    /// ```text
     /// 3.4.4 Stats message
     ///
     /// Command: STATS
@@ -814,9 +836,10 @@ pub enum Command<'a> {
     ///
     ///    STATS m      ; Command to check the command usage
     ///                   for the server you are connected to
-    ///
+    /// ```
     STATS(Option<(&'a str, Option<&'a str>)>),
 
+    /// ```text
     /// 3.4.5 Links message
     ///
     /// Command: LINKS
@@ -843,9 +866,10 @@ pub enum Command<'a> {
     ///    LINKS *.edu *.bu.edu            ; Command to list servers matching
     ///                                    *.bu.edu as seen by the first server
     ///                                    matching *.edu.
-    ///
+    /// ```
     LINKS(Option<(Option<&'a str>, &'a str)>),
 
+    /// ```text
     /// 3.4.6 Time message
     ///
     /// Command: TIME
@@ -864,9 +888,10 @@ pub enum Command<'a> {
     /// Examples:
     ///    TIME tolsun.oulu.fi             ; check the time on the server
     ///                                    "tolson.oulu.fi"
-    ///
+    /// ```
     TIME(Option<&'a str>),
 
+    /// ```text
     /// 3.4.7 Connect message
     ///
     /// Command: CONNECT
@@ -895,6 +920,7 @@ pub enum Command<'a> {
     ///
     CONNECT(&'a str, i16, Option<&'a str>),
 
+    /// ```text
     /// 3.4.8 Trace message
     ///
     /// Command: TRACE
@@ -951,9 +977,10 @@ pub enum Command<'a> {
     ///
     ///    TRACE *.oulu.fi                 ; TRACE to a server matching
     ///                                    *.oulu.fi
-    ///
+    /// ```
     TRACE(Option<&'a str>),
 
+    /// ```text
     /// 3.4.9 Admin command
     ///
     /// Command: ADMIN
@@ -979,9 +1006,10 @@ pub enum Command<'a> {
     ///
     ///    ADMIN syrk                      ; ADMIN request for the server to
     ///                                    which the user syrk is connected
-    ///
+    /// ```
     ADMIN(Option<&'a str>),
 
+    /// ```text
     /// 3.4.10 Info command
     ///
     /// Command: INFO
@@ -1006,9 +1034,10 @@ pub enum Command<'a> {
     ///
     ///    INFO Angel                      ; request info from the server that
     ///                                    Angel is connected to.
-    ///
+    /// ```
     INFO(Option<&'a str>),
 
+    /// ```text
     /// 3.5.1 Servlist message
     ///
     /// Command: SERVLIST
@@ -1022,9 +1051,10 @@ pub enum Command<'a> {
     /// Numeric Replies:
     ///
     ///    RPL_SERVLIST                  RPL_SERVLISTEND
-    ///
+    /// ```
     SERVLIST(Option<(&'a str, Option<&'a str>)>),
 
+    /// ```text
     /// 3.5.2 Squery
     ///
     /// Command: SQUERY
@@ -1045,9 +1075,10 @@ pub enum Command<'a> {
     ///    SQUERY dict@irc.fr :fr2en blaireau
     ///                                    ; Message to the service with name
     ///                                    dict@irc.fr.
-    ///
+    /// ```
     SQUERY(&'a str, &'a str),
 
+    /// ```text
     /// 3.6.1 Who query
     ///
     /// Command: WHO
@@ -1080,9 +1111,10 @@ pub enum Command<'a> {
     ///    WHO jto* o                      ; Command to list all users with a
     ///                                    match against "jto*" if they are an
     ///                                    operator.
-    ///
+    /// ```
     WHO(&'a str, bool),
 
+    /// ```text
     /// 3.6.2 Whois query
     ///
     /// Command: WHOIS
@@ -1119,9 +1151,10 @@ pub enum Command<'a> {
     ///
     ///    WHOIS eff.org trillian          ; ask server eff.org for user
     ///                                    information  about trillian
-    ///
+    /// ```
     WHOIS(Option<&'a str>, Vec<&'a str>),
 
+    /// ```text
     /// 3.6.3 Whowas
     ///
     /// Command: WHOWAS
@@ -1157,9 +1190,10 @@ pub enum Command<'a> {
     ///    WHOWAS Trillian 1 *.edu         ; return the most recent history for
     ///                                    "Trillian" from the first server
     ///                                    found to match "*.edu".
-    ///
+    /// ```
     WHOWAS(Vec<&'a str>, Option<(&'a str, Option<&'a str>)>),
 
+    /// ```text
     /// 3.7.1 Kill message
     ///
     /// Command: KILL
@@ -1211,9 +1245,10 @@ pub enum Command<'a> {
     ///    controversies over the years, and along with the above
     ///    recommendation, it is also widely recognized that not even operators
     ///    should be allowed to kill users on remote servers.
-    ///
+    /// ```
     KILL(&'a str, &'a str),
 
+    /// ```text
     /// 3.7.2 Ping message
     ///
     /// Command: PING
@@ -1246,9 +1281,10 @@ pub enum Command<'a> {
     ///
     ///    PING :irc.funet.fi              ; Ping message sent by server
     ///                                    "irc.funet.fi"
-    ///
+    /// ```
     PING(&'a str, Option<&'a str>),
 
+    /// ```text
     /// 3.7.3 Pong message
     ///
     /// Command: PONG
@@ -1267,9 +1303,10 @@ pub enum Command<'a> {
     ///
     ///    PONG csd.bu.edu tolsun.oulu.fi  ; PONG message from csd.bu.edu to
     ///                                    tolsun.oulu.fi
-    ///
+    /// ```
     PONG(&'a str, Option<&'a str>),
 
+    /// ```text
     /// 3.7.4 Error
     ///
     /// Command: ERROR
@@ -1305,9 +1342,10 @@ pub enum Command<'a> {
     ///    NOTICE WiZ :ERROR from csd.bu.edu -- Server *.fi already exists
     ///                                    ; Same ERROR message as above but
     ///                                    sent to user WiZ on the other server.
-    ///
+    /// ```
     ERROR(&'a str),
 
+    /// ```text
     /// 4.1 Away
     ///
     /// Command: AWAY
@@ -1336,9 +1374,10 @@ pub enum Command<'a> {
     ///
     ///    AWAY :Gone to lunch.  Back in 5 ; Command to set away message to
     ///                                    "Gone to lunch.  Back in 5".
-    ///
+    /// ```
     AWAY(Option<&'a str>),
 
+    /// ```text
     /// 4.2 Rehash message
     ///
     /// Command: REHASH
@@ -1357,9 +1396,10 @@ pub enum Command<'a> {
     ///    REHASH                          ; message from user with operator
     ///                                    status to server asking it to reread
     ///                                    its configuration file.
-    ///
+    /// ```
     REHASH,
 
+    /// ```text
     /// 4.3 Die message
     ///
     /// Command: DIE
@@ -1381,9 +1421,10 @@ pub enum Command<'a> {
     /// Example:
     ///
     ///    DIE                             ; no parameters required.
-    ///
+    /// ```
     DIE,
 
+    /// ```text
     /// 4.4 Restart message
     ///
     /// Command: RESTART
@@ -1405,9 +1446,10 @@ pub enum Command<'a> {
     /// Example:
     ///
     ///    RESTART                         ; no parameters required.
-    ///
+    /// ```
     RESTART,
 
+    /// ```text
     /// 4.5 Summon message
     ///
     /// Command: SUMMON
@@ -1439,9 +1481,10 @@ pub enum Command<'a> {
     ///    SUMMON jto tolsun.oulu.fi       ; summon user jto on the host which a
     ///                                    server named "tolsun.oulu.fi" is
     ///                                    running.
-    ///
+    /// ```
     SUMMON(&'a str, Option<(&'a str, Option<&'a str>)>),
 
+    /// ```text
     /// 4.6 Users
     ///
     /// Command: USERS
@@ -1472,9 +1515,10 @@ pub enum Command<'a> {
     ///
     ///    USERS eff.org                   ; request a list of users logged in
     ///                                    on server eff.org
-    ///
+    /// ```
     USERS(Option<&'a str>),
 
+    /// ```text
     /// 4.7 Operwall message
     ///
     /// Command: WALLOPS
@@ -1500,9 +1544,10 @@ pub enum Command<'a> {
     ///                                    message from csd.bu.edu announcing a
     ///                                    CONNECT message it received from
     ///                                    Joshua and acted upon.
-    ///
+    /// ```
     WALLOPS(&'a str),
 
+    /// ```text
     /// 4.8 Userhost message
     ///
     /// Command: USERHOST
@@ -1524,7 +1569,7 @@ pub enum Command<'a> {
     ///
     ///    :ircd.stealth.net 302 yournick :syrk=+syrk@millennium.stealth.net
     ///                                    ; Reply for user syrk
-    ///
+    /// ```
     USERHOST(Vec<&'a str>),
 }
 
