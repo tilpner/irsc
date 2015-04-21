@@ -1,107 +1,113 @@
-use ::{ Result, IrscError };
 use std::str::FromStr;
-use std::borrow::ToOwned;
+use std::borrow::{ Cow, ToOwned };
+use std::borrow::Cow::*;
+
+use ::{ Result, IrscError };
+use ::message::{ MsgType, Message };
+
+pub type CS<'a> = Cow<'a, str>;
+
 #[allow(non_camel_case_types)]
 #[derive(Debug, Hash, PartialEq, Eq)]
-pub enum Reply {
+pub enum Reply<'a> {
     /// 001    RPL_WELCOME
     ///       "Welcome to the Internet Relay Network
     ///        <nick>!<user>@<host>"
-    RPL_WELCOME = 001,
+    RPL_WELCOME(CS<'a>),
 
     /// 002    RPL_YOURHOST
     ///       "Your host is <servername>, running version <ver>"
-    RPL_YOURHOST = 002,
+    RPL_YOURHOST(CS<'a>),
 
     /// 003    RPL_CREATED
     ///       "This server was created <date>"
-    RPL_CREATED = 003,
+    RPL_CREATED(CS<'a>),
 
     /// 004    RPL_MYINFO
     ///       "<servername> <version> <available user modes>
     ///        <available channel modes>"
-    /// 
+    ///
     ///  - The server sends Replies 001 to 004 to a user upon
     ///    successful registration.
-    /// 
-    RPL_MYINFO = 004,
+    ///
+    RPL_MYINFO(CS<'a>),
 
     /// 005    RPL_BOUNCE
     ///       "Try server <server name>, port <port number>"
-    /// 
+    ///
     ///  - Sent by the server to a user to suggest an alternative
     ///    server.  This is often used when the connection is
     ///    refused because the server is already full.
-    /// 
-    RPL_BOUNCE = 005,
+    ///
+    RPL_BOUNCE(CS<'a>),
 
     /// 302    RPL_USERHOST
     ///       ":*1<reply> *( " " <reply> )"
-    /// 
+    ///
     ///  - Reply format used by USERHOST to list replies to
     ///    the query list.  The reply string is composed as
     ///    follows:
-    /// 
+    ///
     ///    reply = nickname [ "*" ] "=" ( "+" / "-" ) hostname
-    /// 
+    ///
     ///    The '*' indicates whether the client has registered
     ///    as an Operator.  The '-' or '+' characters represent
     ///    whether the client has set an AWAY message or not
     ///    respectively.
-    /// 
-    RPL_USERHOST = 302,
+    ///
+    RPL_USERHOST(CS<'a>),
 
     /// 303    RPL_ISON
     ///       ":*1<nick> *( " " <nick> )"
-    /// 
+    ///
     ///  - Reply format used by ISON to list replies to the
     ///    query list.
-    /// 
-    RPL_ISON = 303,
+    ///
+    RPL_ISON(CS<'a>),
 
     /// 301    RPL_AWAY
     ///       "<nick> :<away message>"
-    RPL_AWAY = 301,
+    RPL_AWAY(CS<'a>),
 
     /// 305    RPL_UNAWAY
     ///       ":You are no longer marked as being away"
-    RPL_UNAWAY = 305,
+    RPL_UNAWAY(CS<'a>),
 
     /// 306    RPL_NOWAWAY
     ///       ":You have been marked as being away"
-    /// 
+    ///
     ///  - These replies are used with the AWAY command (if
     ///    allowed).  RPL_AWAY is sent to any client sending a
     ///    PRIVMSG to a client which is away.  RPL_AWAY is only
     ///    sent by the server to which the client is connected.
     ///    Replies RPL_UNAWAY and RPL_NOWAWAY are sent when the
     ///    client removes and sets an AWAY message.
-    /// 
-    RPL_NOWAWAY = 306,
+    ///
+    RPL_NOWAWAY(CS<'a>),
 
     /// 311    RPL_WHOISUSER
     ///       "<nick> <user> <host> * :<real name>"
-    RPL_WHOISUSER = 311,
+    RPL_WHOISUSER(CS<'a>),
 
     /// 312    RPL_WHOISSERVER
     ///       "<nick> <server> :<server info>"
-    RPL_WHOISSERVER = 312,
+    RPL_WHOISSERVER(CS<'a>),
 
     /// 313    RPL_WHOISOPERATOR
     ///       "<nick> :is an IRC operator"
-    RPL_WHOISOPERATOR = 313,
+    RPL_WHOISOPERATOR(CS<'a>),
 
     /// 317    RPL_WHOISIDLE
     ///       "<nick> <integer> :seconds idle"
-    RPL_WHOISIDLE = 317,
+    RPL_WHOISIDLE(CS<'a>),
 
     /// 318    RPL_ENDOFWHOIS
     ///       "<nick> :End of WHOIS list"
-    RPL_ENDOFWHOIS = 318,
+    RPL_ENDOFWHOIS(CS<'a>),
 
     /// 319    RPL_WHOISCHANNELS
     ///       "<nick> :*( ( "@" / "+" ) <channel> " " )"
-    /// 
+    ///
     ///  - Replies 311 - 313, 317 - 319 are all replies
     ///    generated in response to a WHOIS message.  Given that
     ///    there are enough parameters present, the answering
@@ -116,141 +122,141 @@ pub enum Reply {
     ///    has been granted permission to speak on a moderated
     ///    channel.  The RPL_ENDOFWHOIS reply is used to mark
     ///    the end of processing a WHOIS message.
-    /// 
-    RPL_WHOISCHANNELS = 319,
+    ///
+    RPL_WHOISCHANNELS(CS<'a>),
 
     /// 314    RPL_WHOWASUSER
     ///       "<nick> <user> <host> * :<real name>"
-    RPL_WHOWASUSER = 314,
+    RPL_WHOWASUSER(CS<'a>),
 
     /// 369    RPL_ENDOFWHOWAS
     ///       "<nick> :End of WHOWAS"
-    /// 
+    ///
     ///  - When replying to a WHOWAS message, a server MUST use
     ///    the replies RPL_WHOWASUSER, RPL_WHOISSERVER or
     ///    ERR_WASNOSUCHNICK for each nickname in the presented
     ///    list.  At the end of all reply batches, there MUST
     ///    be RPL_ENDOFWHOWAS (even if there was only one reply
     ///    and it was an error).
-    /// 
-    RPL_ENDOFWHOWAS = 369,
+    ///
+    RPL_ENDOFWHOWAS(CS<'a>),
 
     /// 321    RPL_LISTSTART
     ///       Obsolete. Not used.
-    /// 
-    RPL_LISTSTART = 321,
+    ///
+    RPL_LISTSTART,
 
     /// 322    RPL_LIST
     ///       "<channel> <# visible> :<topic>"
-    RPL_LIST = 322,
+    RPL_LIST(CS<'a>),
 
     /// 323    RPL_LISTEND
     ///       ":End of LIST"
-    /// 
+    ///
     ///  - Replies RPL_LIST, RPL_LISTEND mark the actual replies
     ///    with data and end of the server's response to a LIST
     ///    command.  If there are no channels available to return,
     ///    only the end reply MUST be sent.
-    /// 
-    RPL_LISTEND = 323,
+    ///
+    RPL_LISTEND(CS<'a>),
 
     /// 325    RPL_UNIQOPIS
     ///       "<channel> <nickname>"
-    /// 
-    RPL_UNIQOPIS = 325,
+    ///
+    RPL_UNIQOPIS(CS<'a>),
 
     /// 324    RPL_CHANNELMODEIS
     ///       "<channel> <mode> <mode params>"
-    /// 
-    RPL_CHANNELMODEIS = 324,
+    ///
+    RPL_CHANNELMODEIS(CS<'a>),
 
     /// 331    RPL_NOTOPIC
     ///       "<channel> :No topic is set"
-    RPL_NOTOPIC = 331,
+    RPL_NOTOPIC(CS<'a>),
 
     /// 332    RPL_TOPIC
     ///       "<channel> :<topic>"
-    /// 
+    ///
     ///  - When sending a TOPIC message to determine the
     ///    channel topic, one of two replies is sent.  If
     ///    the topic is set, RPL_TOPIC is sent back else
     ///    RPL_NOTOPIC.
-    /// 
-    RPL_TOPIC = 332,
+    ///
+    RPL_TOPIC(CS<'a>),
 
     /// 341    RPL_INVITING
     ///       "<channel> <nick>"
-    /// 
+    ///
     ///  - Returned by the server to indicate that the
     ///    attempted INVITE message was successful and is
     ///    being passed onto the end client.
-    /// 
-    RPL_INVITING = 341,
+    ///
+    RPL_INVITING(CS<'a>),
 
     /// 342    RPL_SUMMONING
     ///       "<user> :Summoning user to IRC"
-    /// 
+    ///
     ///  - Returned by a server answering a SUMMON message to
     ///    indicate that it is summoning that user.
-    /// 
-    RPL_SUMMONING = 342,
+    ///
+    RPL_SUMMONING(CS<'a>),
 
     /// 346    RPL_INVITELIST
     ///       "<channel> <invitemask>"
-    RPL_INVITELIST = 346,
+    RPL_INVITELIST(CS<'a>),
 
     /// 347    RPL_ENDOFINVITELIST
     ///       "<channel> :End of channel invite list"
-    /// 
+    ///
     ///  - When listing the 'invitations masks' for a given channel,
     ///    a server is required to send the list back using the
     ///    RPL_INVITELIST and RPL_ENDOFINVITELIST messages.  A
     ///    separate RPL_INVITELIST is sent for each active mask.
     ///    After the masks have been listed (or if none present) a
     ///    RPL_ENDOFINVITELIST MUST be sent.
-    /// 
-    RPL_ENDOFINVITELIST = 347,
+    ///
+    RPL_ENDOFINVITELIST(CS<'a>),
 
     /// 348    RPL_EXCEPTLIST
     ///       "<channel> <exceptionmask>"
-    RPL_EXCEPTLIST = 348,
+    RPL_EXCEPTLIST(CS<'a>),
 
     /// 349    RPL_ENDOFEXCEPTLIST
     ///       "<channel> :End of channel exception list"
-    /// 
+    ///
     ///  - When listing the 'exception masks' for a given channel,
     ///    a server is required to send the list back using the
     ///    RPL_EXCEPTLIST and RPL_ENDOFEXCEPTLIST messages.  A
     ///    separate RPL_EXCEPTLIST is sent for each active mask.
     ///    After the masks have been listed (or if none present)
     ///    a RPL_ENDOFEXCEPTLIST MUST be sent.
-    /// 
-    RPL_ENDOFEXCEPTLIST = 349,
+    ///
+    RPL_ENDOFEXCEPTLIST(CS<'a>),
 
     /// 351    RPL_VERSION
     ///       "<version>.<debuglevel> <server> :<comments>"
-    /// 
+    ///
     ///  - Reply by the server showing its version details.
     ///    The <version> is the version of the software being
     ///    used (including any patchlevel revisions) and the
     ///    <debuglevel> is used to indicate if the server is
     ///    running in "debug mode".
-    /// 
+    ///
     ///    The "comments" field may contain any comments about
     ///    the version or further version details.
-    /// 
-    RPL_VERSION = 351,
+    ///
+    RPL_VERSION(CS<'a>),
 
     /// 352    RPL_WHOREPLY
     ///       "<channel> <user> <host> <server> <nick>
     ///       ( "H" / "G" > ["*"] [ ( "@" / "+" ) ]
     ///       :<hopcount> <real name>"
-    /// 
-    RPL_WHOREPLY = 352,
+    ///
+    RPL_WHOREPLY(CS<'a>),
 
     /// 315    RPL_ENDOFWHO
     ///       "<name> :End of WHO list"
-    /// 
+    ///
     ///  - The RPL_WHOREPLY and RPL_ENDOFWHO pair are used
     ///    to answer a WHO message.  The RPL_WHOREPLY is only
     ///    sent if there is an appropriate match to the WHO
@@ -258,20 +264,20 @@ pub enum Reply {
     ///    with a WHO message, a RPL_ENDOFWHO MUST be sent
     ///    after processing each list item with <name> being
     ///    the item.
-    /// 
-    RPL_ENDOFWHO = 315,
+    ///
+    RPL_ENDOFWHO(CS<'a>),
 
     /// 353    RPL_NAMREPLY
     ///       "( "=" / "*" / "@" ) <channel>
     ///        :[ "@" / "+" ] <nick> *( " " [ "@" / "+" ] <nick> )
     ///  - "@" is used for secret channels, "*" for private
     ///    channels, and "=" for others (public channels).
-    /// 
-    RPL_NAMREPLY = 353,
+    ///
+    RPL_NAMREPLY(CS<'a>),
 
     /// 366    RPL_ENDOFNAMES
     ///       "<channel> :End of NAMES list"
-    /// 
+    ///
     ///  - To reply to a NAMES message, a reply pair consisting
     ///    of RPL_NAMREPLY and RPL_ENDOFNAMES is sent by the
     ///    server back to the client.  If there is no channel
@@ -281,188 +287,188 @@ pub enum Reply {
     ///    channels and contents are sent back in a series of
     ///    RPL_NAMEREPLY messages with a RPL_ENDOFNAMES to mark
     ///    the end.
-    /// 
-    RPL_ENDOFNAMES = 366,
+    ///
+    RPL_ENDOFNAMES(CS<'a>),
 
     /// 364    RPL_LINKS
     ///       "<mask> <server> :<hopcount> <server info>"
-    RPL_LINKS = 364,
+    RPL_LINKS(CS<'a>),
 
     /// 365    RPL_ENDOFLINKS
     ///       "<mask> :End of LINKS list"
-    /// 
+    ///
     ///  - In replying to the LINKS message, a server MUST send
     ///    replies back using the RPL_LINKS numeric and mark the
     ///    end of the list using an RPL_ENDOFLINKS reply.
-    /// 
-    RPL_ENDOFLINKS = 365,
+    ///
+    RPL_ENDOFLINKS(CS<'a>),
 
     /// 367    RPL_BANLIST
     ///       "<channel> <banmask>"
-    RPL_BANLIST = 367,
+    RPL_BANLIST(CS<'a>),
 
     /// 368    RPL_ENDOFBANLIST
     ///       "<channel> :End of channel ban list"
-    /// 
+    ///
     ///  - When listing the active 'bans' for a given channel,
     ///    a server is required to send the list back using the
     ///    RPL_BANLIST and RPL_ENDOFBANLIST messages.  A separate
     ///    RPL_BANLIST is sent for each active banmask.  After the
     ///    banmasks have been listed (or if none present) a
     ///    RPL_ENDOFBANLIST MUST be sent.
-    /// 
-    RPL_ENDOFBANLIST = 368,
+    ///
+    RPL_ENDOFBANLIST(CS<'a>),
 
     /// 371    RPL_INFO
     ///       ":<string>"
-    RPL_INFO = 371,
+    RPL_INFO(CS<'a>),
 
     /// 374    RPL_ENDOFINFO
     ///       ":End of INFO list"
-    /// 
+    ///
     ///  - A server responding to an INFO message is required to
     ///    send all its 'info' in a series of RPL_INFO messages
     ///    with a RPL_ENDOFINFO reply to indicate the end of the
     ///    replies.
-    /// 
-    RPL_ENDOFINFO = 374,
+    ///
+    RPL_ENDOFINFO(CS<'a>),
 
     /// 375    RPL_MOTDSTART
     ///       ":- <server> Message of the day - "
-    RPL_MOTDSTART = 375,
+    RPL_MOTDSTART(CS<'a>),
 
     /// 372    RPL_MOTD
     ///       ":- <text>"
-    RPL_MOTD = 372,
+    RPL_MOTD(CS<'a>),
 
     /// 376    RPL_ENDOFMOTD
     ///       ":End of MOTD command"
-    /// 
+    ///
     ///  - When responding to the MOTD message and the MOTD file
     ///    is found, the file is displayed line by line, with
     ///    each line no longer than 80 characters, using
     ///    RPL_MOTD format replies.  These MUST be surrounded
     ///    by a RPL_MOTDSTART (before the RPL_MOTDs) and an
     ///    RPL_ENDOFMOTD (after).
-    /// 
-    RPL_ENDOFMOTD = 376,
+    ///
+    RPL_ENDOFMOTD(CS<'a>),
 
     /// 381    RPL_YOUREOPER
     ///       ":You are now an IRC operator"
-    /// 
+    ///
     ///  - RPL_YOUREOPER is sent back to a client which has
     ///    just successfully issued an OPER message and gained
     ///    operator status.
-    /// 
-    RPL_YOUREOPER = 381,
+    ///
+    RPL_YOUREOPER(CS<'a>),
 
     /// 382    RPL_REHASHING
     ///       "<config file> :Rehashing"
-    /// 
+    ///
     ///  - If the REHASH option is used and an operator sends
     ///    a REHASH message, an RPL_REHASHING is sent back to
     ///    the operator.
-    /// 
-    RPL_REHASHING = 382,
+    ///
+    RPL_REHASHING(CS<'a>),
 
     /// 383    RPL_YOURESERVICE
     ///       "You are service <servicename>"
-    /// 
+    ///
     ///  - Sent by the server to a service upon successful
     ///    registration.
-    /// 
-    RPL_YOURESERVICE = 383,
+    ///
+    RPL_YOURESERVICE(CS<'a>),
 
     /// 391    RPL_TIME
     ///       "<server> :<string showing server's local time>"
-    /// 
+    ///
     ///  - When replying to the TIME message, a server MUST send
     ///    the reply using the RPL_TIME format above.  The string
     ///    showing the time need only contain the correct day and
     ///    time there.  There is no further requirement for the
     ///    time string.
-    /// 
-    RPL_TIME = 391,
+    ///
+    RPL_TIME(CS<'a>),
 
     /// 392    RPL_USERSSTART
     ///       ":UserID   Terminal  Host"
-    RPL_USERSSTART = 392,
+    RPL_USERSSTART(CS<'a>),
 
     /// 393    RPL_USERS
     ///       ":<username> <ttyline> <hostname>"
-    RPL_USERS = 393,
+    RPL_USERS(CS<'a>),
 
     /// 394    RPL_ENDOFUSERS
     ///       ":End of users"
-    RPL_ENDOFUSERS = 394,
+    RPL_ENDOFUSERS(CS<'a>),
 
     /// 395    RPL_NOUSERS
     ///       ":Nobody logged in"
-    /// 
+    ///
     ///  - If the USERS message is handled by a server, the
     ///    replies RPL_USERSTART, RPL_USERS, RPL_ENDOFUSERS and
     ///    RPL_NOUSERS are used.  RPL_USERSSTART MUST be sent
     ///    first, following by either a sequence of RPL_USERS
     ///    or a single RPL_NOUSER.  Following this is
     ///    RPL_ENDOFUSERS.
-    /// 
-    RPL_NOUSERS = 395,
+    ///
+    RPL_NOUSERS(CS<'a>),
 
     /// 200    RPL_TRACELINK
     ///       "Link <version & debug level> <destination>
     ///        <next server> V<protocol version>
     ///        <link uptime in seconds> <backstream sendq>
     ///        <upstream sendq>"
-    RPL_TRACELINK = 200,
+    RPL_TRACELINK(CS<'a>),
 
     /// 201    RPL_TRACECONNECTING
     ///       "Try. <class> <server>"
-    RPL_TRACECONNECTING = 201,
+    RPL_TRACECONNECTING(CS<'a>),
 
     /// 202    RPL_TRACEHANDSHAKE
     ///       "H.S. <class> <server>"
-    RPL_TRACEHANDSHAKE = 202,
+    RPL_TRACEHANDSHAKE(CS<'a>),
 
     /// 203    RPL_TRACEUNKNOWN
     ///       "???? <class> [<client IP address in dot form>]"
-    RPL_TRACEUNKNOWN = 203,
+    RPL_TRACEUNKNOWN(CS<'a>),
 
     /// 204    RPL_TRACEOPERATOR
     ///       "Oper <class> <nick>"
-    RPL_TRACEOPERATOR = 204,
+    RPL_TRACEOPERATOR(CS<'a>),
 
     /// 205    RPL_TRACEUSER
     ///       "User <class> <nick>"
-    RPL_TRACEUSER = 205,
+    RPL_TRACEUSER(CS<'a>),
 
     /// 206    RPL_TRACESERVER
     ///       "Serv <class> <int>S <int>C <server>
     ///        <nick!user|*!*>@<host|server> V<protocol version>"
-    RPL_TRACESERVER = 206,
+    RPL_TRACESERVER(CS<'a>),
 
     /// 207    RPL_TRACESERVICE
     ///       "Service <class> <name> <type> <active type>"
-    RPL_TRACESERVICE = 207,
+    RPL_TRACESERVICE(CS<'a>),
 
     /// 208    RPL_TRACENEWTYPE
     ///       "<newtype> 0 <client name>"
-    RPL_TRACENEWTYPE = 208,
+    RPL_TRACENEWTYPE(CS<'a>),
 
     /// 209    RPL_TRACECLASS
     ///       "Class <class> <count>"
-    RPL_TRACECLASS = 209,
+    RPL_TRACECLASS(CS<'a>),
 
     /// 210    RPL_TRACERECONNECT
     ///       Unused.
-    RPL_TRACERECONNECT = 210,
+    RPL_TRACERECONNECT(CS<'a>),
 
     /// 261    RPL_TRACELOG
     ///       "File <logfile> <debug level>"
-    RPL_TRACELOG = 261,
+    RPL_TRACELOG(CS<'a>),
 
     /// 262    RPL_TRACEEND
     ///       "<server name> <version & debug level> :End of TRACE"
-    /// 
+    ///
     ///  - The RPL_TRACE* are all returned by the server in
     ///    response to the TRACE message.  How many are
     ///    returned is dependent on the TRACE message and
@@ -479,19 +485,19 @@ pub enum Reply {
     ///    response to a TRACE command traversing the IRC
     ///    network should reflect the actual connectivity of
     ///    the servers themselves along that path.
-    /// 
+    ///
     ///    RPL_TRACENEWTYPE is to be used for any connection
     ///    which does not fit in the other categories but is
     ///    being displayed anyway.
     ///    RPL_TRACEEND is sent to indicate the end of the list.
-    /// 
-    RPL_TRACEEND = 262,
+    ///
+    RPL_TRACEEND(CS<'a>),
 
     /// 211    RPL_STATSLINKINFO
     ///       "<linkname> <sendq> <sent messages>
     ///        <sent Kbytes> <received messages>
     ///        <received Kbytes> <time open>"
-    /// 
+    ///
     ///  - reports statistics on a connection.  <linkname>
     ///    identifies the particular connection, <sendq> is
     ///    the amount of data that is queued and waiting to be
@@ -502,82 +508,82 @@ pub enum Reply {
     ///    Kbytes> for received data, respectively.  <time
     ///    open> indicates how long ago the connection was
     ///    opened, in seconds.
-    /// 
-    RPL_STATSLINKINFO = 211,
+    ///
+    RPL_STATSLINKINFO(CS<'a>),
 
     /// 212    RPL_STATSCOMMANDS
     ///       "<command> <count> <byte count> <remote count>"
-    /// 
+    ///
     ///  - reports statistics on commands usage.
-    /// 
-    RPL_STATSCOMMANDS = 212,
+    ///
+    RPL_STATSCOMMANDS(CS<'a>),
 
     /// 219    RPL_ENDOFSTATS
     ///       "<stats letter> :End of STATS report"
-    /// 
-    RPL_ENDOFSTATS = 219,
+    ///
+    RPL_ENDOFSTATS(CS<'a>),
 
     /// 242    RPL_STATSUPTIME
     ///       ":Server Up %d days %d:%02d:%02d"
-    /// 
+    ///
     ///  - reports the server uptime.
-    /// 
-    RPL_STATSUPTIME = 242,
+    ///
+    RPL_STATSUPTIME(CS<'a>),
 
     /// 243    RPL_STATSOLINE
     ///       "O <hostmask> * <name>"
-    /// 
+    ///
     ///  - reports the allowed hosts from where user may become IRC
     ///    operators.
-    /// 
-    RPL_STATSOLINE = 243,
+    ///
+    RPL_STATSOLINE(CS<'a>),
 
     /// 221    RPL_UMODEIS
     ///       "<user mode string>"
-    /// 
+    ///
     ///  - To answer a query about a client's own mode,
     ///    RPL_UMODEIS is sent back.
-    /// 
-    RPL_UMODEIS = 221,
+    ///
+    RPL_UMODEIS(CS<'a>),
 
     /// 234    RPL_SERVLIST
     ///       "<name> <server> <mask> <type> <hopcount> <info>"
-    /// 
-    RPL_SERVLIST = 234,
+    ///
+    RPL_SERVLIST(CS<'a>),
 
     /// 235    RPL_SERVLISTEND
     ///       "<mask> <type> :End of service listing"
-    /// 
+    ///
     ///  - When listing services in reply to a SERVLIST message,
     ///    a server is required to send the list back using the
     ///    RPL_SERVLIST and RPL_SERVLISTEND messages.  A separate
     ///    RPL_SERVLIST is sent for each service.  After the
     ///    services have been listed (or if none present) a
     ///    RPL_SERVLISTEND MUST be sent.
-    /// 
-    RPL_SERVLISTEND = 235,
+    ///
+    RPL_SERVLISTEND(CS<'a>),
 
     /// 251    RPL_LUSERCLIENT
     ///       ":There are <integer> users and <integer>
     ///        services on <integer> servers"
-    RPL_LUSERCLIENT = 251,
+    RPL_LUSERCLIENT(CS<'a>),
 
     /// 252    RPL_LUSEROP
     ///       "<integer> :operator(s) online"
-    RPL_LUSEROP = 252,
+    RPL_LUSEROP(CS<'a>),
 
     /// 253    RPL_LUSERUNKNOWN
     ///       "<integer> :unknown connection(s)"
-    RPL_LUSERUNKNOWN = 253,
+    RPL_LUSERUNKNOWN(CS<'a>),
 
     /// 254    RPL_LUSERCHANNELS
     ///       "<integer> :channels formed"
-    RPL_LUSERCHANNELS = 254,
+    RPL_LUSERCHANNELS(CS<'a>),
 
     /// 255    RPL_LUSERME
     ///       ":I have <integer> clients and <integer>
     ///         servers"
-    /// 
+    ///
     ///  - In processing an LUSERS message, the server
     ///    sends a set of replies from RPL_LUSERCLIENT,
     ///    RPL_LUSEROP, RPL_USERUNKNOWN,
@@ -586,24 +592,24 @@ pub enum Reply {
     ///    RPL_LUSERCLIENT and RPL_LUSERME.  The other
     ///    replies are only sent back if a non-zero count
     ///    is found for them.
-    /// 
-    RPL_LUSERME = 255,
+    ///
+    RPL_LUSERME(CS<'a>),
 
     /// 256    RPL_ADMINME
     ///       "<server> :Administrative info"
-    RPL_ADMINME = 256,
+    RPL_ADMINME(CS<'a>),
 
     /// 257    RPL_ADMINLOC1
     ///       ":<admin info>"
-    RPL_ADMINLOC1 = 257,
+    RPL_ADMINLOC1(CS<'a>),
 
     /// 258    RPL_ADMINLOC2
     ///       ":<admin info>"
-    RPL_ADMINLOC2 = 258,
+    RPL_ADMINLOC2(CS<'a>),
 
     /// 259    RPL_ADMINEMAIL
     ///       ":<admin info>"
-    /// 
+    ///
     ///  - When replying to an ADMIN message, a server
     ///    is expected to use replies RPL_ADMINME
     ///    through to RPL_ADMINEMAIL and provide a text
@@ -611,441 +617,439 @@ pub enum Reply {
     ///    description of what city, state and country
     ///    the server is in is expected, followed by
     ///    details of the institution (RPL_ADMINLOC2)
-    /// 
+    ///
     ///    and finally the administrative contact for the
     ///    server (an email address here is REQUIRED)
     ///    in RPL_ADMINEMAIL.
-    /// 
-    RPL_ADMINEMAIL = 259,
+    ///
+    RPL_ADMINEMAIL(CS<'a>),
 
     /// 263    RPL_TRYAGAIN
     ///       "<command> :Please wait a while and try again."
-    /// 
+    ///
     ///  - When a server drops a command without processing it,
     ///    it MUST use the reply RPL_TRYAGAIN to inform the
     ///    originating client.
-    /// 
-    RPL_TRYAGAIN = 263,
+    ///
+    RPL_TRYAGAIN(CS<'a>),
 
     /// 401    ERR_NOSUCHNICK
     ///       "<nickname> :No such nick/channel"
-    /// 
+    ///
     ///   - Used to indicate the nickname parameter supplied to a
     ///     command is currently unused.
-    /// 
-    ERR_NOSUCHNICK = 401,
+    ///
+    ERR_NOSUCHNICK(CS<'a>),
 
     /// 402    ERR_NOSUCHSERVER
     ///       "<server name> :No such server"
-    /// 
+    ///
     ///  - Used to indicate the server name given currently
     ///    does not exist.
-    /// 
-    ERR_NOSUCHSERVER = 402,
+    ///
+    ERR_NOSUCHSERVER(CS<'a>),
 
     /// 403    ERR_NOSUCHCHANNEL
     ///       "<channel name> :No such channel"
-    /// 
+    ///
     ///  - Used to indicate the given channel name is invalid.
-    /// 
-    ERR_NOSUCHCHANNEL = 403,
+    ///
+    ERR_NOSUCHCHANNEL(CS<'a>),
 
     /// 404    ERR_CANNOTSENDTOCHAN
     ///       "<channel name> :Cannot send to channel"
-    /// 
+    ///
     ///  - Sent to a user who is either (a) not on a channel
     ///    which is mode +n or (b) not a chanop (or mode +v) on
     ///    a channel which has mode +m set or where the user is
     ///    banned and is trying to send a PRIVMSG message to
     ///    that channel.
-    /// 
-    ERR_CANNOTSENDTOCHAN = 404,
+    ///
+    ERR_CANNOTSENDTOCHAN(CS<'a>),
 
     /// 405    ERR_TOOMANYCHANNELS
     ///       "<channel name> :You have joined too many channels"
-    /// 
+    ///
     ///  - Sent to a user when they have joined the maximum
     ///    number of allowed channels and they try to join
     ///    another channel.
-    /// 
-    ERR_TOOMANYCHANNELS = 405,
+    ///
+    ERR_TOOMANYCHANNELS(CS<'a>),
 
     /// 406    ERR_WASNOSUCHNICK
     ///       "<nickname> :There was no such nickname"
-    /// 
+    ///
     ///  - Returned by WHOWAS to indicate there is no history
     ///    information for that nickname.
-    /// 
-    ERR_WASNOSUCHNICK = 406,
+    ///
+    ERR_WASNOSUCHNICK(CS<'a>),
 
     /// 407    ERR_TOOMANYTARGETS
     ///       "<target> :<error code> recipients. <abort message>"
-    /// 
+    ///
     ///  - Returned to a client which is attempting to send a
     ///    PRIVMSG/NOTICE using the user@host destination format
     ///    and for a user@host which has several occurrences.
-    /// 
+    ///
     ///  - Returned to a client which trying to send a
     ///    PRIVMSG/NOTICE to too many recipients.
-    /// 
+    ///
     ///  - Returned to a client which is attempting to JOIN a safe
     ///    channel using the shortname when there are more than one
     ///    such channel.
-    /// 
-    ERR_TOOMANYTARGETS = 407,
+    ///
+    ERR_TOOMANYTARGETS(CS<'a>),
 
     /// 408    ERR_NOSUCHSERVICE
     ///       "<service name> :No such service"
-    /// 
+    ///
     ///  - Returned to a client which is attempting to send a SQUERY
     ///    to a service which does not exist.
-    /// 
-    ERR_NOSUCHSERVICE = 408,
+    ///
+    ERR_NOSUCHSERVICE(CS<'a>),
 
     /// 409    ERR_NOORIGIN
     ///       ":No origin specified"
-    /// 
+    ///
     ///  - PING or PONG message missing the originator parameter.
-    /// 
-    ERR_NOORIGIN = 409,
+    ///
+    ERR_NOORIGIN(CS<'a>),
 
     /// 411    ERR_NORECIPIENT
     ///       ":No recipient given (<command>)"
-    ERR_NORECIPIENT = 411,
+    ERR_NORECIPIENT(CS<'a>),
 
     /// 412    ERR_NOTEXTTOSEND
     ///       ":No text to send"
-    ERR_NOTEXTTOSEND = 412,
+    ERR_NOTEXTTOSEND(CS<'a>),
 
     /// 413    ERR_NOTOPLEVEL
     ///       "<mask> :No toplevel domain specified"
-    ERR_NOTOPLEVEL = 413,
+    ERR_NOTOPLEVEL(CS<'a>),
 
     /// 414    ERR_WILDTOPLEVEL
     ///       "<mask> :Wildcard in toplevel domain"
-    ERR_WILDTOPLEVEL = 414,
+    ERR_WILDTOPLEVEL(CS<'a>),
 
     /// 415    ERR_BADMASK
     ///       "<mask> :Bad Server/host mask"
-    /// 
+    ///
     ///  - 412 - 415 are returned by PRIVMSG to indicate that
     ///    the message wasn't delivered for some reason.
     ///    ERR_NOTOPLEVEL and ERR_WILDTOPLEVEL are errors that
     ///    are returned when an invalid use of
     ///    "PRIVMSG $<server>" or "PRIVMSG #<host>" is attempted.
-    /// 
-    ERR_BADMASK = 415,
+    ///
+    ERR_BADMASK(CS<'a>),
 
     /// 421    ERR_UNKNOWNCOMMAND
     ///       "<command> :Unknown command"
-    /// 
+    ///
     ///  - Returned to a registered client to indicate that the
     ///    command sent is unknown by the server.
-    /// 
-    ERR_UNKNOWNCOMMAND = 421,
+    ///
+    ERR_UNKNOWNCOMMAND(CS<'a>),
 
     /// 422    ERR_NOMOTD
     ///       ":MOTD File is missing"
-    /// 
+    ///
     ///  - Server's MOTD file could not be opened by the server.
-    /// 
-    ERR_NOMOTD = 422,
+    ///
+    ERR_NOMOTD(CS<'a>),
 
     /// 423    ERR_NOADMININFO
     ///       "<server> :No administrative info available"
-    /// 
+    ///
     ///  - Returned by a server in response to an ADMIN message
     ///    when there is an error in finding the appropriate
     ///    information.
-    /// 
-    ERR_NOADMININFO = 423,
+    ///
+    ERR_NOADMININFO(CS<'a>),
 
     /// 424    ERR_FILEERROR
     ///       ":File error doing <file op> on <file>"
-    /// 
+    ///
     ///  - Generic error message used to report a failed file
     ///    operation during the processing of a message.
-    /// 
-    ERR_FILEERROR = 424,
+    ///
+    ERR_FILEERROR(CS<'a>),
 
     /// 431    ERR_NONICKNAMEGIVEN
     ///       ":No nickname given"
-    /// 
+    ///
     ///  - Returned when a nickname parameter expected for a
     ///    command and isn't found.
-    /// 
-    ERR_NONICKNAMEGIVEN = 431,
+    ///
+    ERR_NONICKNAMEGIVEN(CS<'a>),
 
     /// 432    ERR_ERRONEUSNICKNAME
     ///       "<nick> :Erroneous nickname"
-    /// 
+    ///
     ///  - Returned after receiving a NICK message which contains
     ///    characters which do not fall in the defined set.  See
     ///    section 2.3.1 for details on valid nicknames.
-    /// 
-    ERR_ERRONEUSNICKNAME = 432,
+    ///
+    ERR_ERRONEUSNICKNAME(CS<'a>),
 
     /// 433    ERR_NICKNAMEINUSE
     ///       "<nick> :Nickname is already in use"
-    /// 
+    ///
     ///  - Returned when a NICK message is processed that results
     ///    in an attempt to change to a currently existing
     ///    nickname.
-    /// 
-    ERR_NICKNAMEINUSE = 433,
+    ///
+    ERR_NICKNAMEINUSE(CS<'a>),
 
     /// 436    ERR_NICKCOLLISION
     ///       "<nick> :Nickname collision KILL from <user>@<host>"
-    /// 
+    ///
     ///  - Returned by a server to a client when it detects a
     ///    nickname collision (registered of a NICK that
     ///    already exists by another server).
-    /// 
-    ERR_NICKCOLLISION = 436,
+    ///
+    ERR_NICKCOLLISION(CS<'a>),
 
     /// 437    ERR_UNAVAILRESOURCE
     ///       "<nick/channel> :Nick/channel is temporarily unavailable"
-    /// 
+    ///
     ///  - Returned by a server to a user trying to join a channel
     ///    currently blocked by the channel delay mechanism.
-    /// 
+    ///
     ///  - Returned by a server to a user trying to change nickname
     ///    when the desired nickname is blocked by the nick delay
     ///    mechanism.
-    /// 
-    ERR_UNAVAILRESOURCE = 437,
+    ///
+    ERR_UNAVAILRESOURCE(CS<'a>),
 
     /// 441    ERR_USERNOTINCHANNEL
     ///       "<nick> <channel> :They aren't on that channel"
-    /// 
+    ///
     ///  - Returned by the server to indicate that the target
     ///    user of the command is not on the given channel.
-    /// 
-    ERR_USERNOTINCHANNEL = 441,
+    ///
+    ERR_USERNOTINCHANNEL(CS<'a>),
 
     /// 442    ERR_NOTONCHANNEL
     ///       "<channel> :You're not on that channel"
-    /// 
+    ///
     ///  - Returned by the server whenever a client tries to
     ///    perform a channel affecting command for which the
     ///    client isn't a member.
-    /// 
-    ERR_NOTONCHANNEL = 442,
+    ///
+    ERR_NOTONCHANNEL(CS<'a>),
 
     /// 443    ERR_USERONCHANNEL
     ///       "<user> <channel> :is already on channel"
-    /// 
+    ///
     ///  - Returned when a client tries to invite a user to a
     ///    channel they are already on.
-    /// 
-    ERR_USERONCHANNEL = 443,
+    ///
+    ERR_USERONCHANNEL(CS<'a>),
 
     /// 444    ERR_NOLOGIN
     ///       "<user> :User not logged in"
-    /// 
+    ///
     ///  - Returned by the summon after a SUMMON command for a
     ///    user was unable to be performed since they were not
     ///    logged in.
-    /// 
-    ERR_NOLOGIN = 444,
+    ///
+    ERR_NOLOGIN(CS<'a>),
 
     /// 445    ERR_SUMMONDISABLED
     ///       ":SUMMON has been disabled"
-    /// 
+    ///
     ///  - Returned as a response to the SUMMON command.  MUST be
     ///    returned by any server which doesn't implement it.
-    /// 
-    ERR_SUMMONDISABLED = 445,
+    ///
+    ERR_SUMMONDISABLED(CS<'a>),
 
     /// 446    ERR_USERSDISABLED
     ///       ":USERS has been disabled"
-    /// 
+    ///
     ///  - Returned as a response to the USERS command.  MUST be
     ///    returned by any server which does not implement it.
-    /// 
-    ERR_USERSDISABLED = 446,
+    ///
+    ERR_USERSDISABLED(CS<'a>),
 
     /// 451    ERR_NOTREGISTERED
     ///       ":You have not registered"
-    /// 
+    ///
     ///  - Returned by the server to indicate that the client
     ///    MUST be registered before the server will allow it
     ///    to be parsed in detail.
-    /// 
-    ERR_NOTREGISTERED = 451,
+    ///
+    ERR_NOTREGISTERED(CS<'a>),
 
     /// 461    ERR_NEEDMOREPARAMS
     ///       "<command> :Not enough parameters"
-    /// 
+    ///
     ///  - Returned by the server by numerous commands to
     ///    indicate to the client that it didn't supply enough
     ///    parameters.
-    /// 
-    ERR_NEEDMOREPARAMS = 461,
+    ///
+    ERR_NEEDMOREPARAMS(CS<'a>),
 
     /// 462    ERR_ALREADYREGISTRED
     ///       ":Unauthorized command (already registered)"
-    /// 
+    ///
     ///  - Returned by the server to any link which tries to
     ///    change part of the registered details (such as
     ///    password or user details from second USER message).
-    /// 
-    ERR_ALREADYREGISTRED = 462,
+    ///
+    ERR_ALREADYREGISTRED(CS<'a>),
 
     /// 463    ERR_NOPERMFORHOST
     ///       ":Your host isn't among the privileged"
-    /// 
+    ///
     ///  - Returned to a client which attempts to register with
     ///    a server which does not been setup to allow
     ///    connections from the host the attempted connection
     ///    is tried.
-    /// 
-    ERR_NOPERMFORHOST = 463,
+    ///
+    ERR_NOPERMFORHOST(CS<'a>),
 
     /// 464    ERR_PASSWDMISMATCH
     ///       ":Password incorrect"
-    /// 
+    ///
     ///  - Returned to indicate a failed attempt at registering
     ///    a connection for which a password was required and
     ///    was either not given or incorrect.
-    /// 
-    ERR_PASSWDMISMATCH = 464,
+    ///
+    ERR_PASSWDMISMATCH(CS<'a>),
 
     /// 465    ERR_YOUREBANNEDCREEP
     ///       ":You are banned from this server"
-    /// 
+    ///
     ///  - Returned after an attempt to connect and register
     ///    yourself with a server which has been setup to
     ///    explicitly deny connections to you.
-    /// 
-    ERR_YOUREBANNEDCREEP = 465,
+    ///
+    ERR_YOUREBANNEDCREEP(CS<'a>),
 
     /// 466    ERR_YOUWILLBEBANNED
-    /// 
+    ///
     ///  - Sent by a server to a user to inform that access to the
     ///    server will soon be denied.
-    /// 
-    ERR_YOUWILLBEBANNED = 466,
+    ///
+    ERR_YOUWILLBEBANNED(CS<'a>),
 
     /// 467    ERR_KEYSET
     ///       "<channel> :Channel key already set"
-    ERR_KEYSET = 467,
+    ERR_KEYSET(CS<'a>),
 
     /// 471    ERR_CHANNELISFULL
     ///       "<channel> :Cannot join channel (+l)"
-    ERR_CHANNELISFULL = 471,
+    ERR_CHANNELISFULL(CS<'a>),
 
     /// 472    ERR_UNKNOWNMODE
     ///       "<char> :is unknown mode char to me for <channel>"
-    ERR_UNKNOWNMODE = 472,
+    ERR_UNKNOWNMODE(CS<'a>),
 
     /// 473    ERR_INVITEONLYCHAN
     ///       "<channel> :Cannot join channel (+i)"
-    ERR_INVITEONLYCHAN = 473,
+    ERR_INVITEONLYCHAN(CS<'a>),
 
     /// 474    ERR_BANNEDFROMCHAN
     ///       "<channel> :Cannot join channel (+b)"
-    ERR_BANNEDFROMCHAN = 474,
+    ERR_BANNEDFROMCHAN(CS<'a>),
 
     /// 475    ERR_BADCHANNELKEY
     ///       "<channel> :Cannot join channel (+k)"
-    ERR_BADCHANNELKEY = 475,
+    ERR_BADCHANNELKEY(CS<'a>),
 
     /// 476    ERR_BADCHANMASK
     ///       "<channel> :Bad Channel Mask"
-    ERR_BADCHANMASK = 476,
+    ERR_BADCHANMASK(CS<'a>),
 
     /// 477    ERR_NOCHANMODES
     ///       "<channel> :Channel doesn't support modes"
-    ERR_NOCHANMODES = 477,
+    ERR_NOCHANMODES(CS<'a>),
 
     /// 478    ERR_BANLISTFULL
     ///       "<channel> <char> :Channel list is full"
-    /// 
-    ERR_BANLISTFULL = 478,
+    ///
+    ERR_BANLISTFULL(CS<'a>),
 
     /// 481    ERR_NOPRIVILEGES
     ///       ":Permission Denied- You're not an IRC operator"
-    /// 
+    ///
     ///  - Any command requiring operator privileges to operate
     ///    MUST return this error to indicate the attempt was
     ///    unsuccessful.
-    /// 
-    ERR_NOPRIVILEGES = 481,
+    ///
+    ERR_NOPRIVILEGES(CS<'a>),
 
     /// 482    ERR_CHANOPRIVSNEEDED
     ///       "<channel> :You're not channel operator"
-    /// 
+    ///
     ///  - Any command requiring 'chanop' privileges (such as
     ///    MODE messages) MUST return this error if the client
     ///    making the attempt is not a chanop on the specified
     ///    channel.
-    /// 
-    ERR_CHANOPRIVSNEEDED = 482,
+    ///
+    ERR_CHANOPRIVSNEEDED(CS<'a>),
 
     /// 483    ERR_CANTKILLSERVER
     ///       ":You can't kill a server!"
-    /// 
+    ///
     ///  - Any attempts to use the KILL command on a server
     ///    are to be refused and this error returned directly
     ///    to the client.
-    /// 
-    ERR_CANTKILLSERVER = 483,
+    ///
+    ERR_CANTKILLSERVER(CS<'a>),
 
     /// 484    ERR_RESTRICTED
     ///       ":Your connection is restricted!"
-    /// 
+    ///
     ///  - Sent by the server to a user upon connection to indicate
     ///    the restricted nature of the connection (user mode "+r").
-    /// 
-    ERR_RESTRICTED = 484,
+    ///
+    ERR_RESTRICTED(CS<'a>),
 
     /// 485    ERR_UNIQOPPRIVSNEEDED
     ///       ":You're not the original channel operator"
-    /// 
+    ///
     ///  - Any MODE requiring "channel creator" privileges MUST
     ///    return this error if the client making the attempt is not
     ///    a chanop on the specified channel.
-    /// 
-    ERR_UNIQOPPRIVSNEEDED = 485,
+    ///
+    ERR_UNIQOPPRIVSNEEDED(CS<'a>),
 
     /// 491    ERR_NOOPERHOST
     ///       ":No O-lines for your host"
-    /// 
+    ///
     ///  - If a client sends an OPER message and the server has
     ///    not been configured to allow connections from the
     ///    client's host as an operator, this error MUST be
     ///    returned.
-    /// 
-    ERR_NOOPERHOST = 491,
+    ///
+    ERR_NOOPERHOST(CS<'a>),
 
     /// 501    ERR_UMODEUNKNOWNFLAG
     ///       ":Unknown MODE flag"
-    /// 
+    ///
     ///  - Returned by the server to indicate that a MODE
     ///    message was sent with a nickname parameter and that
     ///    the a mode flag sent was not recognized.
-    /// 
-    ERR_UMODEUNKNOWNFLAG = 501,
+    ///
+    ERR_UMODEUNKNOWNFLAG(CS<'a>),
 
     /// 502    ERR_USERSDONTMATCH
     ///       ":Cannot change mode for other users"
-    /// 
+    ///
     ///  - Error sent to any user trying to view or change the
     ///    user mode for a user other than themselves.
-    /// 
-    ERR_USERSDONTMATCH = 502,
+    ///
+    ERR_USERSDONTMATCH(CS<'a>),
 
 }
 
-
-impl FromStr for Reply {
-    type Err = IrscError;
-    fn from_str(s: &str) -> Result<Reply> {
+impl<'a> Reply<'a> {
+    pub fn from_message(msg: &'a Message) -> Option<Reply<'a>> {
         use self::Reply::*;
-        match s {
-            "001" => Ok(RPL_WELCOME),
-            "002" => Ok(RPL_YOURHOST),
+        match msg.command() {
+            "001" => msg.elements().last().map(|&e| RPL_WELCOME(Borrowed(e))),
+            /*"002" => Ok(RPL_YOURHOST),
             "003" => Ok(RPL_CREATED),
             "004" => Ok(RPL_MYINFO),
             "005" => Ok(RPL_BOUNCE),
@@ -1180,152 +1184,151 @@ impl FromStr for Reply {
             "485" => Ok(ERR_UNIQOPPRIVSNEEDED),
             "491" => Ok(ERR_NOOPERHOST),
             "501" => Ok(ERR_UMODEUNKNOWNFLAG),
-            "502" => Ok(ERR_USERSDONTMATCH),
-            _ => Err(IrscError::NotFound)
+            "502" => Ok(ERR_USERSDONTMATCH),*/
+            _ => None
         }
      }
-}
-impl ToString for Reply {
-    fn to_string(&self) -> String {
+
+    pub fn to_message(&'a self) -> Message {
         use self::Reply::*;
-        match *self {
-            RPL_WELCOME => "001".to_owned(),
-            RPL_YOURHOST => "002".to_owned(),
-            RPL_CREATED => "003".to_owned(),
-            RPL_MYINFO => "004".to_owned(),
-            RPL_BOUNCE => "005".to_owned(),
-            RPL_USERHOST => "302".to_owned(),
-            RPL_ISON => "303".to_owned(),
-            RPL_AWAY => "301".to_owned(),
-            RPL_UNAWAY => "305".to_owned(),
-            RPL_NOWAWAY => "306".to_owned(),
-            RPL_WHOISUSER => "311".to_owned(),
-            RPL_WHOISSERVER => "312".to_owned(),
-            RPL_WHOISOPERATOR => "313".to_owned(),
-            RPL_WHOISIDLE => "317".to_owned(),
-            RPL_ENDOFWHOIS => "318".to_owned(),
-            RPL_WHOISCHANNELS => "319".to_owned(),
-            RPL_WHOWASUSER => "314".to_owned(),
-            RPL_ENDOFWHOWAS => "369".to_owned(),
-            RPL_LISTSTART => "321".to_owned(),
-            RPL_LIST => "322".to_owned(),
-            RPL_LISTEND => "323".to_owned(),
-            RPL_UNIQOPIS => "325".to_owned(),
-            RPL_CHANNELMODEIS => "324".to_owned(),
-            RPL_NOTOPIC => "331".to_owned(),
-            RPL_TOPIC => "332".to_owned(),
-            RPL_INVITING => "341".to_owned(),
-            RPL_SUMMONING => "342".to_owned(),
-            RPL_INVITELIST => "346".to_owned(),
-            RPL_ENDOFINVITELIST => "347".to_owned(),
-            RPL_EXCEPTLIST => "348".to_owned(),
-            RPL_ENDOFEXCEPTLIST => "349".to_owned(),
-            RPL_VERSION => "351".to_owned(),
-            RPL_WHOREPLY => "352".to_owned(),
-            RPL_ENDOFWHO => "315".to_owned(),
-            RPL_NAMREPLY => "353".to_owned(),
-            RPL_ENDOFNAMES => "366".to_owned(),
-            RPL_LINKS => "364".to_owned(),
-            RPL_ENDOFLINKS => "365".to_owned(),
-            RPL_BANLIST => "367".to_owned(),
-            RPL_ENDOFBANLIST => "368".to_owned(),
-            RPL_INFO => "371".to_owned(),
-            RPL_ENDOFINFO => "374".to_owned(),
-            RPL_MOTDSTART => "375".to_owned(),
-            RPL_MOTD => "372".to_owned(),
-            RPL_ENDOFMOTD => "376".to_owned(),
-            RPL_YOUREOPER => "381".to_owned(),
-            RPL_REHASHING => "382".to_owned(),
-            RPL_YOURESERVICE => "383".to_owned(),
-            RPL_TIME => "391".to_owned(),
-            RPL_USERSSTART => "392".to_owned(),
-            RPL_USERS => "393".to_owned(),
-            RPL_ENDOFUSERS => "394".to_owned(),
-            RPL_NOUSERS => "395".to_owned(),
-            RPL_TRACELINK => "200".to_owned(),
-            RPL_TRACECONNECTING => "201".to_owned(),
-            RPL_TRACEHANDSHAKE => "202".to_owned(),
-            RPL_TRACEUNKNOWN => "203".to_owned(),
-            RPL_TRACEOPERATOR => "204".to_owned(),
-            RPL_TRACEUSER => "205".to_owned(),
-            RPL_TRACESERVER => "206".to_owned(),
-            RPL_TRACESERVICE => "207".to_owned(),
-            RPL_TRACENEWTYPE => "208".to_owned(),
-            RPL_TRACECLASS => "209".to_owned(),
-            RPL_TRACERECONNECT => "210".to_owned(),
-            RPL_TRACELOG => "261".to_owned(),
-            RPL_TRACEEND => "262".to_owned(),
-            RPL_STATSLINKINFO => "211".to_owned(),
-            RPL_STATSCOMMANDS => "212".to_owned(),
-            RPL_ENDOFSTATS => "219".to_owned(),
-            RPL_STATSUPTIME => "242".to_owned(),
-            RPL_STATSOLINE => "243".to_owned(),
-            RPL_UMODEIS => "221".to_owned(),
-            RPL_SERVLIST => "234".to_owned(),
-            RPL_SERVLISTEND => "235".to_owned(),
-            RPL_LUSERCLIENT => "251".to_owned(),
-            RPL_LUSEROP => "252".to_owned(),
-            RPL_LUSERUNKNOWN => "253".to_owned(),
-            RPL_LUSERCHANNELS => "254".to_owned(),
-            RPL_LUSERME => "255".to_owned(),
-            RPL_ADMINME => "256".to_owned(),
-            RPL_ADMINLOC1 => "257".to_owned(),
-            RPL_ADMINLOC2 => "258".to_owned(),
-            RPL_ADMINEMAIL => "259".to_owned(),
-            RPL_TRYAGAIN => "263".to_owned(),
-            ERR_NOSUCHNICK => "401".to_owned(),
-            ERR_NOSUCHSERVER => "402".to_owned(),
-            ERR_NOSUCHCHANNEL => "403".to_owned(),
-            ERR_CANNOTSENDTOCHAN => "404".to_owned(),
-            ERR_TOOMANYCHANNELS => "405".to_owned(),
-            ERR_WASNOSUCHNICK => "406".to_owned(),
-            ERR_TOOMANYTARGETS => "407".to_owned(),
-            ERR_NOSUCHSERVICE => "408".to_owned(),
-            ERR_NOORIGIN => "409".to_owned(),
-            ERR_NORECIPIENT => "411".to_owned(),
-            ERR_NOTEXTTOSEND => "412".to_owned(),
-            ERR_NOTOPLEVEL => "413".to_owned(),
-            ERR_WILDTOPLEVEL => "414".to_owned(),
-            ERR_BADMASK => "415".to_owned(),
-            ERR_UNKNOWNCOMMAND => "421".to_owned(),
-            ERR_NOMOTD => "422".to_owned(),
-            ERR_NOADMININFO => "423".to_owned(),
-            ERR_FILEERROR => "424".to_owned(),
-            ERR_NONICKNAMEGIVEN => "431".to_owned(),
-            ERR_ERRONEUSNICKNAME => "432".to_owned(),
-            ERR_NICKNAMEINUSE => "433".to_owned(),
-            ERR_NICKCOLLISION => "436".to_owned(),
-            ERR_UNAVAILRESOURCE => "437".to_owned(),
-            ERR_USERNOTINCHANNEL => "441".to_owned(),
-            ERR_NOTONCHANNEL => "442".to_owned(),
-            ERR_USERONCHANNEL => "443".to_owned(),
-            ERR_NOLOGIN => "444".to_owned(),
-            ERR_SUMMONDISABLED => "445".to_owned(),
-            ERR_USERSDISABLED => "446".to_owned(),
-            ERR_NOTREGISTERED => "451".to_owned(),
-            ERR_NEEDMOREPARAMS => "461".to_owned(),
-            ERR_ALREADYREGISTRED => "462".to_owned(),
-            ERR_NOPERMFORHOST => "463".to_owned(),
-            ERR_PASSWDMISMATCH => "464".to_owned(),
-            ERR_YOUREBANNEDCREEP => "465".to_owned(),
-            ERR_YOUWILLBEBANNED => "466".to_owned(),
-            ERR_KEYSET => "467".to_owned(),
-            ERR_CHANNELISFULL => "471".to_owned(),
-            ERR_UNKNOWNMODE => "472".to_owned(),
-            ERR_INVITEONLYCHAN => "473".to_owned(),
-            ERR_BANNEDFROMCHAN => "474".to_owned(),
-            ERR_BADCHANNELKEY => "475".to_owned(),
-            ERR_BADCHANMASK => "476".to_owned(),
-            ERR_NOCHANMODES => "477".to_owned(),
-            ERR_BANLISTFULL => "478".to_owned(),
-            ERR_NOPRIVILEGES => "481".to_owned(),
-            ERR_CHANOPRIVSNEEDED => "482".to_owned(),
-            ERR_CANTKILLSERVER => "483".to_owned(),
-            ERR_RESTRICTED => "484".to_owned(),
-            ERR_UNIQOPPRIVSNEEDED => "485".to_owned(),
-            ERR_NOOPERHOST => "491".to_owned(),
-            ERR_UMODEUNKNOWNFLAG => "501".to_owned(),
-            ERR_USERSDONTMATCH => "502".to_owned(),
+        match self {
+            &RPL_WELCOME(ref s) => Message::format(None, Borrowed("001"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_YOURHOST(ref s) => Message::format(None, Borrowed("002"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_CREATED(ref s) => Message::format(None, Borrowed("003"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_MYINFO(ref s) => Message::format(None, Borrowed("004"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_BOUNCE(ref s) => Message::format(None, Borrowed("005"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_USERHOST(ref s) => Message::format(None, Borrowed("302"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ISON(ref s) => Message::format(None, Borrowed("303"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_AWAY(ref s) => Message::format(None, Borrowed("301"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_UNAWAY(ref s) => Message::format(None, Borrowed("305"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_NOWAWAY(ref s) => Message::format(None, Borrowed("306"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_WHOISUSER(ref s) => Message::format(None, Borrowed("311"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_WHOISSERVER(ref s) => Message::format(None, Borrowed("312"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_WHOISOPERATOR(ref s) => Message::format(None, Borrowed("313"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_WHOISIDLE(ref s) => Message::format(None, Borrowed("317"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ENDOFWHOIS(ref s) => Message::format(None, Borrowed("318"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_WHOISCHANNELS(ref s) => Message::format(None, Borrowed("319"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_WHOWASUSER(ref s) => Message::format(None, Borrowed("314"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ENDOFWHOWAS(ref s) => Message::format(None, Borrowed("369"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_LISTSTART => Message::format(None, Borrowed("321"), vec![], None, MsgType::Irc),
+            &RPL_LIST(ref s) => Message::format(None, Borrowed("322"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_LISTEND(ref s) => Message::format(None, Borrowed("323"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_UNIQOPIS(ref s) => Message::format(None, Borrowed("325"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_CHANNELMODEIS(ref s) => Message::format(None, Borrowed("324"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_NOTOPIC(ref s) => Message::format(None, Borrowed("331"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TOPIC(ref s) => Message::format(None, Borrowed("332"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_INVITING(ref s) => Message::format(None, Borrowed("341"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_SUMMONING(ref s) => Message::format(None, Borrowed("342"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_INVITELIST(ref s) => Message::format(None, Borrowed("346"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ENDOFINVITELIST(ref s) => Message::format(None, Borrowed("347"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_EXCEPTLIST(ref s) => Message::format(None, Borrowed("348"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ENDOFEXCEPTLIST(ref s) => Message::format(None, Borrowed("349"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_VERSION(ref s) => Message::format(None, Borrowed("351"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_WHOREPLY(ref s) => Message::format(None, Borrowed("352"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ENDOFWHO(ref s) => Message::format(None, Borrowed("315"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_NAMREPLY(ref s) => Message::format(None, Borrowed("353"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ENDOFNAMES(ref s) => Message::format(None, Borrowed("366"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_LINKS(ref s) => Message::format(None, Borrowed("364"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ENDOFLINKS(ref s) => Message::format(None, Borrowed("365"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_BANLIST(ref s) => Message::format(None, Borrowed("367"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ENDOFBANLIST(ref s) => Message::format(None, Borrowed("368"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_INFO(ref s) => Message::format(None, Borrowed("371"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ENDOFINFO(ref s) => Message::format(None, Borrowed("374"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_MOTDSTART(ref s) => Message::format(None, Borrowed("375"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_MOTD(ref s) => Message::format(None, Borrowed("372"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ENDOFMOTD(ref s) => Message::format(None, Borrowed("376"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_YOUREOPER(ref s) => Message::format(None, Borrowed("381"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_REHASHING(ref s) => Message::format(None, Borrowed("382"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_YOURESERVICE(ref s) => Message::format(None, Borrowed("383"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TIME(ref s) => Message::format(None, Borrowed("391"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_USERSSTART(ref s) => Message::format(None, Borrowed("392"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_USERS(ref s) => Message::format(None, Borrowed("393"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ENDOFUSERS(ref s) => Message::format(None, Borrowed("394"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_NOUSERS(ref s) => Message::format(None, Borrowed("395"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TRACELINK(ref s) => Message::format(None, Borrowed("200"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TRACECONNECTING(ref s) => Message::format(None, Borrowed("201"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TRACEHANDSHAKE(ref s) => Message::format(None, Borrowed("202"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TRACEUNKNOWN(ref s) => Message::format(None, Borrowed("203"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TRACEOPERATOR(ref s) => Message::format(None, Borrowed("204"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TRACEUSER(ref s) => Message::format(None, Borrowed("205"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TRACESERVER(ref s) => Message::format(None, Borrowed("206"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TRACESERVICE(ref s) => Message::format(None, Borrowed("207"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TRACENEWTYPE(ref s) => Message::format(None, Borrowed("208"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TRACECLASS(ref s) => Message::format(None, Borrowed("209"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TRACERECONNECT(ref s) => Message::format(None, Borrowed("210"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TRACELOG(ref s) => Message::format(None, Borrowed("261"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TRACEEND(ref s) => Message::format(None, Borrowed("262"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_STATSLINKINFO(ref s) => Message::format(None, Borrowed("211"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_STATSCOMMANDS(ref s) => Message::format(None, Borrowed("212"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ENDOFSTATS(ref s) => Message::format(None, Borrowed("219"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_STATSUPTIME(ref s) => Message::format(None, Borrowed("242"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_STATSOLINE(ref s) => Message::format(None, Borrowed("243"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_UMODEIS(ref s) => Message::format(None, Borrowed("221"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_SERVLIST(ref s) => Message::format(None, Borrowed("234"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_SERVLISTEND(ref s) => Message::format(None, Borrowed("235"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_LUSERCLIENT(ref s) => Message::format(None, Borrowed("251"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_LUSEROP(ref s) => Message::format(None, Borrowed("252"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_LUSERUNKNOWN(ref s) => Message::format(None, Borrowed("253"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_LUSERCHANNELS(ref s) => Message::format(None, Borrowed("254"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_LUSERME(ref s) => Message::format(None, Borrowed("255"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ADMINME(ref s) => Message::format(None, Borrowed("256"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ADMINLOC1(ref s) => Message::format(None, Borrowed("257"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ADMINLOC2(ref s) => Message::format(None, Borrowed("258"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_ADMINEMAIL(ref s) => Message::format(None, Borrowed("259"), vec![], Some(s.clone()), MsgType::Irc),
+            &RPL_TRYAGAIN(ref s) => Message::format(None, Borrowed("263"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOSUCHNICK(ref s) => Message::format(None, Borrowed("401"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOSUCHSERVER(ref s) => Message::format(None, Borrowed("402"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOSUCHCHANNEL(ref s) => Message::format(None, Borrowed("403"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_CANNOTSENDTOCHAN(ref s) => Message::format(None, Borrowed("404"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_TOOMANYCHANNELS(ref s) => Message::format(None, Borrowed("405"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_WASNOSUCHNICK(ref s) => Message::format(None, Borrowed("406"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_TOOMANYTARGETS(ref s) => Message::format(None, Borrowed("407"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOSUCHSERVICE(ref s) => Message::format(None, Borrowed("408"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOORIGIN(ref s) => Message::format(None, Borrowed("409"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NORECIPIENT(ref s) => Message::format(None, Borrowed("411"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOTEXTTOSEND(ref s) => Message::format(None, Borrowed("412"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOTOPLEVEL(ref s) => Message::format(None, Borrowed("413"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_WILDTOPLEVEL(ref s) => Message::format(None, Borrowed("414"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_BADMASK(ref s) => Message::format(None, Borrowed("415"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_UNKNOWNCOMMAND(ref s) => Message::format(None, Borrowed("421"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOMOTD(ref s) => Message::format(None, Borrowed("422"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOADMININFO(ref s) => Message::format(None, Borrowed("423"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_FILEERROR(ref s) => Message::format(None, Borrowed("424"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NONICKNAMEGIVEN(ref s) => Message::format(None, Borrowed("431"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_ERRONEUSNICKNAME(ref s) => Message::format(None, Borrowed("432"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NICKNAMEINUSE(ref s) => Message::format(None, Borrowed("433"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NICKCOLLISION(ref s) => Message::format(None, Borrowed("436"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_UNAVAILRESOURCE(ref s) => Message::format(None, Borrowed("437"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_USERNOTINCHANNEL(ref s) => Message::format(None, Borrowed("441"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOTONCHANNEL(ref s) => Message::format(None, Borrowed("442"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_USERONCHANNEL(ref s) => Message::format(None, Borrowed("443"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOLOGIN(ref s) => Message::format(None, Borrowed("444"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_SUMMONDISABLED(ref s) => Message::format(None, Borrowed("445"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_USERSDISABLED(ref s) => Message::format(None, Borrowed("446"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOTREGISTERED(ref s) => Message::format(None, Borrowed("451"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NEEDMOREPARAMS(ref s) => Message::format(None, Borrowed("461"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_ALREADYREGISTRED(ref s) => Message::format(None, Borrowed("462"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOPERMFORHOST(ref s) => Message::format(None, Borrowed("463"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_PASSWDMISMATCH(ref s) => Message::format(None, Borrowed("464"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_YOUREBANNEDCREEP(ref s) => Message::format(None, Borrowed("465"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_YOUWILLBEBANNED(ref s) => Message::format(None, Borrowed("466"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_KEYSET(ref s) => Message::format(None, Borrowed("467"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_CHANNELISFULL(ref s) => Message::format(None, Borrowed("471"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_UNKNOWNMODE(ref s) => Message::format(None, Borrowed("472"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_INVITEONLYCHAN(ref s) => Message::format(None, Borrowed("473"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_BANNEDFROMCHAN(ref s) => Message::format(None, Borrowed("474"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_BADCHANNELKEY(ref s) => Message::format(None, Borrowed("475"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_BADCHANMASK(ref s) => Message::format(None, Borrowed("476"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOCHANMODES(ref s) => Message::format(None, Borrowed("477"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_BANLISTFULL(ref s) => Message::format(None, Borrowed("478"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOPRIVILEGES(ref s) => Message::format(None, Borrowed("481"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_CHANOPRIVSNEEDED(ref s) => Message::format(None, Borrowed("482"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_CANTKILLSERVER(ref s) => Message::format(None, Borrowed("483"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_RESTRICTED(ref s) => Message::format(None, Borrowed("484"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_UNIQOPPRIVSNEEDED(ref s) => Message::format(None, Borrowed("485"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_NOOPERHOST(ref s) => Message::format(None, Borrowed("491"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_UMODEUNKNOWNFLAG(ref s) => Message::format(None, Borrowed("501"), vec![], Some(s.clone()), MsgType::Irc),
+            &ERR_USERSDONTMATCH(ref s) => Message::format(None, Borrowed("502"), vec![], Some(s.clone()), MsgType::Irc),
         }
      }
 }

@@ -1,7 +1,7 @@
 use regex::Regex;
 use std::borrow::ToOwned;
 
-static PATTERN: Regex = regex!(":(.*)!(.*)@(.*)");
+static PATTERN: Regex = regex!("(.*)!(.*)@(.*)");
 
 #[derive(Debug, Clone)]
 pub struct Ident {

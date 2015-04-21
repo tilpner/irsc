@@ -458,7 +458,7 @@ pub enum Command<'a> {
     ///    MODE !12345ircd O               ; Command to ask who the channel
     ///                                    creator for "!12345ircd" is
     /// ```
-    MODE(CS<'a>, CS<'a> /* *( ( "-" / "+" ) *<modes> *<modeparams> ) */),
+    MODE(CS<'a>, Vec<(CS<'a>, CS<'a>)>),
 
     /// ```text```
     /// 3.2.4 Topic message
@@ -1608,11 +1608,13 @@ impl<'a> Command<'a> {
                 Some(PART(ch.split(",").map(Borrowed).collect(),
                           reason.first().map(|&m| m).map(Borrowed)))
             } else { None },
-            /*"NOTICE" => msg.content().get(0).and_then(|c| msg.content().get(1).map(|t|
-                Command::NOTICE(t, c))),
-            "PING" => msg.content().get(0).map(|s1|
-                Command::PING(&s1, msg.content().get(1).map(|&s| s))),*/
-            _ => unimplemented!()
+            "PRIVMSG" => if let [target, msg, ..] = msg.elements().as_ref() {
+                Some(PRIVMSG(Borrowed(target), Borrowed(msg)))
+            } else { None },
+            "NOTICE" => if let [target, msg, ..] = msg.elements().as_ref() {
+                Some(NOTICE(Borrowed(target), Borrowed(msg)))
+            } else { None },
+            _ => None
         }
     }
 
@@ -1640,6 +1642,12 @@ impl<'a> Command<'a> {
             &PART(ref ch, ref reason) =>
                 Message::format(None, Borrowed("PART"),
                     vec![Owned(ch.connect(","))], reason.clone(), MsgType::Irc),
+            &PRIVMSG(ref target, ref msg) =>
+                Message::format(None, Borrowed("PRIVMSG"),
+                    vec![target.clone()], Some(msg.clone()), MsgType::Irc),
+            &NOTICE(ref target, ref text) =>
+                Message::format(None, Borrowed("NOTICE"),
+                    vec![target.clone()], Some(text.clone()), MsgType::Irc),
             /*&Command::PING(ref server1, ref server2) => {
                 let mut c = Vec::new();
                 c.push(server1.clone());

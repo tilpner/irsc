@@ -6,7 +6,7 @@ extern crate regex;
 extern crate log;
 extern crate eventual;
 
-pub mod server;
+pub mod client;
 pub mod color;
 pub mod ident;
 pub mod callback;
@@ -16,6 +16,11 @@ pub mod reply;
 
 use std::io;
 use std::result;
+
+pub use ident::Ident;
+pub use message::{ Message, MsgType };
+pub use command::Command;
+pub use reply::Reply;
 
 #[derive(Debug)]
 pub enum IrscError {

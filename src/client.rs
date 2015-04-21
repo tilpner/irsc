@@ -51,21 +51,22 @@ impl Read for StreamKind {
     }
 }
 
-pub struct Server {
-    stream: Option<StreamKind>,
+pub struct Client {
+    stream: Option<StreamKind>
 }
 
-impl Server {
-    pub fn new() -> Server {
-        Server {
+impl Client {
+    pub fn new() -> Client {
+        Client {
             stream: None
         }
     }
 
     fn handle_event(&mut self, msg: &Message) {
-        if msg.command() == "PING" {
-            let _ = self.send(Command::PONG(Cow::Borrowed(msg.suffix().unwrap_or("")), None).to_message());
-        }
+        let _ = match Command::from_message(msg) {
+            Some(Command::PING(s1, s2)) => self.send(Command::PONG(s1, s2)),
+            _ => Ok(())
+        };
     }
 
     pub fn connect(&mut self, host: String, port: u16) -> Result<()> {
@@ -96,7 +97,7 @@ impl Server {
     }
 
     #[inline]
-    fn sendraw(&mut self, s: &str) -> Result<()> {
+    fn send_raw(&mut self, s: &str) -> Result<()> {
         info!(">> {}", s);
         if DEBUG && s.len() > 512 {
             panic!("Message too long, kittens will die if this runs in release mode. Msg: {}", s)
@@ -109,35 +110,16 @@ impl Server {
                                          .map_err(IrscError::Io))
     }
 
-    pub fn send(&mut self, msg: Message) -> Result<()> {
-        self.sendraw(&msg.to_string())
+    pub fn send_message(&mut self, msg: Message) -> Result<()> {
+        self.send_raw(&msg.to_string())
     }
 
-    pub fn join(&mut self, channel: &str) -> Result<()> {
-        self.sendraw(format!("JOIN {}\r\n", channel).as_ref())
+    pub fn send(&mut self, cmd: Command) -> Result<()> {
+        self.send_message(cmd.to_message())
     }
 
-    pub fn part(&mut self, channel: &str) -> Result<()> {
-        self.sendraw(format!("PART {}\r\n", channel).as_ref())
-    }
-
-    pub fn nick(&mut self, nick: &str) -> Result<()> {
-        self.sendraw(format!("NICK {}\r\n", nick).as_ref())
-    }
-
-    pub fn user(&mut self, username: &str, hostname: &str, servername: &str, realname: &str) -> Result<()> {
-        self.sendraw(format!("USER {} {} {} :{}\r\n", username, hostname, servername, realname).as_ref())
-    }
-
-    pub fn password(&mut self, password: &str) -> Result<()> {
-        self.sendraw(format!("PASS {}\r\n", password).as_ref())
-    }
-
-    pub fn msg(&mut self, target: &str, message: &str) -> Result<()> {
-        self.sendraw(format!("PRIVMSG {} :{}\r\n", target, message).as_ref())
-    }
-
-    pub fn listen(&mut self, events: &[fn(&mut Server, &Message)]) -> Result<()> {
+    pub fn listen<F>(&mut self, events: F) -> Result<()>
+    where F: Fn(&mut Client, &Message) {
         let reader = BufReader::new(match self.stream {
             Some(StreamKind::Plain(ref s)) => (*s).try_clone().unwrap(),
             #[cfg(feature = "ssl")]
@@ -149,11 +131,8 @@ impl Server {
             let line = line.unwrap().parse();
 
             if let Ok(msg) = line {
-                println!("{:?}", msg);
                 self.handle_event(&msg);
-                for e in events.iter() {
-                    e(self, &msg)
-                }
+                events(self, &msg);
             }
         }
         Ok(())

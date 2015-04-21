@@ -16,6 +16,7 @@ pub enum MsgType {
     Ctcp
 }
 
+/// Byte indices, be careful.
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Message {
     pub source: String,
@@ -83,7 +84,7 @@ impl Message {
     }
 
     pub fn range(&self, r: &Range<u16>) -> &str {
-        self.source.slice_chars(r.start as usize, r.end as usize)
+        &self.source[r.start as usize..r.end as usize]
     }
 
     pub fn prefix(&self) -> Option<&str> { self.prefix.as_ref().map(|r| self.range(r)) }
@@ -96,11 +97,12 @@ impl Message {
 impl FromStr for Message {
     type Err = IrscError;
     fn from_str(i: &str) -> Result<Message, IrscError> {
-        info!("Attempting to parse message: {}", i);
+        info!("<< {}", i);
         let len = i.len();
+        // remember, bytes, not chars
         let mut s = 0;
 
-        let prefix = if len >= 1 && i[s..].chars().next() == Some(':') {
+        let prefix = if len >= 1 && i[s..].as_bytes()[0] == ':' as u8 {
             i[s..].find(' ').map(|i| { let n = 1u16..(s + i) as u16; s += i + 1; n })
         } else { None };
 
@@ -110,12 +112,10 @@ impl FromStr for Message {
             p
         });
 
-        // TODO: Parse last non-suffix argument as suffix if no suffix
-        // with colon is available.
         let mut content = Vec::with_capacity(15);
         let mut suffix = None;
         while s < len - 3 {
-            if i[s..].chars().next() == Some(':') {
+            if i[s..].as_bytes()[0] == ':' as u8 {
                 suffix = Some(s as u16 + 1 as u16..i.len() as u16);
                 break
             }
@@ -129,8 +129,9 @@ impl FromStr for Message {
             s += 1;
         }
 
-        let msg_type = if suffix.as_ref()
-            .and_then(|s| i[s.start as usize..].chars().next()) == Some('\u{1}') { MsgType::Ctcp } else { MsgType::Irc };
+        let msg_type = if suffix.as_ref().map(|s| i[s.start as usize..].as_bytes()[0] == 1
+                                               && i[(s.end - 3) as usize..].as_bytes()[0] == 1)
+            == Some(true) { MsgType::Ctcp } else { MsgType::Irc };
 
         command.map(move |c|
             Ok(Message::new(
@@ -141,8 +142,8 @@ impl FromStr for Message {
                 // strip \{1} if CTCP message
                 // strip \r\n for each line, relying on their existence
                 match msg_type {
-                    MsgType::Irc => suffix.map(|s| s.start..s.end - 2),
-                    MsgType::Ctcp => suffix.map(|s| s.start + 1..s.end - 3)
+                    MsgType::Irc => suffix.map(|s| s.start..s.end - 1),
+                    MsgType::Ctcp => suffix.map(|s| s.start + 1..s.end - 2)
                 },
                 msg_type
             ))
@@ -200,7 +201,7 @@ mod test {
             Some(1..2),
             3..10,
             vec![11..14],
-            Some(17..57),
+            Some(17..58),
             MsgType::Ctcp
         );
 
@@ -217,7 +218,7 @@ mod test {
             Some(1..6),
             7..13,
             vec![14..18],
-            Some(20..51),
+            Some(20..52),
             MsgType::Irc
         );
         assert_eq!(a.parse::<Message>().unwrap(), a2.clone());
