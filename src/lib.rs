@@ -1,5 +1,8 @@
-#![feature(plugin, collections, custom_derive, slice_patterns)]
+#![feature(plugin, custom_derive, slice_patterns)]
 #![plugin(regex_macros)]
+
+#![deny(warnings)]
+#![allow(unused_imports)]
 
 extern crate regex;
 #[macro_use]
