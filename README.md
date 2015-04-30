@@ -13,47 +13,64 @@ Want to build an IRC bot with low resource consumption? You might want to have a
 
 This library is supposed to be a thin layer over the IRC protocol, doing all the network IO and event parsing for you. Right now, it only works, nothing more.
 
+## Features
+
+- Semi-complete implementation of [RFC2812](http://tools.ietf.org/html/rfc2812)
+- Some CTCP support
+
+### Planned
+
+- Higher-level wrapper, directly aimed at writing bots
+- Lots of tests
+- Some documentation (yeah, sure)
+
 ## Example
 
-Compiles and works with `rustc 0.13.0-nightly (3327ecca4 2014-11-01 22:41:48 +0000)` and `11b12ad` of this library.
+Compiles and works with `rustc 1.1.0-nightly (c4b23aec4 2015-04-29)` and `3e898f8451229bcc4988b40e2edcaec348bf7f79` of this library.
 
 ```rust
-#![feature(globs, slicing_syntax)]
-
 extern crate irsc;
 
-use irsc::server::Server;
+use std::borrow::ToOwned;
+use std::borrow::Cow::*;
+
+use irsc::client::Client;
 use irsc::color::bold;
-use irsc::event;
-use irsc::event::{ Event, ParseResult, PrivMsg };
+use irsc::*;
+use irsc::Command::*;
+use irsc::Reply::*;
 
 static NAME: &'static str = "rusticbot";
 static DESC: &'static str = "A bot, written in Rust.";
 
-fn callback(arg: (Server, Event)) {
-    let (mut server, event) = arg;
-    match event.command[] {
-        event::PRIVMSG => {
-            let privmsg: PrivMsg = ParseResult::parse(event).unwrap();
-            let response = format!("You wrote: {}", bold(privmsg.content[]));
-            server.msg(privmsg.from.nickname[], response[]).unwrap();
+fn callback(server: &mut Client, msg: &Message) {
+    match Command::from_message(msg) {
+        Some(PRIVMSG(to, content)) => {
+            let from = msg.prefix().and_then(Ident::parse).unwrap();
+            let response = match msg.msg_type {
+                MsgType::Irc => format!("{} wrote: {}", from.nickname, bold(&content)),
+                MsgType::Ctcp => format!("{} emoted: {}", from.nickname, bold(&content["ACTION ".len()..]))
+            };
+            server.send(PRIVMSG(to, Owned(response))).unwrap();
+        },
+        _ => ()
+    }
+
+    match Reply::from_message(msg) {
+        Some(RPL_WELCOME(_)) => {
+            server.send(JOIN(vec![Borrowed("#botzoo")], vec![])).unwrap();
         },
         _ => ()
     }
 }
 
 fn main() {
-    let mut s = Server::new();
-    s.connect("irc.freenode.org".into_string(), 6667).unwrap();
-    s.nick(NAME).unwrap();
-    s.user(NAME, "*", "*", DESC).unwrap();
-    s.join("#botzoo").unwrap();
-
-    s.msg("flan3002", "Hey there! You should probably change the nick in this README!").unwrap();
-
-    s.events.lock().register(&callback);
+    let mut s = Client::new();
+    s.connect("irc.mozilla.org".to_owned(), 6667).unwrap();
+    s.send(NICK(Borrowed(NAME))).unwrap();
+    s.send(USER(Borrowed(NAME), Borrowed("*"), Borrowed("*"), Borrowed(DESC))).unwrap();
 
     // Dedicate this thread to listening and event processing
-    s.listen().unwrap();
+    s.listen(callback).unwrap();
 }
 ```

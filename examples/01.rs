@@ -1,8 +1,4 @@
-#![feature(plugin)]
-#![plugin(regex_macros)]
-
 extern crate irsc;
-extern crate env_logger;
 
 use std::borrow::ToOwned;
 use std::borrow::Cow::*;
@@ -38,7 +34,6 @@ fn callback(server: &mut Client, msg: &Message) {
 }
 
 fn main() {
-    env_logger::init().unwrap();
     let mut s = Client::new();
     s.connect("irc.mozilla.org".to_owned(), 6667).unwrap();
     s.send(NICK(Borrowed(NAME))).unwrap();
