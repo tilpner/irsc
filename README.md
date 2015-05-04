@@ -17,6 +17,7 @@ This library is supposed to be a thin layer over the IRC protocol, doing all the
 
 - Semi-complete implementation of [RFC2812](http://tools.ietf.org/html/rfc2812)
 - Some CTCP support
+- SSL for connections
 
 ### Planned
 
