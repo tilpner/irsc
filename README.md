@@ -26,10 +26,19 @@ This library is supposed to be a thin layer over the IRC protocol, doing all the
 
 ## Example
 
-Compiles and works with `rustc 1.1.0-nightly (c4b23aec4 2015-04-29)` and `3e898f8451229bcc4988b40e2edcaec348bf7f79` of this library.
+Compiles and works with `rustc 1.1.0-nightly (ce1150b9f 2015-05-04)` and `fbb7251493ff5a9bc42f849b9b781e69aef9d184` of this library.
+
+Run with
+
+    cargo run --example 01 --features ssl
+
+and join [#botzoo on irc.mozilla.org](http://irc.lc/mozilla/botzoo).
 
 ```rust
 extern crate irsc;
+extern crate env_logger;
+#[cfg(feature = "ssl")]
+extern crate openssl;
 
 use std::borrow::ToOwned;
 use std::borrow::Cow::*;
@@ -39,6 +48,9 @@ use irsc::color::bold;
 use irsc::*;
 use irsc::Command::*;
 use irsc::Reply::*;
+
+#[cfg(feature = "ssl")]
+use openssl::ssl::{ Ssl, SslContext, SslMethod };
 
 static NAME: &'static str = "rusticbot";
 static DESC: &'static str = "A bot, written in Rust.";
@@ -51,7 +63,12 @@ fn callback(server: &mut Client, msg: &Message) {
                 MsgType::Irc => format!("{} wrote: {}", from.nickname, bold(&content)),
                 MsgType::Ctcp => format!("{} emoted: {}", from.nickname, bold(&content["ACTION ".len()..]))
             };
-            server.send(PRIVMSG(to, Owned(response))).unwrap();
+
+            // only send to channels, to prevent recursion when we are pm'ed
+            // technically, there are other prefixes than '#', but ignoring them is fine
+            if to.starts_with("#") {
+                server.send(PRIVMSG(to, Owned(response))).unwrap();
+            }
         },
         _ => ()
     }
@@ -64,9 +81,21 @@ fn callback(server: &mut Client, msg: &Message) {
     }
 }
 
-fn main() {
-    let mut s = Client::new();
+#[cfg(feature = "ssl")]
+fn connect(s: &mut Client) {
+    let ssl = Ssl::new(&SslContext::new(SslMethod::Tlsv1).unwrap()).unwrap();
+    s.connect_ssl("irc.mozilla.org".to_owned(), 6697, ssl).unwrap();
+}
+
+#[cfg(not(feature = "ssl"))]
+fn connect(s: &mut Client) {
     s.connect("irc.mozilla.org".to_owned(), 6667).unwrap();
+}
+
+fn main() {
+    env_logger::init().unwrap();
+    let mut s = Client::new();
+    connect(&mut s);
     s.send(NICK(Borrowed(NAME))).unwrap();
     s.send(USER(Borrowed(NAME), Borrowed("*"), Borrowed("*"), Borrowed(DESC))).unwrap();
 
