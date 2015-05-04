@@ -20,7 +20,7 @@ use openssl::ssl::{ SslContext, SslMethod, SslStream };
 enum StreamKind {
     Plain(TcpStream),
     #[cfg(feature = "ssl")]
-    Ssl(SslStream)
+    Ssl(SslStream<TcpStream>)
 }
 
 impl Write for StreamKind {
@@ -82,18 +82,24 @@ impl Client {
 
     #[cfg(feature = "ssl")]
     pub fn connect_ssl(&mut self, host: String, port: u16) -> Result<()> {
-        let mut s = self.stream.lock();
+        let s = &mut self.stream;
         match *s { Some(_) => return Err(IrscError::AlreadyConnected), _ => () };
         let tcp_stream = match TcpStream::connect((host.as_ref(), port)) {
             Ok(tcp) => Some(tcp),
             Err(e) => return Err(IrscError::Io(e))
         };
 
-        let ssl = SslContext::new(SslMethod::Tlsv1);
-        let ssl_stream = SslStream::new(&ssl, tcp_stream);
-        *s = ssl_stream;
+        let ssl = try!(SslContext::new(SslMethod::Tlsv1));
+        match tcp_stream.map(|tcp| SslStream::new(&ssl, tcp)) {
+            Some(Ok(ssl_stream)) => { *s = Some(StreamKind::Ssl(ssl_stream)); Ok(()) },
+            Some(Err(ssl_error)) => Err(IrscError::Ssl(ssl_error)),
+            None => Err(IrscError::NotConnected)
+        }
+    }
 
-        Ok(())
+    #[cfg(not(feature = "ssl"))]
+    pub fn connect_ssl(&mut self, _host: String, _port: u16) -> Result<()> {
+        panic!("Not compiled with ssl feature.")
     }
 
     #[inline]
@@ -121,9 +127,9 @@ impl Client {
     pub fn listen<F>(&mut self, events: F) -> Result<()>
     where F: Fn(&mut Client, &Message) {
         let reader = BufReader::new(match self.stream {
-            Some(StreamKind::Plain(ref s)) => (*s).try_clone().unwrap(),
+            Some(StreamKind::Plain(ref s)) => StreamKind::Plain((*s).try_clone().unwrap()),
             #[cfg(feature = "ssl")]
-            Some(StreamKind::Ssl(ref s)) => (*s).try_clone().unwrap(),
+            Some(StreamKind::Ssl(ref s)) => StreamKind::Ssl((*s).try_clone().unwrap()),
             None => return Err(IrscError::NotConnected)
         });
 

@@ -1,4 +1,5 @@
 extern crate irsc;
+extern crate env_logger;
 
 use std::borrow::ToOwned;
 use std::borrow::Cow::*;
@@ -20,7 +21,12 @@ fn callback(server: &mut Client, msg: &Message) {
                 MsgType::Irc => format!("{} wrote: {}", from.nickname, bold(&content)),
                 MsgType::Ctcp => format!("{} emoted: {}", from.nickname, bold(&content["ACTION ".len()..]))
             };
-            server.send(PRIVMSG(to, Owned(response))).unwrap();
+
+            // only send to channels, to prevent recursion when we are pm'ed
+            // technically, there are other prefixes than '#', but ignoring them is fine
+            if to.starts_with("#") {
+                server.send(PRIVMSG(to, Owned(response))).unwrap();
+            }
         },
         _ => ()
     }
@@ -34,8 +40,13 @@ fn callback(server: &mut Client, msg: &Message) {
 }
 
 fn main() {
+    env_logger::init().unwrap();
     let mut s = Client::new();
-    s.connect("irc.mozilla.org".to_owned(), 6667).unwrap();
+    if cfg!(feature = "ssl") {
+        s.connect_ssl("irc.mozilla.org".to_owned(), 6697).unwrap();
+    } else {
+        s.connect("irc.mozilla.org".to_owned(), 6667).unwrap();
+    }
     s.send(NICK(Borrowed(NAME))).unwrap();
     s.send(USER(Borrowed(NAME), Borrowed("*"), Borrowed("*"), Borrowed(DESC))).unwrap();
 
