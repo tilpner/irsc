@@ -14,7 +14,7 @@ use command::Command;
 use ::{ DEBUG, Result, IrscError };
 
 #[cfg(feature = "ssl")]
-use openssl::ssl::{ SslContext, SslMethod, SslStream };
+use openssl::ssl::{ Ssl, SslContext, SslMethod, SslStream };
 
 /// Yes, I don't like the name either, but it's private, so...
 enum StreamKind {
@@ -81,7 +81,7 @@ impl Client {
     }
 
     #[cfg(feature = "ssl")]
-    pub fn connect_ssl(&mut self, host: String, port: u16) -> Result<()> {
+    pub fn connect_ssl(&mut self, host: String, port: u16, ssl: Ssl) -> Result<()> {
         let s = &mut self.stream;
         match *s { Some(_) => return Err(IrscError::AlreadyConnected), _ => () };
         let tcp_stream = match TcpStream::connect((host.as_ref(), port)) {
@@ -89,17 +89,11 @@ impl Client {
             Err(e) => return Err(IrscError::Io(e))
         };
 
-        let ssl = try!(SslContext::new(SslMethod::Tlsv1));
-        match tcp_stream.map(|tcp| SslStream::new(&ssl, tcp)) {
+        match tcp_stream.map(|tcp| SslStream::new_from(ssl, tcp)) {
             Some(Ok(ssl_stream)) => { *s = Some(StreamKind::Ssl(ssl_stream)); Ok(()) },
             Some(Err(ssl_error)) => Err(IrscError::Ssl(ssl_error)),
             None => Err(IrscError::NotConnected)
         }
-    }
-
-    #[cfg(not(feature = "ssl"))]
-    pub fn connect_ssl(&mut self, _host: String, _port: u16) -> Result<()> {
-        panic!("Not compiled with ssl feature.")
     }
 
     #[inline]

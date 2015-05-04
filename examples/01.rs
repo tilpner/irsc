@@ -1,5 +1,7 @@
 extern crate irsc;
 extern crate env_logger;
+#[cfg(feature = "ssl")]
+extern crate openssl;
 
 use std::borrow::ToOwned;
 use std::borrow::Cow::*;
@@ -9,6 +11,9 @@ use irsc::color::bold;
 use irsc::*;
 use irsc::Command::*;
 use irsc::Reply::*;
+
+#[cfg(feature = "ssl")]
+use openssl::ssl::{ Ssl, SslContext, SslMethod };
 
 static NAME: &'static str = "rusticbot";
 static DESC: &'static str = "A bot, written in Rust.";
@@ -39,14 +44,21 @@ fn callback(server: &mut Client, msg: &Message) {
     }
 }
 
+#[cfg(feature = "ssl")]
+fn connect(s: &mut Client) {
+    let ssl = Ssl::new(&SslContext::new(SslMethod::Tlsv1).unwrap()).unwrap();
+    s.connect_ssl("irc.mozilla.org".to_owned(), 6697, ssl).unwrap();
+}
+
+#[cfg(not(feature = "ssl"))]
+fn connect(s: &mut Client) {
+    s.connect("irc.mozilla.org".to_owned(), 6667).unwrap();
+}
+
 fn main() {
     env_logger::init().unwrap();
     let mut s = Client::new();
-    if cfg!(feature = "ssl") {
-        s.connect_ssl("irc.mozilla.org".to_owned(), 6697).unwrap();
-    } else {
-        s.connect("irc.mozilla.org".to_owned(), 6667).unwrap();
-    }
+    connect(&mut s);
     s.send(NICK(Borrowed(NAME))).unwrap();
     s.send(USER(Borrowed(NAME), Borrowed("*"), Borrowed("*"), Borrowed(DESC))).unwrap();
 
