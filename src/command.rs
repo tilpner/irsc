@@ -1630,8 +1630,8 @@ impl<'a> Command<'a> {
                 Message::format(None, Borrowed("NICK"), vec![], Some(nick.clone()), MsgType::Irc),
             &USER(ref user, ref mode, ref unused, ref realname) =>
                 Message::format(None, Borrowed("USER"),
-                    vec![user.clone(), mode.clone(), unused.clone(), realname.clone()],
-                    None, MsgType::Irc),
+                    vec![user.clone(), mode.clone(), unused.clone()],
+                    Some(realname.clone()), MsgType::Irc),
             &OPER(ref name, ref pw) =>
                 Message::format(None, Borrowed("OPER"),
                     vec![name.clone(), pw.clone()], None, MsgType::Irc),
