@@ -1,5 +1,6 @@
 #![feature(plugin, custom_derive, slice_patterns)]
 #![plugin(regex_macros)]
+#![cfg_attr(feature = "lints", plugin(clippy))]
 
 #![deny(warnings)]
 #![allow(unused_imports)]
@@ -28,6 +29,7 @@ pub use ident::Ident;
 pub use message::{ Message, MsgType };
 pub use command::Command;
 pub use reply::Reply;
+pub use client::Client;
 
 #[derive(Debug)]
 pub enum IrscError {
@@ -46,4 +48,4 @@ impl From<SslError> for IrscError {
 
 pub type Result<T> = result::Result<T, IrscError>;
 
-pub const DEBUG: bool = cfg!(not(ndebug));
+pub const DEBUG: bool = cfg!(debug_assertions);
