@@ -1,4 +1,4 @@
-language: rust
+language: rust nightly
 after_success:
     - |
         [ $TRAVIS_BRANCH = master ] &&
