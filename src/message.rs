@@ -6,6 +6,7 @@ use std::borrow::{ ToOwned };
 use std::ops::{ Deref, Range };
 
 use ::IrscError;
+use ident::Ident;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MsgType {
@@ -92,6 +93,7 @@ impl Message {
     pub fn content(&self) -> Vec<&str> { self.content.iter().map(|r| self.range(&r)).collect() }
     pub fn suffix(&self) -> Option<&str> { self.suffix.as_ref().map(|r| self.range(r)) }
     pub fn elements(&self) -> Vec<&str> { let mut s = self.content(); self.suffix().map(|f| s.push(f)); s }
+    pub fn ident(&self) -> Option<Ident> { self.prefix().and_then(Ident::parse) }
 }
 
 impl FromStr for Message {
