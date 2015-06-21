@@ -8,7 +8,7 @@ use ::message::{ MsgType, Message };
 pub type CS<'a> = Cow<'a, str>;
 
 #[allow(non_camel_case_types)]
-#[derive(Debug, Hash, PartialEq, Eq)]
+#[derive(Debug, Hash, Clone, PartialEq, Eq)]
 pub enum Reply<'a> {
     /// 001    RPL_WELCOME
     ///       "Welcome to the Internet Relay Network

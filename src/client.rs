@@ -7,7 +7,9 @@ use std::io::{
 };
 
 use std::net::TcpStream;
-use std::borrow::Cow;
+use std::borrow::Cow::{ self, Borrowed, Owned };
+
+//use carboxyl::{ Stream, Sink };
 
 use message::Message;
 use command::Command;
@@ -55,13 +57,15 @@ impl Read for StreamKind {
 }
 
 pub struct Client {
-    stream: Option<StreamKind>
+    stream: Option<StreamKind>,
+//    sink: Sink<Message>
 }
 
 impl Client {
     pub fn new() -> Client {
         Client {
-            stream: None
+            stream: None,
+//            sink: Sink::new()
         }
     }
 
@@ -124,7 +128,7 @@ impl Client {
         self.send_message(cmd.to_message())
     }
 
-    pub fn listen<F>(&mut self, events: Option<F>) -> Result<()>
+    fn intern_listen<F>(&mut self, events: Option<F>) -> Result<()>
     where F: Fn(&mut Client, &Message, Option<Event>) {
         let reader = BufReader::new(match self.stream {
             Some(StreamKind::Plain(ref s)) => StreamKind::Plain((*s).try_clone().unwrap()),
@@ -152,10 +156,37 @@ impl Client {
 
                     on_event(self, &msg, event);
                 }
+
+                //self.sink.send(msg)
             }
         }
         Result(Ok(()))
     }
+
+    pub fn listen(&mut self) -> Result<()> {
+        self.intern_listen::<fn(&mut Client, &Message, Option<Event>)>(None)
+    }
+
+    pub fn listen_with_callback<F>(&mut self, events: F) -> Result<()>
+    where F: Fn(&mut Client, &Message, Option<Event>) {
+        self.intern_listen(Some(events))
+    }
+
+//    pub fn messages(&self) -> Stream<Message> { self.sink.stream() }
+
+    /*pub fn events(&self) -> Stream<(Message, Event)> {
+        self.messages().filter_map(|msg| match Command::from_message(&msg) {
+            Some(m) => Some((msg, Event::Command(m.clone()))),
+            None => match Reply::from_message(&msg) {
+                Some(r) => Some((msg, Event::Reply(r))),
+                None => None
+            }
+        })
+    }*/
+
+//    pub fn commands(&self) -> Stream<Command> {
+//        self.messages().filter_map(|msg| Command::from_message(&msg).map(|c| c.to_static()))
+//    }
 
     pub fn join(&mut self, channel: &str, password: Option<&str>) -> Result<()> {
         self.send_message(JOIN(vec![channel.into()], password.iter().map(|&p| p.into()).collect()).to_message())
@@ -167,7 +198,7 @@ impl Client {
 
     pub fn register(&mut self, nick: &str, user: &str, desc: &str) -> Result<()> {
         Result(self.send_message(NICK(nick.into()).to_message()).inner()
-            .and_then(|_| self.send_message(USER(user.into(), Cow::Borrowed("0"), Cow::Borrowed("*"), desc.into()).to_message()).inner()))
+            .and_then(|_| self.send_message(USER(user.into(), Borrowed("0"), Borrowed("*"), desc.into()).to_message()).inner()))
 
     }
 }
