@@ -5,23 +5,21 @@ use std::borrow::Cow::*;
 use ::{ Result, IrscError };
 use ::message::{ MsgType, Message };
 
-pub type CS<'a> = Cow<'a, str>;
-
 #[allow(non_camel_case_types)]
 #[derive(Debug, Hash, Clone, PartialEq, Eq)]
-pub enum Reply<'a> {
+pub enum Reply {
     /// 001    RPL_WELCOME
     ///       "Welcome to the Internet Relay Network
     ///        <nick>!<user>@<host>"
-    RPL_WELCOME(CS<'a>),
+    RPL_WELCOME(String),
 
     /// 002    RPL_YOURHOST
     ///       "Your host is <servername>, running version <ver>"
-    RPL_YOURHOST(CS<'a>),
+    RPL_YOURHOST(String),
 
     /// 003    RPL_CREATED
     ///       "This server was created <date>"
-    RPL_CREATED(CS<'a>),
+    RPL_CREATED(String),
 
     /// 004    RPL_MYINFO
     ///       "<servername> <version> <available user modes>
@@ -30,7 +28,7 @@ pub enum Reply<'a> {
     ///  - The server sends Replies 001 to 004 to a user upon
     ///    successful registration.
     ///
-    RPL_MYINFO(CS<'a>),
+    RPL_MYINFO(String),
 
     /// 005    RPL_BOUNCE
     ///       "Try server <server name>, port <port number>"
@@ -39,7 +37,7 @@ pub enum Reply<'a> {
     ///    server.  This is often used when the connection is
     ///    refused because the server is already full.
     ///
-    RPL_BOUNCE(CS<'a>),
+    RPL_BOUNCE(String),
 
     /// 302    RPL_USERHOST
     ///       ":*1<reply> *( " " <reply> )"
@@ -55,7 +53,7 @@ pub enum Reply<'a> {
     ///    whether the client has set an AWAY message or not
     ///    respectively.
     ///
-    RPL_USERHOST(CS<'a>),
+    RPL_USERHOST(String),
 
     /// 303    RPL_ISON
     ///       ":*1<nick> *( " " <nick> )"
@@ -63,15 +61,15 @@ pub enum Reply<'a> {
     ///  - Reply format used by ISON to list replies to the
     ///    query list.
     ///
-    RPL_ISON(CS<'a>),
+    RPL_ISON(String),
 
     /// 301    RPL_AWAY
     ///       "<nick> :<away message>"
-    RPL_AWAY(CS<'a>),
+    RPL_AWAY(String),
 
     /// 305    RPL_UNAWAY
     ///       ":You are no longer marked as being away"
-    RPL_UNAWAY(CS<'a>),
+    RPL_UNAWAY(String),
 
     /// 306    RPL_NOWAWAY
     ///       ":You have been marked as being away"
@@ -83,27 +81,27 @@ pub enum Reply<'a> {
     ///    Replies RPL_UNAWAY and RPL_NOWAWAY are sent when the
     ///    client removes and sets an AWAY message.
     ///
-    RPL_NOWAWAY(CS<'a>),
+    RPL_NOWAWAY(String),
 
     /// 311    RPL_WHOISUSER
     ///       "<nick> <user> <host> * :<real name>"
-    RPL_WHOISUSER(CS<'a>),
+    RPL_WHOISUSER(String),
 
     /// 312    RPL_WHOISSERVER
     ///       "<nick> <server> :<server info>"
-    RPL_WHOISSERVER(CS<'a>),
+    RPL_WHOISSERVER(String),
 
     /// 313    RPL_WHOISOPERATOR
     ///       "<nick> :is an IRC operator"
-    RPL_WHOISOPERATOR(CS<'a>),
+    RPL_WHOISOPERATOR(String),
 
     /// 317    RPL_WHOISIDLE
     ///       "<nick> <integer> :seconds idle"
-    RPL_WHOISIDLE(CS<'a>),
+    RPL_WHOISIDLE(String),
 
     /// 318    RPL_ENDOFWHOIS
     ///       "<nick> :End of WHOIS list"
-    RPL_ENDOFWHOIS(CS<'a>),
+    RPL_ENDOFWHOIS(String),
 
     /// 319    RPL_WHOISCHANNELS
     ///       "<nick> :*( ( "@" / "+" ) <channel> " " )"
@@ -123,11 +121,11 @@ pub enum Reply<'a> {
     ///    channel.  The RPL_ENDOFWHOIS reply is used to mark
     ///    the end of processing a WHOIS message.
     ///
-    RPL_WHOISCHANNELS(CS<'a>),
+    RPL_WHOISCHANNELS(String),
 
     /// 314    RPL_WHOWASUSER
     ///       "<nick> <user> <host> * :<real name>"
-    RPL_WHOWASUSER(CS<'a>),
+    RPL_WHOWASUSER(String),
 
     /// 369    RPL_ENDOFWHOWAS
     ///       "<nick> :End of WHOWAS"
@@ -139,7 +137,7 @@ pub enum Reply<'a> {
     ///    be RPL_ENDOFWHOWAS (even if there was only one reply
     ///    and it was an error).
     ///
-    RPL_ENDOFWHOWAS(CS<'a>),
+    RPL_ENDOFWHOWAS(String),
 
     /// 321    RPL_LISTSTART
     ///       Obsolete. Not used.
@@ -148,7 +146,7 @@ pub enum Reply<'a> {
 
     /// 322    RPL_LIST
     ///       "<channel> <# visible> :<topic>"
-    RPL_LIST(CS<'a>),
+    RPL_LIST(String),
 
     /// 323    RPL_LISTEND
     ///       ":End of LIST"
@@ -158,21 +156,21 @@ pub enum Reply<'a> {
     ///    command.  If there are no channels available to return,
     ///    only the end reply MUST be sent.
     ///
-    RPL_LISTEND(CS<'a>),
+    RPL_LISTEND(String),
 
     /// 325    RPL_UNIQOPIS
     ///       "<channel> <nickname>"
     ///
-    RPL_UNIQOPIS(CS<'a>),
+    RPL_UNIQOPIS(String),
 
     /// 324    RPL_CHANNELMODEIS
     ///       "<channel> <mode> <mode params>"
     ///
-    RPL_CHANNELMODEIS(CS<'a>),
+    RPL_CHANNELMODEIS(String),
 
     /// 331    RPL_NOTOPIC
     ///       "<channel> :No topic is set"
-    RPL_NOTOPIC(CS<'a>),
+    RPL_NOTOPIC(String),
 
     /// 332    RPL_TOPIC
     ///       "<channel> :<topic>"
@@ -182,7 +180,7 @@ pub enum Reply<'a> {
     ///    the topic is set, RPL_TOPIC is sent back else
     ///    RPL_NOTOPIC.
     ///
-    RPL_TOPIC(CS<'a>),
+    RPL_TOPIC(String),
 
     /// 341    RPL_INVITING
     ///       "<channel> <nick>"
@@ -191,7 +189,7 @@ pub enum Reply<'a> {
     ///    attempted INVITE message was successful and is
     ///    being passed onto the end client.
     ///
-    RPL_INVITING(CS<'a>),
+    RPL_INVITING(String),
 
     /// 342    RPL_SUMMONING
     ///       "<user> :Summoning user to IRC"
@@ -199,11 +197,11 @@ pub enum Reply<'a> {
     ///  - Returned by a server answering a SUMMON message to
     ///    indicate that it is summoning that user.
     ///
-    RPL_SUMMONING(CS<'a>),
+    RPL_SUMMONING(String),
 
     /// 346    RPL_INVITELIST
     ///       "<channel> <invitemask>"
-    RPL_INVITELIST(CS<'a>),
+    RPL_INVITELIST(String),
 
     /// 347    RPL_ENDOFINVITELIST
     ///       "<channel> :End of channel invite list"
@@ -215,11 +213,11 @@ pub enum Reply<'a> {
     ///    After the masks have been listed (or if none present) a
     ///    RPL_ENDOFINVITELIST MUST be sent.
     ///
-    RPL_ENDOFINVITELIST(CS<'a>),
+    RPL_ENDOFINVITELIST(String),
 
     /// 348    RPL_EXCEPTLIST
     ///       "<channel> <exceptionmask>"
-    RPL_EXCEPTLIST(CS<'a>),
+    RPL_EXCEPTLIST(String),
 
     /// 349    RPL_ENDOFEXCEPTLIST
     ///       "<channel> :End of channel exception list"
@@ -231,7 +229,7 @@ pub enum Reply<'a> {
     ///    After the masks have been listed (or if none present)
     ///    a RPL_ENDOFEXCEPTLIST MUST be sent.
     ///
-    RPL_ENDOFEXCEPTLIST(CS<'a>),
+    RPL_ENDOFEXCEPTLIST(String),
 
     /// 351    RPL_VERSION
     ///       "<version>.<debuglevel> <server> :<comments>"
@@ -245,14 +243,14 @@ pub enum Reply<'a> {
     ///    The "comments" field may contain any comments about
     ///    the version or further version details.
     ///
-    RPL_VERSION(CS<'a>),
+    RPL_VERSION(String),
 
     /// 352    RPL_WHOREPLY
     ///       "<channel> <user> <host> <server> <nick>
     ///       ( "H" / "G" > ["*"] [ ( "@" / "+" ) ]
     ///       :<hopcount> <real name>"
     ///
-    RPL_WHOREPLY(CS<'a>),
+    RPL_WHOREPLY(String),
 
     /// 315    RPL_ENDOFWHO
     ///       "<name> :End of WHO list"
@@ -265,7 +263,7 @@ pub enum Reply<'a> {
     ///    after processing each list item with <name> being
     ///    the item.
     ///
-    RPL_ENDOFWHO(CS<'a>),
+    RPL_ENDOFWHO(String),
 
     /// 353    RPL_NAMREPLY
     ///       "( "=" / "*" / "@" ) <channel>
@@ -273,7 +271,7 @@ pub enum Reply<'a> {
     ///  - "@" is used for secret channels, "*" for private
     ///    channels, and "=" for others (public channels).
     ///
-    RPL_NAMREPLY(CS<'a>),
+    RPL_NAMREPLY(String),
 
     /// 366    RPL_ENDOFNAMES
     ///       "<channel> :End of NAMES list"
@@ -288,11 +286,11 @@ pub enum Reply<'a> {
     ///    RPL_NAMEREPLY messages with a RPL_ENDOFNAMES to mark
     ///    the end.
     ///
-    RPL_ENDOFNAMES(CS<'a>),
+    RPL_ENDOFNAMES(String),
 
     /// 364    RPL_LINKS
     ///       "<mask> <server> :<hopcount> <server info>"
-    RPL_LINKS(CS<'a>),
+    RPL_LINKS(String),
 
     /// 365    RPL_ENDOFLINKS
     ///       "<mask> :End of LINKS list"
@@ -301,11 +299,11 @@ pub enum Reply<'a> {
     ///    replies back using the RPL_LINKS numeric and mark the
     ///    end of the list using an RPL_ENDOFLINKS reply.
     ///
-    RPL_ENDOFLINKS(CS<'a>),
+    RPL_ENDOFLINKS(String),
 
     /// 367    RPL_BANLIST
     ///       "<channel> <banmask>"
-    RPL_BANLIST(CS<'a>),
+    RPL_BANLIST(String),
 
     /// 368    RPL_ENDOFBANLIST
     ///       "<channel> :End of channel ban list"
@@ -317,11 +315,11 @@ pub enum Reply<'a> {
     ///    banmasks have been listed (or if none present) a
     ///    RPL_ENDOFBANLIST MUST be sent.
     ///
-    RPL_ENDOFBANLIST(CS<'a>),
+    RPL_ENDOFBANLIST(String),
 
     /// 371    RPL_INFO
     ///       ":<string>"
-    RPL_INFO(CS<'a>),
+    RPL_INFO(String),
 
     /// 374    RPL_ENDOFINFO
     ///       ":End of INFO list"
@@ -331,15 +329,15 @@ pub enum Reply<'a> {
     ///    with a RPL_ENDOFINFO reply to indicate the end of the
     ///    replies.
     ///
-    RPL_ENDOFINFO(CS<'a>),
+    RPL_ENDOFINFO(String),
 
     /// 375    RPL_MOTDSTART
     ///       ":- <server> Message of the day - "
-    RPL_MOTDSTART(CS<'a>),
+    RPL_MOTDSTART(String),
 
     /// 372    RPL_MOTD
     ///       ":- <text>"
-    RPL_MOTD(CS<'a>),
+    RPL_MOTD(String),
 
     /// 376    RPL_ENDOFMOTD
     ///       ":End of MOTD command"
@@ -351,7 +349,7 @@ pub enum Reply<'a> {
     ///    by a RPL_MOTDSTART (before the RPL_MOTDs) and an
     ///    RPL_ENDOFMOTD (after).
     ///
-    RPL_ENDOFMOTD(CS<'a>),
+    RPL_ENDOFMOTD(String),
 
     /// 381    RPL_YOUREOPER
     ///       ":You are now an IRC operator"
@@ -360,7 +358,7 @@ pub enum Reply<'a> {
     ///    just successfully issued an OPER message and gained
     ///    operator status.
     ///
-    RPL_YOUREOPER(CS<'a>),
+    RPL_YOUREOPER(String),
 
     /// 382    RPL_REHASHING
     ///       "<config file> :Rehashing"
@@ -369,7 +367,7 @@ pub enum Reply<'a> {
     ///    a REHASH message, an RPL_REHASHING is sent back to
     ///    the operator.
     ///
-    RPL_REHASHING(CS<'a>),
+    RPL_REHASHING(String),
 
     /// 383    RPL_YOURESERVICE
     ///       "You are service <servicename>"
@@ -377,7 +375,7 @@ pub enum Reply<'a> {
     ///  - Sent by the server to a service upon successful
     ///    registration.
     ///
-    RPL_YOURESERVICE(CS<'a>),
+    RPL_YOURESERVICE(String),
 
     /// 391    RPL_TIME
     ///       "<server> :<string showing server's local time>"
@@ -388,19 +386,19 @@ pub enum Reply<'a> {
     ///    time there.  There is no further requirement for the
     ///    time string.
     ///
-    RPL_TIME(CS<'a>),
+    RPL_TIME(String),
 
     /// 392    RPL_USERSSTART
     ///       ":UserID   Terminal  Host"
-    RPL_USERSSTART(CS<'a>),
+    RPL_USERSSTART(String),
 
     /// 393    RPL_USERS
     ///       ":<username> <ttyline> <hostname>"
-    RPL_USERS(CS<'a>),
+    RPL_USERS(String),
 
     /// 394    RPL_ENDOFUSERS
     ///       ":End of users"
-    RPL_ENDOFUSERS(CS<'a>),
+    RPL_ENDOFUSERS(String),
 
     /// 395    RPL_NOUSERS
     ///       ":Nobody logged in"
@@ -412,59 +410,59 @@ pub enum Reply<'a> {
     ///    or a single RPL_NOUSER.  Following this is
     ///    RPL_ENDOFUSERS.
     ///
-    RPL_NOUSERS(CS<'a>),
+    RPL_NOUSERS(String),
 
     /// 200    RPL_TRACELINK
     ///       "Link <version & debug level> <destination>
     ///        <next server> V<protocol version>
     ///        <link uptime in seconds> <backstream sendq>
     ///        <upstream sendq>"
-    RPL_TRACELINK(CS<'a>),
+    RPL_TRACELINK(String),
 
     /// 201    RPL_TRACECONNECTING
     ///       "Try. <class> <server>"
-    RPL_TRACECONNECTING(CS<'a>),
+    RPL_TRACECONNECTING(String),
 
     /// 202    RPL_TRACEHANDSHAKE
     ///       "H.S. <class> <server>"
-    RPL_TRACEHANDSHAKE(CS<'a>),
+    RPL_TRACEHANDSHAKE(String),
 
     /// 203    RPL_TRACEUNKNOWN
     ///       "???? <class> [<client IP address in dot form>]"
-    RPL_TRACEUNKNOWN(CS<'a>),
+    RPL_TRACEUNKNOWN(String),
 
     /// 204    RPL_TRACEOPERATOR
     ///       "Oper <class> <nick>"
-    RPL_TRACEOPERATOR(CS<'a>),
+    RPL_TRACEOPERATOR(String),
 
     /// 205    RPL_TRACEUSER
     ///       "User <class> <nick>"
-    RPL_TRACEUSER(CS<'a>),
+    RPL_TRACEUSER(String),
 
     /// 206    RPL_TRACESERVER
     ///       "Serv <class> <int>S <int>C <server>
     ///        <nick!user|*!*>@<host|server> V<protocol version>"
-    RPL_TRACESERVER(CS<'a>),
+    RPL_TRACESERVER(String),
 
     /// 207    RPL_TRACESERVICE
     ///       "Service <class> <name> <type> <active type>"
-    RPL_TRACESERVICE(CS<'a>),
+    RPL_TRACESERVICE(String),
 
     /// 208    RPL_TRACENEWTYPE
     ///       "<newtype> 0 <client name>"
-    RPL_TRACENEWTYPE(CS<'a>),
+    RPL_TRACENEWTYPE(String),
 
     /// 209    RPL_TRACECLASS
     ///       "Class <class> <count>"
-    RPL_TRACECLASS(CS<'a>),
+    RPL_TRACECLASS(String),
 
     /// 210    RPL_TRACERECONNECT
     ///       Unused.
-    RPL_TRACERECONNECT(CS<'a>),
+    RPL_TRACERECONNECT(String),
 
     /// 261    RPL_TRACELOG
     ///       "File <logfile> <debug level>"
-    RPL_TRACELOG(CS<'a>),
+    RPL_TRACELOG(String),
 
     /// 262    RPL_TRACEEND
     ///       "<server name> <version & debug level> :End of TRACE"
@@ -491,7 +489,7 @@ pub enum Reply<'a> {
     ///    being displayed anyway.
     ///    RPL_TRACEEND is sent to indicate the end of the list.
     ///
-    RPL_TRACEEND(CS<'a>),
+    RPL_TRACEEND(String),
 
     /// 211    RPL_STATSLINKINFO
     ///       "<linkname> <sendq> <sent messages>
@@ -509,26 +507,26 @@ pub enum Reply<'a> {
     ///    open> indicates how long ago the connection was
     ///    opened, in seconds.
     ///
-    RPL_STATSLINKINFO(CS<'a>),
+    RPL_STATSLINKINFO(String),
 
     /// 212    RPL_STATSCOMMANDS
     ///       "<command> <count> <byte count> <remote count>"
     ///
     ///  - reports statistics on commands usage.
     ///
-    RPL_STATSCOMMANDS(CS<'a>),
+    RPL_STATSCOMMANDS(String),
 
     /// 219    RPL_ENDOFSTATS
     ///       "<stats letter> :End of STATS report"
     ///
-    RPL_ENDOFSTATS(CS<'a>),
+    RPL_ENDOFSTATS(String),
 
     /// 242    RPL_STATSUPTIME
     ///       ":Server Up %d days %d:%02d:%02d"
     ///
     ///  - reports the server uptime.
     ///
-    RPL_STATSUPTIME(CS<'a>),
+    RPL_STATSUPTIME(String),
 
     /// 243    RPL_STATSOLINE
     ///       "O <hostmask> * <name>"
@@ -536,7 +534,7 @@ pub enum Reply<'a> {
     ///  - reports the allowed hosts from where user may become IRC
     ///    operators.
     ///
-    RPL_STATSOLINE(CS<'a>),
+    RPL_STATSOLINE(String),
 
     /// 221    RPL_UMODEIS
     ///       "<user mode string>"
@@ -544,12 +542,12 @@ pub enum Reply<'a> {
     ///  - To answer a query about a client's own mode,
     ///    RPL_UMODEIS is sent back.
     ///
-    RPL_UMODEIS(CS<'a>),
+    RPL_UMODEIS(String),
 
     /// 234    RPL_SERVLIST
     ///       "<name> <server> <mask> <type> <hopcount> <info>"
     ///
-    RPL_SERVLIST(CS<'a>),
+    RPL_SERVLIST(String),
 
     /// 235    RPL_SERVLISTEND
     ///       "<mask> <type> :End of service listing"
@@ -561,24 +559,24 @@ pub enum Reply<'a> {
     ///    services have been listed (or if none present) a
     ///    RPL_SERVLISTEND MUST be sent.
     ///
-    RPL_SERVLISTEND(CS<'a>),
+    RPL_SERVLISTEND(String),
 
     /// 251    RPL_LUSERCLIENT
     ///       ":There are <integer> users and <integer>
     ///        services on <integer> servers"
-    RPL_LUSERCLIENT(CS<'a>),
+    RPL_LUSERCLIENT(String),
 
     /// 252    RPL_LUSEROP
     ///       "<integer> :operator(s) online"
-    RPL_LUSEROP(CS<'a>),
+    RPL_LUSEROP(String),
 
     /// 253    RPL_LUSERUNKNOWN
     ///       "<integer> :unknown connection(s)"
-    RPL_LUSERUNKNOWN(CS<'a>),
+    RPL_LUSERUNKNOWN(String),
 
     /// 254    RPL_LUSERCHANNELS
     ///       "<integer> :channels formed"
-    RPL_LUSERCHANNELS(CS<'a>),
+    RPL_LUSERCHANNELS(String),
 
     /// 255    RPL_LUSERME
     ///       ":I have <integer> clients and <integer>
@@ -593,19 +591,19 @@ pub enum Reply<'a> {
     ///    replies are only sent back if a non-zero count
     ///    is found for them.
     ///
-    RPL_LUSERME(CS<'a>),
+    RPL_LUSERME(String),
 
     /// 256    RPL_ADMINME
     ///       "<server> :Administrative info"
-    RPL_ADMINME(CS<'a>),
+    RPL_ADMINME(String),
 
     /// 257    RPL_ADMINLOC1
     ///       ":<admin info>"
-    RPL_ADMINLOC1(CS<'a>),
+    RPL_ADMINLOC1(String),
 
     /// 258    RPL_ADMINLOC2
     ///       ":<admin info>"
-    RPL_ADMINLOC2(CS<'a>),
+    RPL_ADMINLOC2(String),
 
     /// 259    RPL_ADMINEMAIL
     ///       ":<admin info>"
@@ -622,7 +620,7 @@ pub enum Reply<'a> {
     ///    server (an email address here is REQUIRED)
     ///    in RPL_ADMINEMAIL.
     ///
-    RPL_ADMINEMAIL(CS<'a>),
+    RPL_ADMINEMAIL(String),
 
     /// 263    RPL_TRYAGAIN
     ///       "<command> :Please wait a while and try again."
@@ -631,7 +629,7 @@ pub enum Reply<'a> {
     ///    it MUST use the reply RPL_TRYAGAIN to inform the
     ///    originating client.
     ///
-    RPL_TRYAGAIN(CS<'a>),
+    RPL_TRYAGAIN(String),
 
     /// 401    ERR_NOSUCHNICK
     ///       "<nickname> :No such nick/channel"
@@ -639,7 +637,7 @@ pub enum Reply<'a> {
     ///   - Used to indicate the nickname parameter supplied to a
     ///     command is currently unused.
     ///
-    ERR_NOSUCHNICK(CS<'a>),
+    ERR_NOSUCHNICK(String),
 
     /// 402    ERR_NOSUCHSERVER
     ///       "<server name> :No such server"
@@ -647,14 +645,14 @@ pub enum Reply<'a> {
     ///  - Used to indicate the server name given currently
     ///    does not exist.
     ///
-    ERR_NOSUCHSERVER(CS<'a>),
+    ERR_NOSUCHSERVER(String),
 
     /// 403    ERR_NOSUCHCHANNEL
     ///       "<channel name> :No such channel"
     ///
     ///  - Used to indicate the given channel name is invalid.
     ///
-    ERR_NOSUCHCHANNEL(CS<'a>),
+    ERR_NOSUCHCHANNEL(String),
 
     /// 404    ERR_CANNOTSENDTOCHAN
     ///       "<channel name> :Cannot send to channel"
@@ -665,7 +663,7 @@ pub enum Reply<'a> {
     ///    banned and is trying to send a PRIVMSG message to
     ///    that channel.
     ///
-    ERR_CANNOTSENDTOCHAN(CS<'a>),
+    ERR_CANNOTSENDTOCHAN(String),
 
     /// 405    ERR_TOOMANYCHANNELS
     ///       "<channel name> :You have joined too many channels"
@@ -674,7 +672,7 @@ pub enum Reply<'a> {
     ///    number of allowed channels and they try to join
     ///    another channel.
     ///
-    ERR_TOOMANYCHANNELS(CS<'a>),
+    ERR_TOOMANYCHANNELS(String),
 
     /// 406    ERR_WASNOSUCHNICK
     ///       "<nickname> :There was no such nickname"
@@ -682,7 +680,7 @@ pub enum Reply<'a> {
     ///  - Returned by WHOWAS to indicate there is no history
     ///    information for that nickname.
     ///
-    ERR_WASNOSUCHNICK(CS<'a>),
+    ERR_WASNOSUCHNICK(String),
 
     /// 407    ERR_TOOMANYTARGETS
     ///       "<target> :<error code> recipients. <abort message>"
@@ -698,7 +696,7 @@ pub enum Reply<'a> {
     ///    channel using the shortname when there are more than one
     ///    such channel.
     ///
-    ERR_TOOMANYTARGETS(CS<'a>),
+    ERR_TOOMANYTARGETS(String),
 
     /// 408    ERR_NOSUCHSERVICE
     ///       "<service name> :No such service"
@@ -706,30 +704,30 @@ pub enum Reply<'a> {
     ///  - Returned to a client which is attempting to send a SQUERY
     ///    to a service which does not exist.
     ///
-    ERR_NOSUCHSERVICE(CS<'a>),
+    ERR_NOSUCHSERVICE(String),
 
     /// 409    ERR_NOORIGIN
     ///       ":No origin specified"
     ///
     ///  - PING or PONG message missing the originator parameter.
     ///
-    ERR_NOORIGIN(CS<'a>),
+    ERR_NOORIGIN(String),
 
     /// 411    ERR_NORECIPIENT
     ///       ":No recipient given (<command>)"
-    ERR_NORECIPIENT(CS<'a>),
+    ERR_NORECIPIENT(String),
 
     /// 412    ERR_NOTEXTTOSEND
     ///       ":No text to send"
-    ERR_NOTEXTTOSEND(CS<'a>),
+    ERR_NOTEXTTOSEND(String),
 
     /// 413    ERR_NOTOPLEVEL
     ///       "<mask> :No toplevel domain specified"
-    ERR_NOTOPLEVEL(CS<'a>),
+    ERR_NOTOPLEVEL(String),
 
     /// 414    ERR_WILDTOPLEVEL
     ///       "<mask> :Wildcard in toplevel domain"
-    ERR_WILDTOPLEVEL(CS<'a>),
+    ERR_WILDTOPLEVEL(String),
 
     /// 415    ERR_BADMASK
     ///       "<mask> :Bad Server/host mask"
@@ -740,7 +738,7 @@ pub enum Reply<'a> {
     ///    are returned when an invalid use of
     ///    "PRIVMSG $<server>" or "PRIVMSG #<host>" is attempted.
     ///
-    ERR_BADMASK(CS<'a>),
+    ERR_BADMASK(String),
 
     /// 421    ERR_UNKNOWNCOMMAND
     ///       "<command> :Unknown command"
@@ -748,14 +746,14 @@ pub enum Reply<'a> {
     ///  - Returned to a registered client to indicate that the
     ///    command sent is unknown by the server.
     ///
-    ERR_UNKNOWNCOMMAND(CS<'a>),
+    ERR_UNKNOWNCOMMAND(String),
 
     /// 422    ERR_NOMOTD
     ///       ":MOTD File is missing"
     ///
     ///  - Server's MOTD file could not be opened by the server.
     ///
-    ERR_NOMOTD(CS<'a>),
+    ERR_NOMOTD(String),
 
     /// 423    ERR_NOADMININFO
     ///       "<server> :No administrative info available"
@@ -764,7 +762,7 @@ pub enum Reply<'a> {
     ///    when there is an error in finding the appropriate
     ///    information.
     ///
-    ERR_NOADMININFO(CS<'a>),
+    ERR_NOADMININFO(String),
 
     /// 424    ERR_FILEERROR
     ///       ":File error doing <file op> on <file>"
@@ -772,7 +770,7 @@ pub enum Reply<'a> {
     ///  - Generic error message used to report a failed file
     ///    operation during the processing of a message.
     ///
-    ERR_FILEERROR(CS<'a>),
+    ERR_FILEERROR(String),
 
     /// 431    ERR_NONICKNAMEGIVEN
     ///       ":No nickname given"
@@ -780,7 +778,7 @@ pub enum Reply<'a> {
     ///  - Returned when a nickname parameter expected for a
     ///    command and isn't found.
     ///
-    ERR_NONICKNAMEGIVEN(CS<'a>),
+    ERR_NONICKNAMEGIVEN(String),
 
     /// 432    ERR_ERRONEUSNICKNAME
     ///       "<nick> :Erroneous nickname"
@@ -789,7 +787,7 @@ pub enum Reply<'a> {
     ///    characters which do not fall in the defined set.  See
     ///    section 2.3.1 for details on valid nicknames.
     ///
-    ERR_ERRONEUSNICKNAME(CS<'a>),
+    ERR_ERRONEUSNICKNAME(String),
 
     /// 433    ERR_NICKNAMEINUSE
     ///       "<nick> :Nickname is already in use"
@@ -798,7 +796,7 @@ pub enum Reply<'a> {
     ///    in an attempt to change to a currently existing
     ///    nickname.
     ///
-    ERR_NICKNAMEINUSE(CS<'a>),
+    ERR_NICKNAMEINUSE(String),
 
     /// 436    ERR_NICKCOLLISION
     ///       "<nick> :Nickname collision KILL from <user>@<host>"
@@ -807,7 +805,7 @@ pub enum Reply<'a> {
     ///    nickname collision (registered of a NICK that
     ///    already exists by another server).
     ///
-    ERR_NICKCOLLISION(CS<'a>),
+    ERR_NICKCOLLISION(String),
 
     /// 437    ERR_UNAVAILRESOURCE
     ///       "<nick/channel> :Nick/channel is temporarily unavailable"
@@ -819,7 +817,7 @@ pub enum Reply<'a> {
     ///    when the desired nickname is blocked by the nick delay
     ///    mechanism.
     ///
-    ERR_UNAVAILRESOURCE(CS<'a>),
+    ERR_UNAVAILRESOURCE(String),
 
     /// 441    ERR_USERNOTINCHANNEL
     ///       "<nick> <channel> :They aren't on that channel"
@@ -827,7 +825,7 @@ pub enum Reply<'a> {
     ///  - Returned by the server to indicate that the target
     ///    user of the command is not on the given channel.
     ///
-    ERR_USERNOTINCHANNEL(CS<'a>),
+    ERR_USERNOTINCHANNEL(String),
 
     /// 442    ERR_NOTONCHANNEL
     ///       "<channel> :You're not on that channel"
@@ -836,7 +834,7 @@ pub enum Reply<'a> {
     ///    perform a channel affecting command for which the
     ///    client isn't a member.
     ///
-    ERR_NOTONCHANNEL(CS<'a>),
+    ERR_NOTONCHANNEL(String),
 
     /// 443    ERR_USERONCHANNEL
     ///       "<user> <channel> :is already on channel"
@@ -844,7 +842,7 @@ pub enum Reply<'a> {
     ///  - Returned when a client tries to invite a user to a
     ///    channel they are already on.
     ///
-    ERR_USERONCHANNEL(CS<'a>),
+    ERR_USERONCHANNEL(String),
 
     /// 444    ERR_NOLOGIN
     ///       "<user> :User not logged in"
@@ -853,7 +851,7 @@ pub enum Reply<'a> {
     ///    user was unable to be performed since they were not
     ///    logged in.
     ///
-    ERR_NOLOGIN(CS<'a>),
+    ERR_NOLOGIN(String),
 
     /// 445    ERR_SUMMONDISABLED
     ///       ":SUMMON has been disabled"
@@ -861,7 +859,7 @@ pub enum Reply<'a> {
     ///  - Returned as a response to the SUMMON command.  MUST be
     ///    returned by any server which doesn't implement it.
     ///
-    ERR_SUMMONDISABLED(CS<'a>),
+    ERR_SUMMONDISABLED(String),
 
     /// 446    ERR_USERSDISABLED
     ///       ":USERS has been disabled"
@@ -869,7 +867,7 @@ pub enum Reply<'a> {
     ///  - Returned as a response to the USERS command.  MUST be
     ///    returned by any server which does not implement it.
     ///
-    ERR_USERSDISABLED(CS<'a>),
+    ERR_USERSDISABLED(String),
 
     /// 451    ERR_NOTREGISTERED
     ///       ":You have not registered"
@@ -878,7 +876,7 @@ pub enum Reply<'a> {
     ///    MUST be registered before the server will allow it
     ///    to be parsed in detail.
     ///
-    ERR_NOTREGISTERED(CS<'a>),
+    ERR_NOTREGISTERED(String),
 
     /// 461    ERR_NEEDMOREPARAMS
     ///       "<command> :Not enough parameters"
@@ -887,7 +885,7 @@ pub enum Reply<'a> {
     ///    indicate to the client that it didn't supply enough
     ///    parameters.
     ///
-    ERR_NEEDMOREPARAMS(CS<'a>),
+    ERR_NEEDMOREPARAMS(String),
 
     /// 462    ERR_ALREADYREGISTRED
     ///       ":Unauthorized command (already registered)"
@@ -896,7 +894,7 @@ pub enum Reply<'a> {
     ///    change part of the registered details (such as
     ///    password or user details from second USER message).
     ///
-    ERR_ALREADYREGISTRED(CS<'a>),
+    ERR_ALREADYREGISTRED(String),
 
     /// 463    ERR_NOPERMFORHOST
     ///       ":Your host isn't among the privileged"
@@ -906,7 +904,7 @@ pub enum Reply<'a> {
     ///    connections from the host the attempted connection
     ///    is tried.
     ///
-    ERR_NOPERMFORHOST(CS<'a>),
+    ERR_NOPERMFORHOST(String),
 
     /// 464    ERR_PASSWDMISMATCH
     ///       ":Password incorrect"
@@ -915,7 +913,7 @@ pub enum Reply<'a> {
     ///    a connection for which a password was required and
     ///    was either not given or incorrect.
     ///
-    ERR_PASSWDMISMATCH(CS<'a>),
+    ERR_PASSWDMISMATCH(String),
 
     /// 465    ERR_YOUREBANNEDCREEP
     ///       ":You are banned from this server"
@@ -924,51 +922,51 @@ pub enum Reply<'a> {
     ///    yourself with a server which has been setup to
     ///    explicitly deny connections to you.
     ///
-    ERR_YOUREBANNEDCREEP(CS<'a>),
+    ERR_YOUREBANNEDCREEP(String),
 
     /// 466    ERR_YOUWILLBEBANNED
     ///
     ///  - Sent by a server to a user to inform that access to the
     ///    server will soon be denied.
     ///
-    ERR_YOUWILLBEBANNED(CS<'a>),
+    ERR_YOUWILLBEBANNED(String),
 
     /// 467    ERR_KEYSET
     ///       "<channel> :Channel key already set"
-    ERR_KEYSET(CS<'a>),
+    ERR_KEYSET(String),
 
     /// 471    ERR_CHANNELISFULL
     ///       "<channel> :Cannot join channel (+l)"
-    ERR_CHANNELISFULL(CS<'a>),
+    ERR_CHANNELISFULL(String),
 
     /// 472    ERR_UNKNOWNMODE
     ///       "<char> :is unknown mode char to me for <channel>"
-    ERR_UNKNOWNMODE(CS<'a>),
+    ERR_UNKNOWNMODE(String),
 
     /// 473    ERR_INVITEONLYCHAN
     ///       "<channel> :Cannot join channel (+i)"
-    ERR_INVITEONLYCHAN(CS<'a>),
+    ERR_INVITEONLYCHAN(String),
 
     /// 474    ERR_BANNEDFROMCHAN
     ///       "<channel> :Cannot join channel (+b)"
-    ERR_BANNEDFROMCHAN(CS<'a>),
+    ERR_BANNEDFROMCHAN(String),
 
     /// 475    ERR_BADCHANNELKEY
     ///       "<channel> :Cannot join channel (+k)"
-    ERR_BADCHANNELKEY(CS<'a>),
+    ERR_BADCHANNELKEY(String),
 
     /// 476    ERR_BADCHANMASK
     ///       "<channel> :Bad Channel Mask"
-    ERR_BADCHANMASK(CS<'a>),
+    ERR_BADCHANMASK(String),
 
     /// 477    ERR_NOCHANMODES
     ///       "<channel> :Channel doesn't support modes"
-    ERR_NOCHANMODES(CS<'a>),
+    ERR_NOCHANMODES(String),
 
     /// 478    ERR_BANLISTFULL
     ///       "<channel> <char> :Channel list is full"
     ///
-    ERR_BANLISTFULL(CS<'a>),
+    ERR_BANLISTFULL(String),
 
     /// 481    ERR_NOPRIVILEGES
     ///       ":Permission Denied- You're not an IRC operator"
@@ -977,7 +975,7 @@ pub enum Reply<'a> {
     ///    MUST return this error to indicate the attempt was
     ///    unsuccessful.
     ///
-    ERR_NOPRIVILEGES(CS<'a>),
+    ERR_NOPRIVILEGES(String),
 
     /// 482    ERR_CHANOPRIVSNEEDED
     ///       "<channel> :You're not channel operator"
@@ -987,7 +985,7 @@ pub enum Reply<'a> {
     ///    making the attempt is not a chanop on the specified
     ///    channel.
     ///
-    ERR_CHANOPRIVSNEEDED(CS<'a>),
+    ERR_CHANOPRIVSNEEDED(String),
 
     /// 483    ERR_CANTKILLSERVER
     ///       ":You can't kill a server!"
@@ -996,7 +994,7 @@ pub enum Reply<'a> {
     ///    are to be refused and this error returned directly
     ///    to the client.
     ///
-    ERR_CANTKILLSERVER(CS<'a>),
+    ERR_CANTKILLSERVER(String),
 
     /// 484    ERR_RESTRICTED
     ///       ":Your connection is restricted!"
@@ -1004,7 +1002,7 @@ pub enum Reply<'a> {
     ///  - Sent by the server to a user upon connection to indicate
     ///    the restricted nature of the connection (user mode "+r").
     ///
-    ERR_RESTRICTED(CS<'a>),
+    ERR_RESTRICTED(String),
 
     /// 485    ERR_UNIQOPPRIVSNEEDED
     ///       ":You're not the original channel operator"
@@ -1013,7 +1011,7 @@ pub enum Reply<'a> {
     ///    return this error if the client making the attempt is not
     ///    a chanop on the specified channel.
     ///
-    ERR_UNIQOPPRIVSNEEDED(CS<'a>),
+    ERR_UNIQOPPRIVSNEEDED(String),
 
     /// 491    ERR_NOOPERHOST
     ///       ":No O-lines for your host"
@@ -1023,7 +1021,7 @@ pub enum Reply<'a> {
     ///    client's host as an operator, this error MUST be
     ///    returned.
     ///
-    ERR_NOOPERHOST(CS<'a>),
+    ERR_NOOPERHOST(String),
 
     /// 501    ERR_UMODEUNKNOWNFLAG
     ///       ":Unknown MODE flag"
@@ -1032,7 +1030,7 @@ pub enum Reply<'a> {
     ///    message was sent with a nickname parameter and that
     ///    the a mode flag sent was not recognized.
     ///
-    ERR_UMODEUNKNOWNFLAG(CS<'a>),
+    ERR_UMODEUNKNOWNFLAG(String),
 
     /// 502    ERR_USERSDONTMATCH
     ///       ":Cannot change mode for other users"
@@ -1040,12 +1038,12 @@ pub enum Reply<'a> {
     ///  - Error sent to any user trying to view or change the
     ///    user mode for a user other than themselves.
     ///
-    ERR_USERSDONTMATCH(CS<'a>),
+    ERR_USERSDONTMATCH(String),
 
 }
 
-impl<'a> Reply<'a> {
-    pub fn from_message(msg: &'a Message) -> Option<Reply<'a>> {
+impl<'a> Reply {
+    pub fn from_message(msg: &'a Message) -> Option<Reply> {
         use self::Reply::*;
         match msg.command() {
             "001" => msg.elements().last().map(|&e| RPL_WELCOME(Borrowed(e))),
