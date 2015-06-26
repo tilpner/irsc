@@ -6,8 +6,11 @@ use std::iter::Extend;
 
 use message::{ Message, MsgType };
 
+pub type CS<'a> = Cow<'a, str>;
+
 #[derive(Debug, Hash, Clone, PartialEq, Eq)]
-pub enum Command {
+#[doc(disables)]
+pub enum Command<'a> {
     /// ```text
     /// 3.1.1 Password message
     ///
@@ -27,7 +30,7 @@ pub enum Command {
     ///
     ///    PASS secretpasswordhere
     /// ```
-    PASS(String),
+    PASS(CS<'a>),
 
     /// ```text
     /// 3.1.2 Nick message
@@ -54,7 +57,7 @@ pub enum Command {
     ///                            ; Server telling that WiZ changed his
     ///                            nickname to Kilroy.
     /// ```
-    NICK(String),
+    NICK(CS<'a>),
 
     /// ```text
     /// 3.1.3 User message
@@ -89,7 +92,7 @@ pub enum Command {
     ///                                    "Ronnie Reagan", and asking to be set
     ///                                    invisible.
     /// ```
-    USER(String, String, String, String),
+    USER(CS<'a>, CS<'a>, CS<'a>, CS<'a>),
 
     /// ```text
     /// 3.1.4 Oper message
@@ -113,7 +116,7 @@ pub enum Command {
     ///                                    using a username of "foo" and "bar"
     ///                                    as the password.
     /// ```
-    OPER(String, String),
+    OPER(CS<'a>, CS<'a>),
 
     /// ```text
     /// 3.1.5 User mode message
@@ -178,7 +181,7 @@ pub enum Command {
     ///    MODE WiZ -o                     ; WiZ 'deopping' (removing operator
     ///                                    status).
     /// ```
-    UMODE(String),
+    UMODE(CS<'a>),
 
     /// ```text
     /// 3.1.6 Service message
@@ -214,7 +217,7 @@ pub enum Command {
     ///                                    service will only be available on
     ///                                    servers which name matches "*.fr".
     /// ```
-    SERVICE(String, String, String, String, String, String),
+    SERVICE(CS<'a>, CS<'a>, CS<'a>, CS<'a>, CS<'a>, CS<'a>),
 
     /// ```text
     /// 3.1.7 Quit
@@ -236,7 +239,7 @@ pub enum Command {
     ///    :syrk!kalt@millennium.stealth.net QUIT :Gone to have lunch ; User
     ///                                    syrk has quit IRC to have lunch.
     /// ```
-    QUIT(Option<String>),
+    QUIT(Option<CS<'a>>),
 
     /// ```text
     /// 3.1.8 Squit
@@ -272,7 +275,7 @@ pub enum Command {
     ///                                    "cm22.eng.umd.edu" from the net with
     ///                                    comment "Server out of control".
     /// ```
-    SQUIT(String, String),
+    SQUIT(CS<'a>, CS<'a>),
 
     /// ```text
     /// 3.2.1 Join message
@@ -335,7 +338,7 @@ pub enum Command {
     ///    :WiZ!jto@tolsun.oulu.fi JOIN #Twilight_zone ; JOIN message from WiZ
     ///                                    on channel #Twilight_zone
     /// ```
-    JOIN(Vec<String>, Vec<String>),
+    JOIN(Vec<CS<'a>>, Vec<CS<'a>>),
 
     /// ```text
     /// 3.2.2 Part message
@@ -371,7 +374,7 @@ pub enum Command {
     ///                                    "#playzone" with the message "I
     ///                                    lost".
     /// ```
-    PART(Vec<String>, Option<String>),
+    PART(Vec<CS<'a>>, Option<CS<'a>>),
 
     /// ```text
     /// 3.2.3 Channel mode message
@@ -456,7 +459,7 @@ pub enum Command {
     ///    MODE !12345ircd O               ; Command to ask who the channel
     ///                                    creator for "!12345ircd" is
     /// ```
-    MODE(String, Vec<(String, String)>),
+    MODE(CS<'a>, Vec<(CS<'a>, CS<'a>)>),
 
     /// ```text```
     /// 3.2.4 Topic message
@@ -491,7 +494,7 @@ pub enum Command {
     ///    TOPIC #test                     ; Command to check the topic for
     ///                                    #test.
     /// ```
-    TOPIC(String, Option<String>),
+    TOPIC(CS<'a>, Option<CS<'a>>),
 
     /// ```text
     /// 3.2.5 Names message
@@ -528,7 +531,7 @@ pub enum Command {
     ///    NAMES                           ; Command to list all visible
     ///                                    channels and users
     /// ```
-    NAMES(Vec<String>, Option<String>),
+    NAMES(Vec<CS<'a>>, Option<CS<'a>>),
 
     /// ```text
     /// 3.2.6 List message
@@ -557,7 +560,7 @@ pub enum Command {
     ///    LIST #twilight_zone,#42         ; Command to list channels
     ///                                    #twilight_zone and #42
     /// ```
-    LIST(Vec<String>, Option<String>),
+    LIST(Vec<CS<'a>>, Option<CS<'a>>),
 
     /// ```text
     /// 3.2.7 Invite message
@@ -595,7 +598,7 @@ pub enum Command {
     ///    INVITE Wiz #Twilight_Zone       ; Command to invite WiZ to
     ///                                    #Twilight_zone
     /// ```
-    INVITE(String, String),
+    INVITE(CS<'a>, CS<'a>),
 
     /// ```text
     /// 3.2.8 Kick command
@@ -636,7 +639,7 @@ pub enum Command {
     ///                                    ; KICK message on channel #Finnish
     ///                                    from WiZ to remove John from channel
     /// ```
-    KICK(Vec<String>, Vec<String>, Option<String>),
+    KICK(Vec<CS<'a>>, Vec<CS<'a>>, Option<CS<'a>>),
 
     /// ```text
     /// 3.3.1 Private messages
@@ -705,7 +708,7 @@ pub enum Command {
     ///                                    a host which has a name matching
     ///                                    *.edu.
     /// ```
-    PRIVMSG(String, String),
+    PRIVMSG(CS<'a>, CS<'a>),
 
     /// ```text
     /// 3.3.2 Notice
@@ -728,7 +731,7 @@ pub enum Command {
     ///
     /// See PRIVMSG for more details on replies and examples.
     /// ```
-    NOTICE(String, String),
+    NOTICE(CS<'a>, CS<'a>),
 
     /// ```text
     /// 3.4.1 Motd message
@@ -745,7 +748,7 @@ pub enum Command {
     ///    RPL_MOTDSTART                   RPL_MOTD
     ///    RPL_ENDOFMOTD                   ERR_NOMOTD
     /// ```
-    MOTD(Option<String>),
+    MOTD(Option<CS<'a>>),
 
     /// ```text
     /// 3.4.2 Lusers message
@@ -768,7 +771,7 @@ pub enum Command {
     ///    RPL_LUSERUNKOWN                 RPL_LUSERCHANNELS
     ///    RPL_LUSERME                     ERR_NOSUCHSERVER
     /// ```
-    LUSERS(Option<(String, Option<String>)>),
+    LUSERS(Option<(CS<'a>, Option<CS<'a>>)>),
 
     /// ```text
     /// 3.4.3 Version message
@@ -791,7 +794,7 @@ pub enum Command {
     ///    VERSION tolsun.oulu.fi          ; Command to check the version of
     ///                                    server "tolsun.oulu.fi".
     /// ```
-    VERSION(Option<String>),
+    VERSION(Option<CS<'a>>),
 
     /// ```text
     /// 3.4.4 Stats message
@@ -840,7 +843,7 @@ pub enum Command {
     ///    STATS m      ; Command to check the command usage
     ///                   for the server you are connected to
     /// ```
-    STATS(Option<(String, Option<String>)>),
+    STATS(Option<(CS<'a>, Option<CS<'a>>)>),
 
     /// ```text
     /// 3.4.5 Links message
@@ -870,7 +873,7 @@ pub enum Command {
     ///                                    *.bu.edu as seen by the first server
     ///                                    matching *.edu.
     /// ```
-    LINKS(Option<(Option<String>, String)>),
+    LINKS(Option<(Option<CS<'a>>, CS<'a>)>),
 
     /// ```text
     /// 3.4.6 Time message
@@ -892,7 +895,7 @@ pub enum Command {
     ///    TIME tolsun.oulu.fi             ; check the time on the server
     ///                                    "tolson.oulu.fi"
     /// ```
-    TIME(Option<String>),
+    TIME(Option<CS<'a>>),
 
     /// ```text
     /// 3.4.7 Connect message
@@ -921,7 +924,7 @@ pub enum Command {
     ///    CONNECT tolsun.oulu.fi 6667     ; Command to attempt to connect local
     ///                                    server to tolsun.oulu.fi on port 6667
     ///
-    CONNECT(String, i16, Option<String>),
+    CONNECT(CS<'a>, i16, Option<CS<'a>>),
 
     /// ```text
     /// 3.4.8 Trace message
@@ -981,7 +984,7 @@ pub enum Command {
     ///    TRACE *.oulu.fi                 ; TRACE to a server matching
     ///                                    *.oulu.fi
     /// ```
-    TRACE(Option<String>),
+    TRACE(Option<CS<'a>>),
 
     /// ```text
     /// 3.4.9 Admin command
@@ -1010,7 +1013,7 @@ pub enum Command {
     ///    ADMIN syrk                      ; ADMIN request for the server to
     ///                                    which the user syrk is connected
     /// ```
-    ADMIN(Option<String>),
+    ADMIN(Option<CS<'a>>),
 
     /// ```text
     /// 3.4.10 Info command
@@ -1038,7 +1041,7 @@ pub enum Command {
     ///    INFO Angel                      ; request info from the server that
     ///                                    Angel is connected to.
     /// ```
-    INFO(Option<String>),
+    INFO(Option<CS<'a>>),
 
     /// ```text
     /// 3.5.1 Servlist message
@@ -1055,7 +1058,7 @@ pub enum Command {
     ///
     ///    RPL_SERVLIST                  RPL_SERVLISTEND
     /// ```
-    SERVLIST(Option<(String, Option<String>)>),
+    SERVLIST(Option<(CS<'a>, Option<CS<'a>>)>),
 
     /// ```text
     /// 3.5.2 Squery
@@ -1079,7 +1082,7 @@ pub enum Command {
     ///                                    ; Message to the service with name
     ///                                    dict@irc.fr.
     /// ```
-    SQUERY(String, String),
+    SQUERY(CS<'a>, CS<'a>),
 
     /// ```text
     /// 3.6.1 Who query
@@ -1115,7 +1118,7 @@ pub enum Command {
     ///                                    match against "jto*" if they are an
     ///                                    operator.
     /// ```
-    WHO(Option<String>, bool),
+    WHO(Option<CS<'a>>, bool),
 
     /// ```text
     /// 3.6.2 Whois query
@@ -1155,7 +1158,7 @@ pub enum Command {
     ///    WHOIS eff.org trillian          ; ask server eff.org for user
     ///                                    information  about trillian
     /// ```
-    WHOIS(Option<String>, Vec<String>),
+    WHOIS(Option<CS<'a>>, Vec<CS<'a>>),
 
     /// ```text
     /// 3.6.3 Whowas
@@ -1194,7 +1197,7 @@ pub enum Command {
     ///                                    "Trillian" from the first server
     ///                                    found to match "*.edu".
     /// ```
-    WHOWAS(Vec<String>, Option<(String, Option<String>)>),
+    WHOWAS(Vec<CS<'a>>, Option<(CS<'a>, Option<CS<'a>>)>),
 
     /// ```text
     /// 3.7.1 Kill message
@@ -1249,7 +1252,7 @@ pub enum Command {
     ///    recommendation, it is also widely recognized that not even operators
     ///    should be allowed to kill users on remote servers.
     /// ```
-    KILL(String, String),
+    KILL(CS<'a>, CS<'a>),
 
     /// ```text
     /// 3.7.2 Ping message
@@ -1285,7 +1288,7 @@ pub enum Command {
     ///    PING :irc.funet.fi              ; Ping message sent by server
     ///                                    "irc.funet.fi"
     /// ```
-    PING(String, Option<String>),
+    PING(CS<'a>, Option<CS<'a>>),
 
     /// ```text
     /// 3.7.3 Pong message
@@ -1307,7 +1310,7 @@ pub enum Command {
     ///    PONG csd.bu.edu tolsun.oulu.fi  ; PONG message from csd.bu.edu to
     ///                                    tolsun.oulu.fi
     /// ```
-    PONG(String, Option<String>),
+    PONG(CS<'a>, Option<CS<'a>>),
 
     /// ```text
     /// 3.7.4 Error
@@ -1346,7 +1349,7 @@ pub enum Command {
     ///                                    ; Same ERROR message as above but
     ///                                    sent to user WiZ on the other server.
     /// ```
-    ERROR(String),
+    ERROR(CS<'a>),
 
     /// ```text
     /// 4.1 Away
@@ -1378,7 +1381,7 @@ pub enum Command {
     ///    AWAY :Gone to lunch.  Back in 5 ; Command to set away message to
     ///                                    "Gone to lunch.  Back in 5".
     /// ```
-    AWAY(Option<String>),
+    AWAY(Option<CS<'a>>),
 
     /// ```text
     /// 4.2 Rehash message
@@ -1485,7 +1488,7 @@ pub enum Command {
     ///                                    server named "tolsun.oulu.fi" is
     ///                                    running.
     /// ```
-    SUMMON(String, Option<(String, Option<String>)>),
+    SUMMON(CS<'a>, Option<(CS<'a>, Option<CS<'a>>)>),
 
     /// ```text
     /// 4.6 Users
@@ -1519,7 +1522,7 @@ pub enum Command {
     ///    USERS eff.org                   ; request a list of users logged in
     ///                                    on server eff.org
     /// ```
-    USERS(Option<String>),
+    USERS(Option<CS<'a>>),
 
     /// ```text
     /// 4.7 Operwall message
@@ -1548,7 +1551,7 @@ pub enum Command {
     ///                                    CONNECT message it received from
     ///                                    Joshua and acted upon.
     /// ```
-    WALLOPS(String),
+    WALLOPS(CS<'a>),
 
     /// ```text
     /// 4.8 Userhost message
@@ -1573,7 +1576,7 @@ pub enum Command {
     ///    :ircd.stealth.net 302 yournick :syrk=+syrk@millennium.stealth.net
     ///                                    ; Reply for user syrk
     /// ```
-    USERHOST(Vec<String>),
+    USERHOST(Vec<CS<'a>>),
 }
 
 /*impl<'a> Clone for Command<'a> {
