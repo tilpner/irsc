@@ -212,21 +212,21 @@ pub struct SharedClient {
 }
 
 impl SharedClient {
-    pub fn messages(&self) -> Stream<(Arc<Mutex<OwnedClient>>, Message)> {
-        let cl = self.client.clone();
+    pub fn messages(&self) -> Stream<(SharedClient, Message)> {
+        let cl = SharedClient { client: self.client.clone() };
         self.client.lock().unwrap().messages()
             .map(move |m| (cl.clone(), m))
     }
 
-    /*pub fn events(&self) -> Stream<(Message, Event)> {
-        self.client.lock().unwrap().messages().filter_map(|msg| match Command::from_message(&msg) {
-            Some(m) => Some((msg, Event::Command(m.clone()))),
+    pub fn events(&self) -> Stream<(SharedClient, Message, Arc<Event<'static>>)> {
+        self.messages().filter_map(|(cl, msg)| match Command::from_message(&msg) {
+            Some(m) => Some((cl, msg, Arc::new(Event::Command(m.clone())))),
             None => match Reply::from_message(&msg) {
-                Some(r) => Some((msg, Event::Reply(r))),
+                Some(r) => Some((cl, msg, Arc::new(Event::Reply(r)))),
                 None => None
             }
         })
-    }*/
+    }
 
 //    pub fn commands(&self) -> Stream<Command> {
 //        self.messages().filter_map(|msg| Command::from_message(&msg).map(|c| c.to_static()))
