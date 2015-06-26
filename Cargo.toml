@@ -13,7 +13,6 @@ license = "MIT"
 log = "*"
 regex = "*"
 regex_macros = "*"
-carboxyl = "*"
 
 [features]
 ssl = ["openssl"]
@@ -22,6 +21,9 @@ lints = ["clippy"]
 [dependencies.openssl]
 version = "*"
 optional = true
+
+[dependencies.carboxyl]
+git = "https://github.com/tilpner/carboxyl"
 
 [dependencies.clippy]
 version = "*"

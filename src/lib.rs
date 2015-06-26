@@ -10,6 +10,7 @@ extern crate regex;
 extern crate log;
 #[cfg(feature = "ssl")]
 extern crate openssl;
+extern crate carboxyl;
 
 pub mod client;
 pub mod color;

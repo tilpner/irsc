@@ -8,8 +8,9 @@ use std::io::{
 
 use std::net::TcpStream;
 use std::borrow::Cow::{ self, Borrowed, Owned };
+use std::sync::{ Arc, Mutex };
 
-//use carboxyl::{ Stream, Sink };
+use carboxyl::{ Stream, Sink };
 
 use message::Message;
 use command::Command;
@@ -56,16 +57,37 @@ impl Read for StreamKind {
     }
 }
 
-pub struct Client {
-    stream: Option<StreamKind>,
-//    sink: Sink<Message>
+pub trait Client {
+    fn send_message(&mut self, msg: Message) -> Result<()>;
+    fn join(&mut self, channel: &str, password: Option<&str>) -> Result<()> {
+        self.send_message(JOIN(vec![channel.into()], password.iter().map(|&p| p.into()).collect()).to_message())
+    }
+
+    fn msg(&mut self, to: &str, message: &str) -> Result<()> {
+        self.send_message(PRIVMSG(to.into(), message.into()).to_message())
+    }
+
+    fn register(&mut self, nick: &str, user: &str, desc: &str, pass: Option<&str>) -> Result<()> {
+        Result(if let Some(pass) = pass {
+            self.send_message(PASS(pass.into()).to_message()).inner()
+        } else { Ok(()) }
+            .and_then(|_| self.send_message(NICK(nick.into()).to_message()).inner())
+            .and_then(|_| self.send_message(USER(user.into(), Borrowed("0"), Borrowed("*"), desc.into()).to_message()).inner())
+        )
+    }
+
 }
 
-impl Client {
-    pub fn new() -> Client {
-        Client {
+pub struct OwnedClient {
+    stream: Option<StreamKind>,
+    sink: Sink<Message>
+}
+
+impl OwnedClient {
+    pub fn new() -> OwnedClient {
+        OwnedClient {
             stream: None,
-//            sink: Sink::new()
+            sink: Sink::new()
         }
     }
 
@@ -120,9 +142,6 @@ impl Client {
                                          .map_err(IrscError::Io)))
     }
 
-    pub fn send_message(&mut self, msg: Message) -> Result<()> {
-        self.send_raw(&msg.to_string())
-    }
 
     pub fn send(&mut self, cmd: Command) -> Result<()> {
         self.send_message(cmd.to_message())
@@ -157,7 +176,7 @@ impl Client {
                     on_event(self, &msg, event);
                 }
 
-                //self.sink.send(msg)
+                self.sink.send(msg)
             }
         }
         Result(Ok(()))
@@ -172,10 +191,35 @@ impl Client {
         self.intern_listen(Some(events))
     }
 
-//    pub fn messages(&self) -> Stream<Message> { self.sink.stream() }
+    pub fn into_shared(self) -> SharedClient {
+        SharedClient {
+            client: Arc::new(Mutex::new(self)),
+        }
+    }
+
+    pub fn messages(&self) -> Stream<Message> { self.sink.stream() }
+}
+
+impl Client for OwnedClient {
+    fn send_message(&mut self, msg: Message) -> Result<()> {
+        self.send_raw(&msg.to_string())
+    }
+}
+
+#[derive(Clone)]
+pub struct SharedClient {
+    client: Arc<Mutex<OwnedClient>>,
+}
+
+impl SharedClient {
+    pub fn messages(&self) -> Stream<(Arc<Mutex<OwnedClient>>, Message)> {
+        let cl = self.client.clone();
+        self.client.lock().unwrap().messages()
+            .map(move |m| (cl.clone(), m))
+    }
 
     /*pub fn events(&self) -> Stream<(Message, Event)> {
-        self.messages().filter_map(|msg| match Command::from_message(&msg) {
+        self.client.lock().unwrap().messages().filter_map(|msg| match Command::from_message(&msg) {
             Some(m) => Some((msg, Event::Command(m.clone()))),
             None => match Reply::from_message(&msg) {
                 Some(r) => Some((msg, Event::Reply(r))),
@@ -187,18 +231,12 @@ impl Client {
 //    pub fn commands(&self) -> Stream<Command> {
 //        self.messages().filter_map(|msg| Command::from_message(&msg).map(|c| c.to_static()))
 //    }
+}
 
-    pub fn join(&mut self, channel: &str, password: Option<&str>) -> Result<()> {
-        self.send_message(JOIN(vec![channel.into()], password.iter().map(|&p| p.into()).collect()).to_message())
-    }
-
-    pub fn msg(&mut self, to: &str, message: &str) -> Result<()> {
-        self.send_message(PRIVMSG(to.into(), message.into()).to_message())
-    }
-
-    pub fn register(&mut self, nick: &str, user: &str, desc: &str) -> Result<()> {
-        Result(self.send_message(NICK(nick.into()).to_message()).inner()
-            .and_then(|_| self.send_message(USER(user.into(), Borrowed("0"), Borrowed("*"), desc.into()).to_message()).inner()))
-
+impl Client for SharedClient {
+    fn send_message(&mut self, msg: Message) -> Result<()> {
+        if let Ok(mut guard) = self.client.lock() {
+            guard.send_raw(&msg.to_string())
+        } else { Result(Ok(())) }
     }
 }
