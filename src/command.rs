@@ -1876,18 +1876,6 @@ impl<'a> Command<'a> {
                 Message::format(None, Borrowed("PING"), vec![s1.clone()], s2.clone(), MsgType::Irc),
             &PONG(ref s1, ref s2) =>
                 Message::format(None, Borrowed("PONG"), vec![s1.clone()], s2.clone(), MsgType::Irc),
-                        /*&Command::PING(ref server1, ref server2) => {
-                let mut c = Vec::new();
-                c.push(server1.clone());
-                if let &Some(ref s) = server2 { c.push(s.clone()) }
-                Message::format(None, "PING", c, None, MsgType::Irc)
-            },
-            &Command::PONG(ref server1, ref server2) => {
-                let mut c = Vec::new();
-                c.push(server1.clone());
-                if let &Some(ref s) = server2 { c.push(s.clone()) }
-                Message::format(None, "PONG", c, None, MsgType::Irc)
-            },*/
             _ => unimplemented!()
         }
     }

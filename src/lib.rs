@@ -33,7 +33,7 @@ pub use message::{ Message, MsgType };
 pub use command::Command;
 pub use reply::Reply;
 pub use event::Event;
-pub use client::Client;
+pub use client::{ Client, OwnedClient, SharedClient };
 
 #[derive(Debug)]
 pub enum IrscError {

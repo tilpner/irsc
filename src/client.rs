@@ -8,7 +8,7 @@ use std::io::{
 
 use std::net::TcpStream;
 use std::borrow::Cow::{ self, Borrowed, Owned };
-use std::sync::{ Arc, Mutex };
+use std::sync::{ Arc, RwLock };
 
 use carboxyl::{ Stream, Sink };
 
@@ -193,7 +193,7 @@ impl OwnedClient {
 
     pub fn into_shared(self) -> SharedClient {
         SharedClient {
-            client: Arc::new(Mutex::new(self)),
+            client: Arc::new(RwLock::new(self)),
         }
     }
 
@@ -208,14 +208,14 @@ impl Client for OwnedClient {
 
 #[derive(Clone)]
 pub struct SharedClient {
-    client: Arc<Mutex<OwnedClient>>,
+    client: Arc<RwLock<OwnedClient>>,
 }
 
 impl SharedClient {
     pub fn messages(&self) -> Stream<(SharedClient, Message)> {
         let cl = SharedClient { client: self.client.clone() };
-        self.client.lock().unwrap().messages()
-            .map(move |m| (cl.clone(), m))
+        self.client.read().unwrap().messages()
+            .map(move |m| { println!("Message!"); (cl.clone(), m) })
     }
 
     pub fn events(&self) -> Stream<(SharedClient, Message, Arc<Event<'static>>)> {
@@ -228,14 +228,28 @@ impl SharedClient {
         })
     }
 
-//    pub fn commands(&self) -> Stream<Command> {
-//        self.messages().filter_map(|msg| Command::from_message(&msg).map(|c| c.to_static()))
-//    }
+    pub fn listen(&self) -> Result<()> {
+        self.client.write().unwrap().listen()
+    }
+
+    pub fn commands(&self) -> Stream<(SharedClient, Message, Command<'static>)> {
+        self.messages().filter_map(|(cl, msg)| match Command::from_message(&msg) {
+            Some(m) => Some((cl, msg.clone(), m.to_static())),
+            None => None
+        })
+    }
+
+    pub fn replies(&self) -> Stream<(SharedClient, Message, Reply<'static>)> {
+        self.messages().filter_map(|(cl, msg)| match Reply::from_message(&msg) {
+            Some(m) => Some((cl, msg.clone(), m.to_static())),
+            None => None
+        })
+    }
 }
 
 impl Client for SharedClient {
     fn send_message(&mut self, msg: Message) -> Result<()> {
-        if let Ok(mut guard) = self.client.lock() {
+        if let Ok(mut guard) = self.client.write() {
             guard.send_raw(&msg.to_string())
         } else { Result(Ok(())) }
     }
