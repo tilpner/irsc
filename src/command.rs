@@ -1,6 +1,6 @@
 #![allow(non_camel_case_types)]
 
-use std::borrow::{ Cow, Borrow, ToOwned };
+use std::borrow::{ Cow, IntoCow, Borrow, ToOwned };
 use std::borrow::Cow::*;
 use std::iter::Extend;
 
@@ -9,7 +9,6 @@ use message::{ Message, MsgType };
 pub type CS<'a> = Cow<'a, str>;
 
 #[derive(Debug, Hash, Clone, PartialEq, Eq)]
-#[doc(disables)]
 pub enum Command<'a> {
     /// ```text
     /// 3.1.1 Password message
@@ -1893,142 +1892,59 @@ impl<'a> Command<'a> {
         }
     }
 
-/*    pub fn to_static(&self) -> Command<'static> {
+    pub fn to_static(&self) -> Command<'static> {
+        fn s(c: &Cow<str>) -> Cow<'static, str> {
+            Cow::Owned(c.clone().into_owned())
+        }
+        fn so(c: &Option<Cow<str>>) -> Option<Cow<'static, str>> {
+            c.as_ref().map(s)
+        }
+        fn sv(c: &Vec<Cow<str>>) -> Vec<Cow<'static, str>> {
+            c.iter().map(s).collect()
+        }
         use self::Command::*;
         match self {
-            &PASS(ref pw) => PASS(pw.to_owned().clone()),
-            /*&NICK(ref nick) =>
-                Message::format(None, Borrowed("NICK"), vec![], Some(nick.clone()), MsgType::Irc),
+            &PASS(ref pw) => PASS(s(pw)),
+            &NICK(ref nick) => NICK(s(nick)),
             &USER(ref user, ref mode, ref unused, ref realname) =>
-                Message::format(None, Borrowed("USER"),
-                    vec![user.clone(), mode.clone(), unused.clone()],
-                    Some(realname.clone()), MsgType::Irc),
-            &OPER(ref name, ref pw) =>
-                Message::format(None, Borrowed("OPER"),
-                    vec![name.clone(), pw.clone()], None, MsgType::Irc),
-            &UMODE(ref mode) =>
-                Message::format(None, Borrowed("MODE"), vec![], Some(mode.clone()), MsgType::Irc),
+                USER(s(user), s(mode), s(unused), s(realname)),
+            &OPER(ref name, ref pw) => OPER(s(name), s(pw)),
+            &UMODE(ref mode) => UMODE(s(mode)),
             &SERVICE(ref nick, ref reserved, ref distribution, ref type_, ref reserved2, ref info) =>
-                Message::format(None, Borrowed("SERVICE"),
-                    vec![nick.clone(), reserved.clone(), distribution.clone(),
-                    type_.clone(), reserved2.clone()], Some(info.clone()), MsgType::Irc),
-            &QUIT(ref msg) =>
-                Message::format(None, Borrowed("QUIT"), vec![], msg.clone(), MsgType::Irc),
-            &SQUIT(ref server, ref comment) =>
-                Message::format(None, Borrowed("SQUIT"),
-                    vec![server.clone()], Some(comment.clone()), MsgType::Irc),
-            &JOIN(ref ch, ref pw) =>
-                Message::format(None, Borrowed("JOIN"),
-                    vec![Owned(ch.connect(",")), Owned(pw.connect(","))], None, MsgType::Irc),
-            &PART(ref ch, ref reason) =>
-                Message::format(None, Borrowed("PART"),
-                    vec![Owned(ch.connect(","))], reason.clone(), MsgType::Irc),
+                SERVICE(s(nick), s(reserved), s(distribution), s(type_), s(reserved2), s(info)),
+            &QUIT(ref msg) => QUIT(so(msg)),
+            &SQUIT(ref server, ref comment) => SQUIT(s(server), s(comment)),
+            &JOIN(ref ch, ref pw) => JOIN(sv(ch), sv(pw)),
+            &PART(ref ch, ref reason) => PART(sv(ch), so(reason)),
             &MODE(ref channel, ref modes) =>
-                // Screw this, folding will have to do.
-                Message::format(None, Borrowed("MODE"),
-                    modes.iter().fold(vec![channel.clone()], |mut v, &(ref a, ref b)| {
-                        v.push(a.clone());
-                        v.push(b.clone());
-                        v
-                    }), None, MsgType::Irc),
-            &TOPIC(ref channel, ref topic) =>
-                Message::format(None, Borrowed("TOPIC"),
-                    vec![channel.clone()], topic.clone(), MsgType::Irc),
-            &NAMES(ref ch, ref target) =>
-                Message::format(None, Borrowed("NAMES"),
-                    vec![Owned(ch.connect(","))], target.clone(), MsgType::Irc),
-            &LIST(ref ch, ref target) =>
-                Message::format(None, Borrowed("LIST"),
-                    vec![Owned(ch.connect(","))], target.clone(), MsgType::Irc),
-            &INVITE(ref nick, ref channel) =>
-                Message::format(None, Borrowed("INVITE"),
-                    vec![nick.clone()], Some(channel.clone()), MsgType::Irc),
-            &KICK(ref ch, ref users, ref comment) =>
-                Message::format(None, Borrowed("KICK"),
-                    vec![Owned(ch.connect(",")), Owned(users.connect(","))],
-                    comment.clone(), MsgType::Irc),
-            &PRIVMSG(ref target, ref msg) =>
-                Message::format(None, Borrowed("PRIVMSG"),
-                    vec![target.clone()], Some(msg.clone()), MsgType::Irc),
-            &NOTICE(ref target, ref text) =>
-                Message::format(None, Borrowed("NOTICE"),
-                    vec![target.clone()], Some(text.clone()), MsgType::Irc),
-            &MOTD(ref target) =>
-                Message::format(None, Borrowed("MOTD"), vec![], target.clone(), MsgType::Irc),
-            &LUSERS(ref lu) =>
-                Message::format(None, Borrowed("LUSERS"),
-                    lu.as_ref().map(|&(ref mask, _)| vec![mask.clone()]).unwrap_or(vec![]),
-                    lu.as_ref().and_then(|&(_, ref target)| target.clone()), MsgType::Irc),
-            &VERSION(ref target) =>
-                Message::format(None, Borrowed("VERSION"), vec![], target.clone(), MsgType::Irc),
-            &STATS(ref st) =>
-                Message::format(None, Borrowed("STATS"),
-                    st.as_ref().map(|&(ref query, _)| vec![query.clone()]).unwrap_or(vec![]),
-                    st.as_ref().and_then(|&(_, ref target)| target.clone()), MsgType::Irc),
-            &LINKS(ref l) =>
-                Message::format(None, Borrowed("LINKS"),
-                    l.as_ref().map(|&(ref remote, ref mask)| if remote.is_some() {
-                    vec![remote.clone().unwrap(), mask.clone()] } else { vec![mask.clone()] }).unwrap_or(vec![]),
-                    None, MsgType::Irc),
-            &TIME(ref target) =>
-                Message::format(None, Borrowed("TIME"), vec![], target.clone(), MsgType::Irc),
-            &CONNECT(ref server, ref port, ref remote) =>
-                Message::format(None, Borrowed("CONNECT"),
-                    vec![server.clone(), Owned(format!("{}", port))], remote.clone(), MsgType::Irc),
-            &TRACE(ref target) =>
-                Message::format(None, Borrowed("TRACE"), vec![], target.clone(), MsgType::Irc),
-            &ADMIN(ref target) =>
-                Message::format(None, Borrowed("ADMIN"), vec![], target.clone(), MsgType::Irc),
-            &INFO(ref target) =>
-                Message::format(None, Borrowed("INFO"), vec![], target.clone(), MsgType::Irc),
-            &SERVLIST(ref sl) =>
-                Message::format(None, Borrowed("SERVLIST"),
-                    sl.as_ref().map(|&(ref mask, ref target)| target.as_ref()
-                    .map(|t| vec![mask.clone(), t.clone()])
-                    .unwrap_or_else(|| vec![mask.clone()]))
-                    .unwrap_or(vec![]), None, MsgType::Irc),
-            &SQUERY(ref name, ref text) =>
-                Message::format(None, Borrowed("SQUERY"),
-                    vec![name.clone()], Some(text.clone()), MsgType::Irc),
-            &WHO(ref mask, o) =>
-                Message::format(None, Borrowed("WHO"),
-                    match (mask, o) {
-                        (&Some(ref m), true) => vec![m.clone(), Borrowed("o")],
-                        (&Some(ref m), false) => vec![m.clone()],
-                        (&None, _) => vec![]
-                    }, None, MsgType::Irc),
-            &WHOIS(ref target,  ref masks) =>
-                Message::format(None, Borrowed("WHOIS"),
-                    target.as_ref().map(|t| vec![t.clone(), Owned(masks.connect(","))])
-                    .unwrap_or_else(|| vec![Owned(masks.connect(","))]), None, MsgType::Irc),
+                MODE(s(channel), modes.iter().map(|&(ref a, ref b)| (s(a), s(b))).collect()),
+            &TOPIC(ref channel, ref topic) => TOPIC(s(channel), so(topic)),
+            &NAMES(ref ch, ref target) => NAMES(sv(ch), so(target)),
+            &LIST(ref ch, ref target) => LIST(sv(ch), so(target)),
+            &INVITE(ref nick, ref channel) => INVITE(s(nick), s(channel)),
+            &KICK(ref ch, ref users, ref comment) => KICK(sv(ch), sv(users), so(comment)),
+            &PRIVMSG(ref target, ref msg) => PRIVMSG(s(target), s(msg)),
+            &NOTICE(ref target, ref text) => NOTICE(s(target), s(text)),
+            &MOTD(ref target) => MOTD(so(target)),
+            &LUSERS(ref lu) => LUSERS(lu.as_ref().map(|&(ref a, ref b)| (s(a), so(b)))),
+            &VERSION(ref target) => VERSION(so(target)),
+            &STATS(ref st) => STATS(st.as_ref().map(|&(ref a, ref b)| (s(a), so(b)))),
+            &LINKS(ref l) => LINKS(l.as_ref().map(|&(ref a, ref b)| (so(a), s(b)))),
+            &TIME(ref target) => TIME(so(target)),
+            &CONNECT(ref server, port, ref remote) => CONNECT(s(server), port, so(remote)),
+            &TRACE(ref target) => TRACE(so(target)),
+            &ADMIN(ref target) => ADMIN(so(target)),
+            &INFO(ref target) => INFO(so(target)),
+            &SERVLIST(ref sl) => SERVLIST(sl.as_ref().map(|&(ref a, ref b)| (s(a), so(b)))),
+            &SQUERY(ref name, ref text) => SQUERY(s(name), s(text)),
+            &WHO(ref mask, o) => WHO(so(mask), o),
+            &WHOIS(ref target,  ref masks) => WHOIS(so(target), sv(masks)),
             &WHOWAS(ref nick, ref count) =>
-                Message::format(None, Borrowed("WHOWAS"), match count {
-                        &Some((ref c, Some(ref t))) => vec![Owned(nick.connect(",")), c.clone(), t.clone()],
-                        &Some((ref c, None)) => vec![Owned(nick.connect(",")), c.clone()],
-                        &None => vec![Owned(nick.connect(","))]
-                    }, None, MsgType::Irc),
-            &PING(ref s1, ref s2) =>
-                Message::format(None, Borrowed("PING"), vec![s1.clone()], s2.clone(), MsgType::Irc),
-            &PONG(ref s1, ref s2) =>
-                Message::format(None, Borrowed("PONG"), vec![s1.clone()], s2.clone(), MsgType::Irc),
-             */           /*&Command::PING(ref server1, ref server2) => {
-                let mut c = Vec::new();
-                c.push(server1.clone());
-                if let &Some(ref s) = server2 { c.push(s.clone()) }
-                Message::format(None, "PING", c, None, MsgType::Irc)
-            },
-            &Command::PONG(ref server1, ref server2) => {
-                let mut c = Vec::new();
-                c.push(server1.clone());
-                if let &Some(ref s) = server2 { c.push(s.clone()) }
-                Message::format(None, "PONG", c, None, MsgType::Irc)
-            },*/
+                WHOWAS(sv(nick), count.as_ref().map(|&(ref a, ref b)| (s(a), so(b)))),
+            &PING(ref s1, ref s2) => PING(s(s1), so(s2)),
+            &PONG(ref s1, ref s2) => PONG(s(s1), so(s2)),
             _ => unimplemented!()
         }
-
-    }*/
-
-    //pub fn is_reply(&self) -> bool { let i = *self as uint; i >= 200 && i <= 399 }
-    //pub fn is_error(&self) -> bool { let i = *self as uint; i >= 400 && i <= 599 }
+    }
 }
 

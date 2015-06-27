@@ -10,3 +10,13 @@ pub enum Event<'a> {
     Connected,
     Disconnected
 }
+
+impl<'a> Event<'a> {
+    pub fn to_static(&self) -> Event<'static> {
+        use Event::*;
+        match self {
+            &Command(ref c) => Command(c.to_static()),
+            _ => unimplemented!()
+        }
+    }
+}

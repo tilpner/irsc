@@ -220,9 +220,9 @@ impl SharedClient {
 
     pub fn events(&self) -> Stream<(SharedClient, Message, Arc<Event<'static>>)> {
         self.messages().filter_map(|(cl, msg)| match Command::from_message(&msg) {
-            Some(m) => Some((cl, msg, Arc::new(Event::Command(m.clone())))),
+            Some(m) => Some((cl, msg.clone(), Arc::new(Event::Command(m.clone()).to_static()))),
             None => match Reply::from_message(&msg) {
-                Some(r) => Some((cl, msg, Arc::new(Event::Reply(r)))),
+                Some(r) => Some((cl, msg.clone(), Arc::new(Event::Reply(r).to_static()))),
                 None => None
             }
         })
