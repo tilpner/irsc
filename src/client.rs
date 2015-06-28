@@ -157,8 +157,9 @@ impl OwnedClient {
             None => return Result(Err(IrscError::NotConnected))
         });
 
-        for line in reader.lines() {
-            let line = line.unwrap().parse();
+        for raw_line in reader.lines() {
+            let line = raw_line.as_ref().unwrap().parse();
+            info!("<< {}", raw_line.unwrap());
 
             if let Ok(msg) = line {
                 self.handle_event(&msg);
@@ -187,8 +188,9 @@ impl OwnedClient {
             None => return Result(Err(IrscError::NotConnected))
         });
 
-        for line in reader.lines() {
-            let line = line.unwrap().parse();
+        for raw_line in reader.lines() {
+            let line = raw_line.as_ref().unwrap().parse();
+            info!("<< {}", raw_line.unwrap());
 
             if let Ok(msg) = line {
                 s.handle_event(&msg);

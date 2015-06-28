@@ -99,7 +99,6 @@ impl Message {
 impl FromStr for Message {
     type Err = IrscError;
     fn from_str(i: &str) -> Result<Message, IrscError> {
-        info!("<< {}", i);
         let len = i.len();
         // remember, bytes, not chars
         let mut s = 0;
