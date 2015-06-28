@@ -29,7 +29,7 @@ fn callback(server: &mut Client, msg: &Message, event: Option<Event>) {
             }
         },
         Some(Event::Reply(RPL_WELCOME(_))) => {
-            server.join("#botzoo", None);
+            server.join("#meep!", None);
         },
         _ => ()
     }
@@ -37,11 +37,11 @@ fn callback(server: &mut Client, msg: &Message, event: Option<Event>) {
 
 fn main() {
     env_logger::init().unwrap();
-    let mut s = Client::new();
+    let mut s = OwnedClient::new();
     let ssl = Ssl::new(&SslContext::new(SslMethod::Tlsv1).unwrap()).unwrap();
     s.connect_ssl("irc.mozilla.org", 6697, ssl);
-    s.register(NAME, NAME, DESC);
+    s.register(NAME, NAME, DESC, None);
 
     // Dedicate this thread to listening and event processing
-    s.listen(Some(callback));
+    s.listen_with_callback(callback);
 }
