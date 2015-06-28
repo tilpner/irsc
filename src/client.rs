@@ -20,13 +20,11 @@ use reply::Reply;
 use event::Event;
 use ::{ DEBUG, Result, IrscError };
 
-#[cfg(feature = "ssl")]
 use openssl::ssl::{ Ssl, SslContext, SslMethod, SslStream };
 
 /// Yes, I don't like the name either, but it's private, so...
 enum StreamKind {
     Plain(TcpStream),
-    #[cfg(feature = "ssl")]
     Ssl(SslStream<TcpStream>)
 }
 
@@ -34,7 +32,6 @@ impl Write for StreamKind {
     fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
         match *self {
             StreamKind::Plain(ref mut s) => s.write(buf),
-            #[cfg(feature = "ssl")]
             StreamKind::Ssl(ref mut s) => s.write(buf)
         }
     }
@@ -42,7 +39,6 @@ impl Write for StreamKind {
     fn flush(&mut self) -> io::Result<()> {
         match *self {
             StreamKind::Plain(ref mut s) => s.flush(),
-            #[cfg(feature = "ssl")]
             StreamKind::Ssl(ref mut s) => s.flush()
         }
     }
@@ -52,7 +48,6 @@ impl Read for StreamKind {
     fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
         match *self {
             StreamKind::Plain(ref mut s) => s.read(buf),
-            #[cfg(feature = "ssl")]
             StreamKind::Ssl(ref mut s) => s.read(buf)
         }
     }
@@ -110,7 +105,6 @@ impl OwnedClient {
         Result(Ok(()))
     }
 
-    #[cfg(feature = "ssl")]
     pub fn connect_ssl(&mut self, host: &str, port: u16, ssl: Ssl) -> Result<()> {
         let s = &mut self.stream;
         if s.is_some() { return Result(Err(IrscError::AlreadyConnected)) };
@@ -152,7 +146,6 @@ impl OwnedClient {
     where F: Fn(&mut Client, &Message, Option<Event>) {
         let reader = BufReader::new(match self.stream {
             Some(StreamKind::Plain(ref s)) => StreamKind::Plain((*s).try_clone().unwrap()),
-            #[cfg(feature = "ssl")]
             Some(StreamKind::Ssl(ref s)) => StreamKind::Ssl((*s).try_clone().unwrap()),
             None => return Result(Err(IrscError::NotConnected))
         });
@@ -183,7 +176,6 @@ impl OwnedClient {
         let mut s: &mut OwnedClient = unsafe { mem::transmute(self) };
         let reader = BufReader::new(match self.stream {
             Some(StreamKind::Plain(ref s)) => StreamKind::Plain((*s).try_clone().unwrap()),
-            #[cfg(feature = "ssl")]
             Some(StreamKind::Ssl(ref s)) => StreamKind::Ssl((*s).try_clone().unwrap()),
             None => return Result(Err(IrscError::NotConnected))
         });

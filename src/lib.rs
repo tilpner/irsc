@@ -8,7 +8,6 @@
 extern crate regex;
 #[macro_use]
 extern crate log;
-#[cfg(feature = "ssl")]
 extern crate openssl;
 extern crate carboxyl;
 
@@ -25,7 +24,6 @@ use std::io;
 use std::result;
 use std::ops::{ Deref, DerefMut };
 
-#[cfg(feature = "ssl")]
 use openssl::ssl::error::SslError;
 
 pub use ident::Ident;
@@ -41,11 +39,9 @@ pub enum IrscError {
     AlreadyConnected,
     NotConnected,
     NotFound,
-    #[cfg(feature = "ssl")]
     Ssl(SslError)
 }
 
-#[cfg(feature = "ssl")]
 impl From<SslError> for IrscError {
     fn from(e: SslError) -> IrscError { IrscError::Ssl(e) }
 }
