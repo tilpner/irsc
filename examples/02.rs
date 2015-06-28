@@ -31,7 +31,7 @@ fn main() {
     // register(nick, user, description, [password])
     s.register("irsc02", "irsc", "Example bot 02", None);
 
-    // The client must be accessible from anywh when using the Event API.
+    // The client must be accessible from anywhere when using the Event API.
     // .into_shared() will convert the previously owned client into a wrapper.
     let mut shared = s.into_shared();
 
