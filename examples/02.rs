@@ -14,7 +14,7 @@ fn main() {
     s.register("irsc", "irsc", "Testing for kori", None);
 
     let mut shared = s.into_shared();
-    let _ = shared.commands()
+    let _a = shared.commands()
         .map(|(mut cl, msg, c)| {
             if let PRIVMSG(to, content) = c {
                 let from = msg.ident().unwrap();
