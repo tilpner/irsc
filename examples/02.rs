@@ -82,7 +82,7 @@ fn main() {
             if let RPL_WELCOME(_) = r {
                 // After we've connected successfully, we join a channel
                 // without providing a password.
-                cl.join("#meep!", None);
+                cl.join("#botzoo", None);
             }
         });
 
