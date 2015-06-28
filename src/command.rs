@@ -8,6 +8,18 @@ use message::{ Message, MsgType };
 
 pub type CS<'a> = Cow<'a, str>;
 
+// If you hoped it couldn't get any uglier... I'm sorry, it does.
+// Why a giant match? API.
+//
+// I tried structuring it as a bunch of structs that impl a `Command` trait,
+// but the user would have to use Any and lots of cats. Also, extensibility isn't
+// really a goal; the IRC protocol doesn't seem to evolve very fast.
+//
+// Granted, I *could* have used a phf-map to map to functions to parse this, which
+// - while more readable - shouldn't have resulted in performance gains.
+//
+// Please don't cry.
+
 #[derive(Debug, Hash, Clone, PartialEq, Eq)]
 pub enum Command<'a> {
     /// ```text

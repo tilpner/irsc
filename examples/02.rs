@@ -15,6 +15,7 @@ use openssl::ssl::{ Ssl, SslContext, SslMethod };
 fn main() {
     // If the environment variable RUST_LOG is set to "info",
     // irsc will log incoming and outgoing data in raw form.
+    // Documentation: http://rust-lang.github.io/log/env_logger/#enabling-logging
     env_logger::init().ok().expect("Failed to initialise env_logger");
 
     let mut s = OwnedClient::new();
@@ -25,8 +26,9 @@ fn main() {
     // Connect using the newly constructed Ssl configuration.
     // If Ssl is not desired, use .connect(...) without the ssl argument.
     s.connect_ssl("irc.mozilla.org", 6697, ssl);
-    // Send the USER and NICK message in one go,
-    // <nick> <user> <description> <optional password>
+
+    // Send the USER and NICK message in one go:
+    // register(nick, user, description, [password])
     s.register("irsc02", "irsc", "Example bot 02", None);
 
     // The client must be accessible from anywh when using the Event API.
