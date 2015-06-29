@@ -14,12 +14,10 @@ log = "^0.3"
 regex = "^0.1"
 regex_macros = "^0.1"
 openssl = "^0.6"
+carboxyl = "^0.1"
 
 [features]
 lints = ["clippy"]
-
-[dependencies.carboxyl]
-git = "https://github.com/tilpner/carboxyl"
 
 [dependencies.clippy]
 version = "*"

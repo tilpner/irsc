@@ -16,7 +16,9 @@ impl<'a> Event<'a> {
         use Event::*;
         match self {
             &Command(ref c) => Command(c.to_static()),
-            _ => unimplemented!()
+            &Reply(ref r) => Reply(r.to_static()),
+            &Connected => Connected,
+            &Disconnected => Disconnected
         }
     }
 }

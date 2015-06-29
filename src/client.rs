@@ -63,6 +63,28 @@ pub trait Client {
         self.send_message(PRIVMSG(to.into(), message.into()).to_message())
     }
 
+    fn msg_many(&mut self, to: &str, message: &[&str]) -> Result<()> {
+        for m in message {
+            self.msg(to, m);
+        }
+        Result(Ok(()))
+    }
+
+    fn msg_word_wrap(&mut self, to: &str, message: &str, limit: u16) -> Result<()> {
+        let mut line = String::new();
+        for word in message.split_whitespace() {
+            if line.len() + word.len() < limit as usize {
+                line.push_str(" ");
+                line.push_str(word);
+            } else {
+                debug!("Sending {}", line);
+                self.msg(to, &line);
+                line.clear();
+            }
+        }
+        self.msg(to, &line)
+    }
+
     fn register(&mut self, nick: &str, user: &str, desc: &str, pass: Option<&str>) -> Result<()> {
         Result(if let Some(pass) = pass {
             self.send_message(PASS(pass.into()).to_message()).inner()
