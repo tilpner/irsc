@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Mode",""],["MsgType",""],["SetMode",""]],"struct":[["Message","Byte indices, be careful."]]});

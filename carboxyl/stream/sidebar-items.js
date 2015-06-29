@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Sink","An event sink."],["Stream","A stream of events."]],"trait":[["BoxClone","Trait to wrap cloning of boxed values in a object-safe manner"]]});

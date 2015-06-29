@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Reply` enum in crate `irsc`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Reply">
+
+    <title>irsc::reply::Reply - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <section class="sidebar">
+        
+        <p class='location'><a href='../index.html'>irsc</a>::<wbr><a href='index.html'>reply</a></p><script>window.sidebarCurrent = {name: 'Reply', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </section>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press 'S' to search, '?' for more options..."
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content enum">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>irsc</a>::<wbr><a href='index.html'>reply</a>::<wbr><a class='enum' href=''>Reply</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-14136' class='srclink' href='../../src/irsc/reply.rs.html#12-1045' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum Reply&lt;'a&gt; {
+    RPL_WELCOME(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_YOURHOST(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_CREATED(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_MYINFO(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_BOUNCE(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_USERHOST(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ISON(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_AWAY(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_UNAWAY(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_NOWAWAY(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_WHOISUSER(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_WHOISSERVER(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_WHOISOPERATOR(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_WHOISIDLE(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ENDOFWHOIS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_WHOISCHANNELS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_WHOWASUSER(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ENDOFWHOWAS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_LISTSTART,
+    RPL_LIST(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_LISTEND(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_UNIQOPIS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_CHANNELMODEIS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_NOTOPIC(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TOPIC(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_INVITING(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_SUMMONING(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_INVITELIST(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ENDOFINVITELIST(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_EXCEPTLIST(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ENDOFEXCEPTLIST(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_VERSION(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_WHOREPLY(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ENDOFWHO(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_NAMREPLY(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ENDOFNAMES(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_LINKS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ENDOFLINKS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_BANLIST(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ENDOFBANLIST(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_INFO(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ENDOFINFO(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_MOTDSTART(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_MOTD(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ENDOFMOTD(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_YOUREOPER(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_REHASHING(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_YOURESERVICE(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TIME(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_USERSSTART(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_USERS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ENDOFUSERS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_NOUSERS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TRACELINK(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TRACECONNECTING(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TRACEHANDSHAKE(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TRACEUNKNOWN(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TRACEOPERATOR(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TRACEUSER(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TRACESERVER(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TRACESERVICE(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TRACENEWTYPE(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TRACECLASS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TRACERECONNECT(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TRACELOG(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TRACEEND(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_STATSLINKINFO(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_STATSCOMMANDS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ENDOFSTATS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_STATSUPTIME(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_STATSOLINE(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_UMODEIS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_SERVLIST(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_SERVLISTEND(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_LUSERCLIENT(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_LUSEROP(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_LUSERUNKNOWN(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_LUSERCHANNELS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_LUSERME(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ADMINME(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ADMINLOC1(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ADMINLOC2(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_ADMINEMAIL(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    RPL_TRYAGAIN(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOSUCHNICK(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOSUCHSERVER(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOSUCHCHANNEL(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_CANNOTSENDTOCHAN(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_TOOMANYCHANNELS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_WASNOSUCHNICK(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_TOOMANYTARGETS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOSUCHSERVICE(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOORIGIN(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NORECIPIENT(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOTEXTTOSEND(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOTOPLEVEL(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_WILDTOPLEVEL(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_BADMASK(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_UNKNOWNCOMMAND(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOMOTD(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOADMININFO(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_FILEERROR(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NONICKNAMEGIVEN(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_ERRONEUSNICKNAME(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NICKNAMEINUSE(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NICKCOLLISION(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_UNAVAILRESOURCE(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_USERNOTINCHANNEL(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOTONCHANNEL(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_USERONCHANNEL(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOLOGIN(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_SUMMONDISABLED(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_USERSDISABLED(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOTREGISTERED(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NEEDMOREPARAMS(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_ALREADYREGISTRED(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOPERMFORHOST(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_PASSWDMISMATCH(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_YOUREBANNEDCREEP(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_YOUWILLBEBANNED(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_KEYSET(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_CHANNELISFULL(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_UNKNOWNMODE(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_INVITEONLYCHAN(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_BANNEDFROMCHAN(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_BADCHANNELKEY(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_BADCHANMASK(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOCHANMODES(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_BANLISTFULL(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOPRIVILEGES(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_CHANOPRIVSNEEDED(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_CANTKILLSERVER(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_RESTRICTED(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_UNIQOPPRIVSNEEDED(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_NOOPERHOST(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_UMODEUNKNOWNFLAG(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+    ERR_USERSDONTMATCH(<a class='type' href='../../irsc/reply/type.CS.html' title='irsc::reply::CS'>CS</a>&lt;'a&gt;),
+}</pre><h2 class='variants'>Variants</h2>
+<table><tr><td id='variant.RPL_WELCOME'><code>RPL_WELCOME</code></td><td><div class='docblock'><p>001    RPL_WELCOME
+&quot;Welcome to the Internet Relay Network
+ <nick>!<user>@<host>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_YOURHOST'><code>RPL_YOURHOST</code></td><td><div class='docblock'><p>002    RPL_YOURHOST
+&quot;Your host is <servername>, running version <ver>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_CREATED'><code>RPL_CREATED</code></td><td><div class='docblock'><p>003    RPL_CREATED
+&quot;This server was created <date>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_MYINFO'><code>RPL_MYINFO</code></td><td><div class='docblock'><p>004    RPL_MYINFO
+     &quot;<servername> <version> <available user modes>
+      <available channel modes>&quot;</p>
+
+<ul>
+<li>The server sends Replies 001 to 004 to a user upon
+successful registration.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_BOUNCE'><code>RPL_BOUNCE</code></td><td><div class='docblock'><p>005    RPL_BOUNCE
+     &quot;Try server <server name>, port <port number>&quot;</p>
+
+<ul>
+<li>Sent by the server to a user to suggest an alternative
+server.  This is often used when the connection is
+refused because the server is already full.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_USERHOST'><code>RPL_USERHOST</code></td><td><div class='docblock'><p>302    RPL_USERHOST
+     &quot;:*1<reply> *( &quot; &quot; <reply> )&quot;</p>
+
+<ul>
+<li><p>Reply format used by USERHOST to list replies to
+the query list.  The reply string is composed as
+follows:</p>
+
+<p>reply = nickname [ &quot;*&quot; ] &quot;=&quot; ( &quot;+&quot; / &quot;-&quot; ) hostname</p>
+
+<p>The &#39;*&#39; indicates whether the client has registered
+as an Operator.  The &#39;-&#39; or &#39;+&#39; characters represent
+whether the client has set an AWAY message or not
+respectively.</p></li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_ISON'><code>RPL_ISON</code></td><td><div class='docblock'><p>303    RPL_ISON
+     &quot;:*1<nick> *( &quot; &quot; <nick> )&quot;</p>
+
+<ul>
+<li>Reply format used by ISON to list replies to the
+query list.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_AWAY'><code>RPL_AWAY</code></td><td><div class='docblock'><p>301    RPL_AWAY
+&quot;<nick> :<away message>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_UNAWAY'><code>RPL_UNAWAY</code></td><td><div class='docblock'><p>305    RPL_UNAWAY
+&quot;:You are no longer marked as being away&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_NOWAWAY'><code>RPL_NOWAWAY</code></td><td><div class='docblock'><p>306    RPL_NOWAWAY
+     &quot;:You have been marked as being away&quot;</p>
+
+<ul>
+<li>These replies are used with the AWAY command (if
+allowed).  RPL_AWAY is sent to any client sending a
+PRIVMSG to a client which is away.  RPL_AWAY is only
+sent by the server to which the client is connected.
+Replies RPL_UNAWAY and RPL_NOWAWAY are sent when the
+client removes and sets an AWAY message.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_WHOISUSER'><code>RPL_WHOISUSER</code></td><td><div class='docblock'><p>311    RPL_WHOISUSER
+&quot;<nick> <user> <host> * :<real name>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_WHOISSERVER'><code>RPL_WHOISSERVER</code></td><td><div class='docblock'><p>312    RPL_WHOISSERVER
+&quot;<nick> <server> :<server info>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_WHOISOPERATOR'><code>RPL_WHOISOPERATOR</code></td><td><div class='docblock'><p>313    RPL_WHOISOPERATOR
+&quot;<nick> :is an IRC operator&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_WHOISIDLE'><code>RPL_WHOISIDLE</code></td><td><div class='docblock'><p>317    RPL_WHOISIDLE
+&quot;<nick> <integer> :seconds idle&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_ENDOFWHOIS'><code>RPL_ENDOFWHOIS</code></td><td><div class='docblock'><p>318    RPL_ENDOFWHOIS
+&quot;<nick> :End of WHOIS list&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_WHOISCHANNELS'><code>RPL_WHOISCHANNELS</code></td><td><div class='docblock'><p>319    RPL_WHOISCHANNELS
+     &quot;<nick> :*( ( &quot;@&quot; / &quot;+&quot; ) <channel> &quot; &quot; )&quot;</p>
+
+<ul>
+<li>Replies 311 - 313, 317 - 319 are all replies
+generated in response to a WHOIS message.  Given that
+there are enough parameters present, the answering
+server MUST either formulate a reply out of the above
+numerics (if the query nick is found) or return an
+error reply.  The &#39;*&#39; in RPL_WHOISUSER is there as
+the literal character and not as a wild card.  For
+each reply set, only RPL_WHOISCHANNELS may appear
+more than once (for long lists of channel names).
+The &#39;@&#39; and &#39;+&#39; characters next to the channel name
+indicate whether a client is a channel operator or
+has been granted permission to speak on a moderated
+channel.  The RPL_ENDOFWHOIS reply is used to mark
+the end of processing a WHOIS message.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_WHOWASUSER'><code>RPL_WHOWASUSER</code></td><td><div class='docblock'><p>314    RPL_WHOWASUSER
+&quot;<nick> <user> <host> * :<real name>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_ENDOFWHOWAS'><code>RPL_ENDOFWHOWAS</code></td><td><div class='docblock'><p>369    RPL_ENDOFWHOWAS
+     &quot;<nick> :End of WHOWAS&quot;</p>
+
+<ul>
+<li>When replying to a WHOWAS message, a server MUST use
+the replies RPL_WHOWASUSER, RPL_WHOISSERVER or
+ERR_WASNOSUCHNICK for each nickname in the presented
+list.  At the end of all reply batches, there MUST
+be RPL_ENDOFWHOWAS (even if there was only one reply
+and it was an error).</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_LISTSTART'><code>RPL_LISTSTART</code></td><td><div class='docblock'><p>321    RPL_LISTSTART
+Obsolete. Not used.</p>
+</div></td></tr><tr><td id='variant.RPL_LIST'><code>RPL_LIST</code></td><td><div class='docblock'><p>322    RPL_LIST
+&quot;<channel> &lt;# visible&gt; :<topic>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_LISTEND'><code>RPL_LISTEND</code></td><td><div class='docblock'><p>323    RPL_LISTEND
+     &quot;:End of LIST&quot;</p>
+
+<ul>
+<li>Replies RPL_LIST, RPL_LISTEND mark the actual replies
+with data and end of the server&#39;s response to a LIST
+command.  If there are no channels available to return,
+only the end reply MUST be sent.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_UNIQOPIS'><code>RPL_UNIQOPIS</code></td><td><div class='docblock'><p>325    RPL_UNIQOPIS
+&quot;<channel> <nickname>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_CHANNELMODEIS'><code>RPL_CHANNELMODEIS</code></td><td><div class='docblock'><p>324    RPL_CHANNELMODEIS
+&quot;<channel> <mode> <mode params>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_NOTOPIC'><code>RPL_NOTOPIC</code></td><td><div class='docblock'><p>331    RPL_NOTOPIC
+&quot;<channel> :No topic is set&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_TOPIC'><code>RPL_TOPIC</code></td><td><div class='docblock'><p>332    RPL_TOPIC
+     &quot;<channel> :<topic>&quot;</p>
+
+<ul>
+<li>When sending a TOPIC message to determine the
+channel topic, one of two replies is sent.  If
+the topic is set, RPL_TOPIC is sent back else
+RPL_NOTOPIC.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_INVITING'><code>RPL_INVITING</code></td><td><div class='docblock'><p>341    RPL_INVITING
+     &quot;<channel> <nick>&quot;</p>
+
+<ul>
+<li>Returned by the server to indicate that the
+attempted INVITE message was successful and is
+being passed onto the end client.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_SUMMONING'><code>RPL_SUMMONING</code></td><td><div class='docblock'><p>342    RPL_SUMMONING
+     &quot;<user> :Summoning user to IRC&quot;</p>
+
+<ul>
+<li>Returned by a server answering a SUMMON message to
+indicate that it is summoning that user.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_INVITELIST'><code>RPL_INVITELIST</code></td><td><div class='docblock'><p>346    RPL_INVITELIST
+&quot;<channel> <invitemask>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_ENDOFINVITELIST'><code>RPL_ENDOFINVITELIST</code></td><td><div class='docblock'><p>347    RPL_ENDOFINVITELIST
+     &quot;<channel> :End of channel invite list&quot;</p>
+
+<ul>
+<li>When listing the &#39;invitations masks&#39; for a given channel,
+a server is required to send the list back using the
+RPL_INVITELIST and RPL_ENDOFINVITELIST messages.  A
+separate RPL_INVITELIST is sent for each active mask.
+After the masks have been listed (or if none present) a
+RPL_ENDOFINVITELIST MUST be sent.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_EXCEPTLIST'><code>RPL_EXCEPTLIST</code></td><td><div class='docblock'><p>348    RPL_EXCEPTLIST
+&quot;<channel> <exceptionmask>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_ENDOFEXCEPTLIST'><code>RPL_ENDOFEXCEPTLIST</code></td><td><div class='docblock'><p>349    RPL_ENDOFEXCEPTLIST
+     &quot;<channel> :End of channel exception list&quot;</p>
+
+<ul>
+<li>When listing the &#39;exception masks&#39; for a given channel,
+a server is required to send the list back using the
+RPL_EXCEPTLIST and RPL_ENDOFEXCEPTLIST messages.  A
+separate RPL_EXCEPTLIST is sent for each active mask.
+After the masks have been listed (or if none present)
+a RPL_ENDOFEXCEPTLIST MUST be sent.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_VERSION'><code>RPL_VERSION</code></td><td><div class='docblock'><p>351    RPL_VERSION
+     &quot;<version>.<debuglevel> <server> :<comments>&quot;</p>
+
+<ul>
+<li><p>Reply by the server showing its version details.
+The <version> is the version of the software being
+used (including any patchlevel revisions) and the
+<debuglevel> is used to indicate if the server is
+running in &quot;debug mode&quot;.</p>
+
+<p>The &quot;comments&quot; field may contain any comments about
+the version or further version details.</p></li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_WHOREPLY'><code>RPL_WHOREPLY</code></td><td><div class='docblock'><p>352    RPL_WHOREPLY
+&quot;<channel> <user> <host> <server> <nick>
+( &quot;H&quot; / &quot;G&quot; &gt; [&quot;*&quot;] [ ( &quot;@&quot; / &quot;+&quot; ) ]
+:<hopcount> <real name>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_ENDOFWHO'><code>RPL_ENDOFWHO</code></td><td><div class='docblock'><p>315    RPL_ENDOFWHO
+     &quot;<name> :End of WHO list&quot;</p>
+
+<ul>
+<li>The RPL_WHOREPLY and RPL_ENDOFWHO pair are used
+to answer a WHO message.  The RPL_WHOREPLY is only
+sent if there is an appropriate match to the WHO
+query.  If there is a list of parameters supplied
+with a WHO message, a RPL_ENDOFWHO MUST be sent
+after processing each list item with <name> being
+the item.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_NAMREPLY'><code>RPL_NAMREPLY</code></td><td><div class='docblock'><p>353    RPL_NAMREPLY
+     &quot;( &quot;=&quot; / &quot;*&quot; / &quot;@&quot; ) <channel>
+      :[ &quot;@&quot; / &quot;+&quot; ] <nick> <em>( &quot; &quot; [ &quot;@&quot; / &quot;+&quot; ] <nick> )
+- &quot;@&quot; is used for secret channels, &quot;</em>&quot; for private
+  channels, and &quot;=&quot; for others (public channels).</p>
+</div></td></tr><tr><td id='variant.RPL_ENDOFNAMES'><code>RPL_ENDOFNAMES</code></td><td><div class='docblock'><p>366    RPL_ENDOFNAMES
+     &quot;<channel> :End of NAMES list&quot;</p>
+
+<ul>
+<li>To reply to a NAMES message, a reply pair consisting
+of RPL_NAMREPLY and RPL_ENDOFNAMES is sent by the
+server back to the client.  If there is no channel
+found as in the query, then only RPL_ENDOFNAMES is
+returned.  The exception to this is when a NAMES
+message is sent with no parameters and all visible
+channels and contents are sent back in a series of
+RPL_NAMEREPLY messages with a RPL_ENDOFNAMES to mark
+the end.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_LINKS'><code>RPL_LINKS</code></td><td><div class='docblock'><p>364    RPL_LINKS
+&quot;<mask> <server> :<hopcount> <server info>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_ENDOFLINKS'><code>RPL_ENDOFLINKS</code></td><td><div class='docblock'><p>365    RPL_ENDOFLINKS
+     &quot;<mask> :End of LINKS list&quot;</p>
+
+<ul>
+<li>In replying to the LINKS message, a server MUST send
+replies back using the RPL_LINKS numeric and mark the
+end of the list using an RPL_ENDOFLINKS reply.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_BANLIST'><code>RPL_BANLIST</code></td><td><div class='docblock'><p>367    RPL_BANLIST
+&quot;<channel> <banmask>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_ENDOFBANLIST'><code>RPL_ENDOFBANLIST</code></td><td><div class='docblock'><p>368    RPL_ENDOFBANLIST
+     &quot;<channel> :End of channel ban list&quot;</p>
+
+<ul>
+<li>When listing the active &#39;bans&#39; for a given channel,
+a server is required to send the list back using the
+RPL_BANLIST and RPL_ENDOFBANLIST messages.  A separate
+RPL_BANLIST is sent for each active banmask.  After the
+banmasks have been listed (or if none present) a
+RPL_ENDOFBANLIST MUST be sent.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_INFO'><code>RPL_INFO</code></td><td><div class='docblock'><p>371    RPL_INFO
+&quot;:<string>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_ENDOFINFO'><code>RPL_ENDOFINFO</code></td><td><div class='docblock'><p>374    RPL_ENDOFINFO
+     &quot;:End of INFO list&quot;</p>
+
+<ul>
+<li>A server responding to an INFO message is required to
+send all its &#39;info&#39; in a series of RPL_INFO messages
+with a RPL_ENDOFINFO reply to indicate the end of the
+replies.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_MOTDSTART'><code>RPL_MOTDSTART</code></td><td><div class='docblock'><p>375    RPL_MOTDSTART
+&quot;:- <server> Message of the day - &quot;</p>
+</div></td></tr><tr><td id='variant.RPL_MOTD'><code>RPL_MOTD</code></td><td><div class='docblock'><p>372    RPL_MOTD
+&quot;:- <text>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_ENDOFMOTD'><code>RPL_ENDOFMOTD</code></td><td><div class='docblock'><p>376    RPL_ENDOFMOTD
+     &quot;:End of MOTD command&quot;</p>
+
+<ul>
+<li>When responding to the MOTD message and the MOTD file
+is found, the file is displayed line by line, with
+each line no longer than 80 characters, using
+RPL_MOTD format replies.  These MUST be surrounded
+by a RPL_MOTDSTART (before the RPL_MOTDs) and an
+RPL_ENDOFMOTD (after).</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_YOUREOPER'><code>RPL_YOUREOPER</code></td><td><div class='docblock'><p>381    RPL_YOUREOPER
+     &quot;:You are now an IRC operator&quot;</p>
+
+<ul>
+<li>RPL_YOUREOPER is sent back to a client which has
+just successfully issued an OPER message and gained
+operator status.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_REHASHING'><code>RPL_REHASHING</code></td><td><div class='docblock'><p>382    RPL_REHASHING
+     &quot;<config file> :Rehashing&quot;</p>
+
+<ul>
+<li>If the REHASH option is used and an operator sends
+a REHASH message, an RPL_REHASHING is sent back to
+the operator.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_YOURESERVICE'><code>RPL_YOURESERVICE</code></td><td><div class='docblock'><p>383    RPL_YOURESERVICE
+     &quot;You are service <servicename>&quot;</p>
+
+<ul>
+<li>Sent by the server to a service upon successful
+registration.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_TIME'><code>RPL_TIME</code></td><td><div class='docblock'><p>391    RPL_TIME
+     &quot;<server> :<string showing server's local time>&quot;</p>
+
+<ul>
+<li>When replying to the TIME message, a server MUST send
+the reply using the RPL_TIME format above.  The string
+showing the time need only contain the correct day and
+time there.  There is no further requirement for the
+time string.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_USERSSTART'><code>RPL_USERSSTART</code></td><td><div class='docblock'><p>392    RPL_USERSSTART
+&quot;:UserID   Terminal  Host&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_USERS'><code>RPL_USERS</code></td><td><div class='docblock'><p>393    RPL_USERS
+&quot;:<username> <ttyline> <hostname>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_ENDOFUSERS'><code>RPL_ENDOFUSERS</code></td><td><div class='docblock'><p>394    RPL_ENDOFUSERS
+&quot;:End of users&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_NOUSERS'><code>RPL_NOUSERS</code></td><td><div class='docblock'><p>395    RPL_NOUSERS
+     &quot;:Nobody logged in&quot;</p>
+
+<ul>
+<li>If the USERS message is handled by a server, the
+replies RPL_USERSTART, RPL_USERS, RPL_ENDOFUSERS and
+RPL_NOUSERS are used.  RPL_USERSSTART MUST be sent
+first, following by either a sequence of RPL_USERS
+or a single RPL_NOUSER.  Following this is
+RPL_ENDOFUSERS.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_TRACELINK'><code>RPL_TRACELINK</code></td><td><div class='docblock'><p>200    RPL_TRACELINK
+&quot;Link <version & debug level> <destination>
+ <next server> V<protocol version>
+ <link uptime in seconds> <backstream sendq>
+ <upstream sendq>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_TRACECONNECTING'><code>RPL_TRACECONNECTING</code></td><td><div class='docblock'><p>201    RPL_TRACECONNECTING
+&quot;Try. <class> <server>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_TRACEHANDSHAKE'><code>RPL_TRACEHANDSHAKE</code></td><td><div class='docblock'><p>202    RPL_TRACEHANDSHAKE
+&quot;H.S. <class> <server>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_TRACEUNKNOWN'><code>RPL_TRACEUNKNOWN</code></td><td><div class='docblock'><p>203    RPL_TRACEUNKNOWN
+&quot;???? <class> [<client IP address in dot form>]&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_TRACEOPERATOR'><code>RPL_TRACEOPERATOR</code></td><td><div class='docblock'><p>204    RPL_TRACEOPERATOR
+&quot;Oper <class> <nick>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_TRACEUSER'><code>RPL_TRACEUSER</code></td><td><div class='docblock'><p>205    RPL_TRACEUSER
+&quot;User <class> <nick>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_TRACESERVER'><code>RPL_TRACESERVER</code></td><td><div class='docblock'><p>206    RPL_TRACESERVER
+&quot;Serv <class> <int>S <int>C <server>
+ <nick!user|*!*>@<host|server> V<protocol version>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_TRACESERVICE'><code>RPL_TRACESERVICE</code></td><td><div class='docblock'><p>207    RPL_TRACESERVICE
+&quot;Service <class> <name> <type> <active type>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_TRACENEWTYPE'><code>RPL_TRACENEWTYPE</code></td><td><div class='docblock'><p>208    RPL_TRACENEWTYPE
+&quot;<newtype> 0 <client name>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_TRACECLASS'><code>RPL_TRACECLASS</code></td><td><div class='docblock'><p>209    RPL_TRACECLASS
+&quot;Class <class> <count>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_TRACERECONNECT'><code>RPL_TRACERECONNECT</code></td><td><div class='docblock'><p>210    RPL_TRACERECONNECT
+Unused.</p>
+</div></td></tr><tr><td id='variant.RPL_TRACELOG'><code>RPL_TRACELOG</code></td><td><div class='docblock'><p>261    RPL_TRACELOG
+&quot;File <logfile> <debug level>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_TRACEEND'><code>RPL_TRACEEND</code></td><td><div class='docblock'><p>262    RPL_TRACEEND
+     &quot;<server name> <version & debug level> :End of TRACE&quot;</p>
+
+<ul>
+<li><p>The RPL_TRACE* are all returned by the server in
+response to the TRACE message.  How many are
+returned is dependent on the TRACE message and
+whether it was sent by an operator or not.  There
+is no predefined order for which occurs first.
+Replies RPL_TRACEUNKNOWN, RPL_TRACECONNECTING and
+RPL_TRACEHANDSHAKE are all used for connections
+which have not been fully established and are either
+unknown, still attempting to connect or in the
+process of completing the &#39;server handshake&#39;.
+RPL_TRACELINK is sent by any server which handles
+a TRACE message and has to pass it on to another
+server.  The list of RPL_TRACELINKs sent in
+response to a TRACE command traversing the IRC
+network should reflect the actual connectivity of
+the servers themselves along that path.</p>
+
+<p>RPL_TRACENEWTYPE is to be used for any connection
+which does not fit in the other categories but is
+being displayed anyway.
+RPL_TRACEEND is sent to indicate the end of the list.</p></li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_STATSLINKINFO'><code>RPL_STATSLINKINFO</code></td><td><div class='docblock'><p>211    RPL_STATSLINKINFO
+     &quot;<linkname> <sendq> <sent messages>
+      <sent Kbytes> <received messages>
+      <received Kbytes> <time open>&quot;</p>
+
+<ul>
+<li>reports statistics on a connection.  <linkname>
+identifies the particular connection, <sendq> is
+the amount of data that is queued and waiting to be
+sent <sent messages> the number of messages sent,
+and <sent Kbytes> the amount of data sent, in
+Kbytes. <received messages> and <received Kbytes>
+are the equivalent of <sent messages> and <sent
+Kbytes> for received data, respectively.  <time
+open> indicates how long ago the connection was
+opened, in seconds.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_STATSCOMMANDS'><code>RPL_STATSCOMMANDS</code></td><td><div class='docblock'><p>212    RPL_STATSCOMMANDS
+     &quot;<command> <count> <byte count> <remote count>&quot;</p>
+
+<ul>
+<li>reports statistics on commands usage.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_ENDOFSTATS'><code>RPL_ENDOFSTATS</code></td><td><div class='docblock'><p>219    RPL_ENDOFSTATS
+&quot;<stats letter> :End of STATS report&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_STATSUPTIME'><code>RPL_STATSUPTIME</code></td><td><div class='docblock'><p>242    RPL_STATSUPTIME
+     &quot;:Server Up %d days %d:%02d:%02d&quot;</p>
+
+<ul>
+<li>reports the server uptime.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_STATSOLINE'><code>RPL_STATSOLINE</code></td><td><div class='docblock'><p>243    RPL_STATSOLINE
+     &quot;O <hostmask> * <name>&quot;</p>
+
+<ul>
+<li>reports the allowed hosts from where user may become IRC
+operators.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_UMODEIS'><code>RPL_UMODEIS</code></td><td><div class='docblock'><p>221    RPL_UMODEIS
+     &quot;<user mode string>&quot;</p>
+
+<ul>
+<li>To answer a query about a client&#39;s own mode,
+RPL_UMODEIS is sent back.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_SERVLIST'><code>RPL_SERVLIST</code></td><td><div class='docblock'><p>234    RPL_SERVLIST
+&quot;<name> <server> <mask> <type> <hopcount> <info>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_SERVLISTEND'><code>RPL_SERVLISTEND</code></td><td><div class='docblock'><p>235    RPL_SERVLISTEND
+     &quot;<mask> <type> :End of service listing&quot;</p>
+
+<ul>
+<li>When listing services in reply to a SERVLIST message,
+a server is required to send the list back using the
+RPL_SERVLIST and RPL_SERVLISTEND messages.  A separate
+RPL_SERVLIST is sent for each service.  After the
+services have been listed (or if none present) a
+RPL_SERVLISTEND MUST be sent.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_LUSERCLIENT'><code>RPL_LUSERCLIENT</code></td><td><div class='docblock'><p>251    RPL_LUSERCLIENT
+&quot;:There are <integer> users and <integer>
+ services on <integer> servers&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_LUSEROP'><code>RPL_LUSEROP</code></td><td><div class='docblock'><p>252    RPL_LUSEROP
+&quot;<integer> :operator(s) online&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_LUSERUNKNOWN'><code>RPL_LUSERUNKNOWN</code></td><td><div class='docblock'><p>253    RPL_LUSERUNKNOWN
+&quot;<integer> :unknown connection(s)&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_LUSERCHANNELS'><code>RPL_LUSERCHANNELS</code></td><td><div class='docblock'><p>254    RPL_LUSERCHANNELS
+&quot;<integer> :channels formed&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_LUSERME'><code>RPL_LUSERME</code></td><td><div class='docblock'><p>255    RPL_LUSERME
+     &quot;:I have <integer> clients and <integer>
+       servers&quot;</p>
+
+<ul>
+<li>In processing an LUSERS message, the server
+sends a set of replies from RPL_LUSERCLIENT,
+RPL_LUSEROP, RPL_USERUNKNOWN,
+RPL_LUSERCHANNELS and RPL_LUSERME.  When
+replying, a server MUST send back
+RPL_LUSERCLIENT and RPL_LUSERME.  The other
+replies are only sent back if a non-zero count
+is found for them.</li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_ADMINME'><code>RPL_ADMINME</code></td><td><div class='docblock'><p>256    RPL_ADMINME
+&quot;<server> :Administrative info&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_ADMINLOC1'><code>RPL_ADMINLOC1</code></td><td><div class='docblock'><p>257    RPL_ADMINLOC1
+&quot;:<admin info>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_ADMINLOC2'><code>RPL_ADMINLOC2</code></td><td><div class='docblock'><p>258    RPL_ADMINLOC2
+&quot;:<admin info>&quot;</p>
+</div></td></tr><tr><td id='variant.RPL_ADMINEMAIL'><code>RPL_ADMINEMAIL</code></td><td><div class='docblock'><p>259    RPL_ADMINEMAIL
+     &quot;:<admin info>&quot;</p>
+
+<ul>
+<li><p>When replying to an ADMIN message, a server
+is expected to use replies RPL_ADMINME
+through to RPL_ADMINEMAIL and provide a text
+message with each.  For RPL_ADMINLOC1 a
+description of what city, state and country
+the server is in is expected, followed by
+details of the institution (RPL_ADMINLOC2)</p>
+
+<p>and finally the administrative contact for the
+server (an email address here is REQUIRED)
+in RPL_ADMINEMAIL.</p></li>
+</ul>
+</div></td></tr><tr><td id='variant.RPL_TRYAGAIN'><code>RPL_TRYAGAIN</code></td><td><div class='docblock'><p>263    RPL_TRYAGAIN
+     &quot;<command> :Please wait a while and try again.&quot;</p>
+
+<ul>
+<li>When a server drops a command without processing it,
+it MUST use the reply RPL_TRYAGAIN to inform the
+originating client.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NOSUCHNICK'><code>ERR_NOSUCHNICK</code></td><td><div class='docblock'><p>401    ERR_NOSUCHNICK
+    &quot;<nickname> :No such nick/channel&quot;</p>
+
+<ul>
+<li>Used to indicate the nickname parameter supplied to a
+command is currently unused.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NOSUCHSERVER'><code>ERR_NOSUCHSERVER</code></td><td><div class='docblock'><p>402    ERR_NOSUCHSERVER
+     &quot;<server name> :No such server&quot;</p>
+
+<ul>
+<li>Used to indicate the server name given currently
+does not exist.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NOSUCHCHANNEL'><code>ERR_NOSUCHCHANNEL</code></td><td><div class='docblock'><p>403    ERR_NOSUCHCHANNEL
+     &quot;<channel name> :No such channel&quot;</p>
+
+<ul>
+<li>Used to indicate the given channel name is invalid.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_CANNOTSENDTOCHAN'><code>ERR_CANNOTSENDTOCHAN</code></td><td><div class='docblock'><p>404    ERR_CANNOTSENDTOCHAN
+     &quot;<channel name> :Cannot send to channel&quot;</p>
+
+<ul>
+<li>Sent to a user who is either (a) not on a channel
+which is mode +n or (b) not a chanop (or mode +v) on
+a channel which has mode +m set or where the user is
+banned and is trying to send a PRIVMSG message to
+that channel.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_TOOMANYCHANNELS'><code>ERR_TOOMANYCHANNELS</code></td><td><div class='docblock'><p>405    ERR_TOOMANYCHANNELS
+     &quot;<channel name> :You have joined too many channels&quot;</p>
+
+<ul>
+<li>Sent to a user when they have joined the maximum
+number of allowed channels and they try to join
+another channel.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_WASNOSUCHNICK'><code>ERR_WASNOSUCHNICK</code></td><td><div class='docblock'><p>406    ERR_WASNOSUCHNICK
+     &quot;<nickname> :There was no such nickname&quot;</p>
+
+<ul>
+<li>Returned by WHOWAS to indicate there is no history
+information for that nickname.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_TOOMANYTARGETS'><code>ERR_TOOMANYTARGETS</code></td><td><div class='docblock'><p>407    ERR_TOOMANYTARGETS
+     &quot;<target> :<error code> recipients. <abort message>&quot;</p>
+
+<ul>
+<li><p>Returned to a client which is attempting to send a
+PRIVMSG/NOTICE using the user@host destination format
+and for a user@host which has several occurrences.</p></li>
+<li><p>Returned to a client which trying to send a
+PRIVMSG/NOTICE to too many recipients.</p></li>
+<li><p>Returned to a client which is attempting to JOIN a safe
+channel using the shortname when there are more than one
+such channel.</p></li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NOSUCHSERVICE'><code>ERR_NOSUCHSERVICE</code></td><td><div class='docblock'><p>408    ERR_NOSUCHSERVICE
+     &quot;<service name> :No such service&quot;</p>
+
+<ul>
+<li>Returned to a client which is attempting to send a SQUERY
+to a service which does not exist.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NOORIGIN'><code>ERR_NOORIGIN</code></td><td><div class='docblock'><p>409    ERR_NOORIGIN
+     &quot;:No origin specified&quot;</p>
+
+<ul>
+<li>PING or PONG message missing the originator parameter.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NORECIPIENT'><code>ERR_NORECIPIENT</code></td><td><div class='docblock'><p>411    ERR_NORECIPIENT
+&quot;:No recipient given (<command>)&quot;</p>
+</div></td></tr><tr><td id='variant.ERR_NOTEXTTOSEND'><code>ERR_NOTEXTTOSEND</code></td><td><div class='docblock'><p>412    ERR_NOTEXTTOSEND
+&quot;:No text to send&quot;</p>
+</div></td></tr><tr><td id='variant.ERR_NOTOPLEVEL'><code>ERR_NOTOPLEVEL</code></td><td><div class='docblock'><p>413    ERR_NOTOPLEVEL
+&quot;<mask> :No toplevel domain specified&quot;</p>
+</div></td></tr><tr><td id='variant.ERR_WILDTOPLEVEL'><code>ERR_WILDTOPLEVEL</code></td><td><div class='docblock'><p>414    ERR_WILDTOPLEVEL
+&quot;<mask> :Wildcard in toplevel domain&quot;</p>
+</div></td></tr><tr><td id='variant.ERR_BADMASK'><code>ERR_BADMASK</code></td><td><div class='docblock'><p>415    ERR_BADMASK
+     &quot;<mask> :Bad Server/host mask&quot;</p>
+
+<ul>
+<li>412 - 415 are returned by PRIVMSG to indicate that
+the message wasn&#39;t delivered for some reason.
+ERR_NOTOPLEVEL and ERR_WILDTOPLEVEL are errors that
+are returned when an invalid use of
+&quot;PRIVMSG $<server>&quot; or &quot;PRIVMSG #<host>&quot; is attempted.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_UNKNOWNCOMMAND'><code>ERR_UNKNOWNCOMMAND</code></td><td><div class='docblock'><p>421    ERR_UNKNOWNCOMMAND
+     &quot;<command> :Unknown command&quot;</p>
+
+<ul>
+<li>Returned to a registered client to indicate that the
+command sent is unknown by the server.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NOMOTD'><code>ERR_NOMOTD</code></td><td><div class='docblock'><p>422    ERR_NOMOTD
+     &quot;:MOTD File is missing&quot;</p>
+
+<ul>
+<li>Server&#39;s MOTD file could not be opened by the server.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NOADMININFO'><code>ERR_NOADMININFO</code></td><td><div class='docblock'><p>423    ERR_NOADMININFO
+     &quot;<server> :No administrative info available&quot;</p>
+
+<ul>
+<li>Returned by a server in response to an ADMIN message
+when there is an error in finding the appropriate
+information.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_FILEERROR'><code>ERR_FILEERROR</code></td><td><div class='docblock'><p>424    ERR_FILEERROR
+     &quot;:File error doing <file op> on <file>&quot;</p>
+
+<ul>
+<li>Generic error message used to report a failed file
+operation during the processing of a message.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NONICKNAMEGIVEN'><code>ERR_NONICKNAMEGIVEN</code></td><td><div class='docblock'><p>431    ERR_NONICKNAMEGIVEN
+     &quot;:No nickname given&quot;</p>
+
+<ul>
+<li>Returned when a nickname parameter expected for a
+command and isn&#39;t found.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_ERRONEUSNICKNAME'><code>ERR_ERRONEUSNICKNAME</code></td><td><div class='docblock'><p>432    ERR_ERRONEUSNICKNAME
+     &quot;<nick> :Erroneous nickname&quot;</p>
+
+<ul>
+<li>Returned after receiving a NICK message which contains
+characters which do not fall in the defined set.  See
+section 2.3.1 for details on valid nicknames.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NICKNAMEINUSE'><code>ERR_NICKNAMEINUSE</code></td><td><div class='docblock'><p>433    ERR_NICKNAMEINUSE
+     &quot;<nick> :Nickname is already in use&quot;</p>
+
+<ul>
+<li>Returned when a NICK message is processed that results
+in an attempt to change to a currently existing
+nickname.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NICKCOLLISION'><code>ERR_NICKCOLLISION</code></td><td><div class='docblock'><p>436    ERR_NICKCOLLISION
+     &quot;<nick> :Nickname collision KILL from <user>@<host>&quot;</p>
+
+<ul>
+<li>Returned by a server to a client when it detects a
+nickname collision (registered of a NICK that
+already exists by another server).</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_UNAVAILRESOURCE'><code>ERR_UNAVAILRESOURCE</code></td><td><div class='docblock'><p>437    ERR_UNAVAILRESOURCE
+     &quot;<nick/channel> :Nick/channel is temporarily unavailable&quot;</p>
+
+<ul>
+<li><p>Returned by a server to a user trying to join a channel
+currently blocked by the channel delay mechanism.</p></li>
+<li><p>Returned by a server to a user trying to change nickname
+when the desired nickname is blocked by the nick delay
+mechanism.</p></li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_USERNOTINCHANNEL'><code>ERR_USERNOTINCHANNEL</code></td><td><div class='docblock'><p>441    ERR_USERNOTINCHANNEL
+     &quot;<nick> <channel> :They aren&#39;t on that channel&quot;</p>
+
+<ul>
+<li>Returned by the server to indicate that the target
+user of the command is not on the given channel.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NOTONCHANNEL'><code>ERR_NOTONCHANNEL</code></td><td><div class='docblock'><p>442    ERR_NOTONCHANNEL
+     &quot;<channel> :You&#39;re not on that channel&quot;</p>
+
+<ul>
+<li>Returned by the server whenever a client tries to
+perform a channel affecting command for which the
+client isn&#39;t a member.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_USERONCHANNEL'><code>ERR_USERONCHANNEL</code></td><td><div class='docblock'><p>443    ERR_USERONCHANNEL
+     &quot;<user> <channel> :is already on channel&quot;</p>
+
+<ul>
+<li>Returned when a client tries to invite a user to a
+channel they are already on.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NOLOGIN'><code>ERR_NOLOGIN</code></td><td><div class='docblock'><p>444    ERR_NOLOGIN
+     &quot;<user> :User not logged in&quot;</p>
+
+<ul>
+<li>Returned by the summon after a SUMMON command for a
+user was unable to be performed since they were not
+logged in.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_SUMMONDISABLED'><code>ERR_SUMMONDISABLED</code></td><td><div class='docblock'><p>445    ERR_SUMMONDISABLED
+     &quot;:SUMMON has been disabled&quot;</p>
+
+<ul>
+<li>Returned as a response to the SUMMON command.  MUST be
+returned by any server which doesn&#39;t implement it.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_USERSDISABLED'><code>ERR_USERSDISABLED</code></td><td><div class='docblock'><p>446    ERR_USERSDISABLED
+     &quot;:USERS has been disabled&quot;</p>
+
+<ul>
+<li>Returned as a response to the USERS command.  MUST be
+returned by any server which does not implement it.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NOTREGISTERED'><code>ERR_NOTREGISTERED</code></td><td><div class='docblock'><p>451    ERR_NOTREGISTERED
+     &quot;:You have not registered&quot;</p>
+
+<ul>
+<li>Returned by the server to indicate that the client
+MUST be registered before the server will allow it
+to be parsed in detail.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NEEDMOREPARAMS'><code>ERR_NEEDMOREPARAMS</code></td><td><div class='docblock'><p>461    ERR_NEEDMOREPARAMS
+     &quot;<command> :Not enough parameters&quot;</p>
+
+<ul>
+<li>Returned by the server by numerous commands to
+indicate to the client that it didn&#39;t supply enough
+parameters.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_ALREADYREGISTRED'><code>ERR_ALREADYREGISTRED</code></td><td><div class='docblock'><p>462    ERR_ALREADYREGISTRED
+     &quot;:Unauthorized command (already registered)&quot;</p>
+
+<ul>
+<li>Returned by the server to any link which tries to
+change part of the registered details (such as
+password or user details from second USER message).</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NOPERMFORHOST'><code>ERR_NOPERMFORHOST</code></td><td><div class='docblock'><p>463    ERR_NOPERMFORHOST
+     &quot;:Your host isn&#39;t among the privileged&quot;</p>
+
+<ul>
+<li>Returned to a client which attempts to register with
+a server which does not been setup to allow
+connections from the host the attempted connection
+is tried.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_PASSWDMISMATCH'><code>ERR_PASSWDMISMATCH</code></td><td><div class='docblock'><p>464    ERR_PASSWDMISMATCH
+     &quot;:Password incorrect&quot;</p>
+
+<ul>
+<li>Returned to indicate a failed attempt at registering
+a connection for which a password was required and
+was either not given or incorrect.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_YOUREBANNEDCREEP'><code>ERR_YOUREBANNEDCREEP</code></td><td><div class='docblock'><p>465    ERR_YOUREBANNEDCREEP
+     &quot;:You are banned from this server&quot;</p>
+
+<ul>
+<li>Returned after an attempt to connect and register
+yourself with a server which has been setup to
+explicitly deny connections to you.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_YOUWILLBEBANNED'><code>ERR_YOUWILLBEBANNED</code></td><td><div class='docblock'><p>466    ERR_YOUWILLBEBANNED</p>
+
+<ul>
+<li>Sent by a server to a user to inform that access to the
+server will soon be denied.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_KEYSET'><code>ERR_KEYSET</code></td><td><div class='docblock'><p>467    ERR_KEYSET
+&quot;<channel> :Channel key already set&quot;</p>
+</div></td></tr><tr><td id='variant.ERR_CHANNELISFULL'><code>ERR_CHANNELISFULL</code></td><td><div class='docblock'><p>471    ERR_CHANNELISFULL
+&quot;<channel> :Cannot join channel (+l)&quot;</p>
+</div></td></tr><tr><td id='variant.ERR_UNKNOWNMODE'><code>ERR_UNKNOWNMODE</code></td><td><div class='docblock'><p>472    ERR_UNKNOWNMODE
+&quot;<char> :is unknown mode char to me for <channel>&quot;</p>
+</div></td></tr><tr><td id='variant.ERR_INVITEONLYCHAN'><code>ERR_INVITEONLYCHAN</code></td><td><div class='docblock'><p>473    ERR_INVITEONLYCHAN
+&quot;<channel> :Cannot join channel (+i)&quot;</p>
+</div></td></tr><tr><td id='variant.ERR_BANNEDFROMCHAN'><code>ERR_BANNEDFROMCHAN</code></td><td><div class='docblock'><p>474    ERR_BANNEDFROMCHAN
+&quot;<channel> :Cannot join channel (+b)&quot;</p>
+</div></td></tr><tr><td id='variant.ERR_BADCHANNELKEY'><code>ERR_BADCHANNELKEY</code></td><td><div class='docblock'><p>475    ERR_BADCHANNELKEY
+&quot;<channel> :Cannot join channel (+k)&quot;</p>
+</div></td></tr><tr><td id='variant.ERR_BADCHANMASK'><code>ERR_BADCHANMASK</code></td><td><div class='docblock'><p>476    ERR_BADCHANMASK
+&quot;<channel> :Bad Channel Mask&quot;</p>
+</div></td></tr><tr><td id='variant.ERR_NOCHANMODES'><code>ERR_NOCHANMODES</code></td><td><div class='docblock'><p>477    ERR_NOCHANMODES
+&quot;<channel> :Channel doesn&#39;t support modes&quot;</p>
+</div></td></tr><tr><td id='variant.ERR_BANLISTFULL'><code>ERR_BANLISTFULL</code></td><td><div class='docblock'><p>478    ERR_BANLISTFULL
+&quot;<channel> <char> :Channel list is full&quot;</p>
+</div></td></tr><tr><td id='variant.ERR_NOPRIVILEGES'><code>ERR_NOPRIVILEGES</code></td><td><div class='docblock'><p>481    ERR_NOPRIVILEGES
+     &quot;:Permission Denied- You&#39;re not an IRC operator&quot;</p>
+
+<ul>
+<li>Any command requiring operator privileges to operate
+MUST return this error to indicate the attempt was
+unsuccessful.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_CHANOPRIVSNEEDED'><code>ERR_CHANOPRIVSNEEDED</code></td><td><div class='docblock'><p>482    ERR_CHANOPRIVSNEEDED
+     &quot;<channel> :You&#39;re not channel operator&quot;</p>
+
+<ul>
+<li>Any command requiring &#39;chanop&#39; privileges (such as
+MODE messages) MUST return this error if the client
+making the attempt is not a chanop on the specified
+channel.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_CANTKILLSERVER'><code>ERR_CANTKILLSERVER</code></td><td><div class='docblock'><p>483    ERR_CANTKILLSERVER
+     &quot;:You can&#39;t kill a server!&quot;</p>
+
+<ul>
+<li>Any attempts to use the KILL command on a server
+are to be refused and this error returned directly
+to the client.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_RESTRICTED'><code>ERR_RESTRICTED</code></td><td><div class='docblock'><p>484    ERR_RESTRICTED
+     &quot;:Your connection is restricted!&quot;</p>
+
+<ul>
+<li>Sent by the server to a user upon connection to indicate
+the restricted nature of the connection (user mode &quot;+r&quot;).</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_UNIQOPPRIVSNEEDED'><code>ERR_UNIQOPPRIVSNEEDED</code></td><td><div class='docblock'><p>485    ERR_UNIQOPPRIVSNEEDED
+     &quot;:You&#39;re not the original channel operator&quot;</p>
+
+<ul>
+<li>Any MODE requiring &quot;channel creator&quot; privileges MUST
+return this error if the client making the attempt is not
+a chanop on the specified channel.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_NOOPERHOST'><code>ERR_NOOPERHOST</code></td><td><div class='docblock'><p>491    ERR_NOOPERHOST
+     &quot;:No O-lines for your host&quot;</p>
+
+<ul>
+<li>If a client sends an OPER message and the server has
+not been configured to allow connections from the
+client&#39;s host as an operator, this error MUST be
+returned.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_UMODEUNKNOWNFLAG'><code>ERR_UMODEUNKNOWNFLAG</code></td><td><div class='docblock'><p>501    ERR_UMODEUNKNOWNFLAG
+     &quot;:Unknown MODE flag&quot;</p>
+
+<ul>
+<li>Returned by the server to indicate that a MODE
+message was sent with a nickname parameter and that
+the a mode flag sent was not recognized.</li>
+</ul>
+</div></td></tr><tr><td id='variant.ERR_USERSDONTMATCH'><code>ERR_USERSDONTMATCH</code></td><td><div class='docblock'><p>502    ERR_USERSDONTMATCH
+     &quot;:Cannot change mode for other users&quot;</p>
+
+<ul>
+<li>Error sent to any user trying to view or change the
+user mode for a user other than themselves.</li>
+</ul>
+</div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'a&gt; <a class='enum' href='../../irsc/reply/enum.Reply.html' title='irsc::reply::Reply'>Reply</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.from_message' class='method'><code>fn <a href='#method.from_message' class='fnname'>from_message</a>(msg: &amp;'a <a class='struct' href='../../irsc/message/struct.Message.html' title='irsc::message::Message'>Message</a>) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../../irsc/reply/enum.Reply.html' title='irsc::reply::Reply'>Reply</a>&lt;'a&gt;&gt;</code></h4>
+<h4 id='method.to_message' class='method'><code>fn <a href='#method.to_message' class='fnname'>to_message</a>(&amp;'a self) -&gt; <a class='struct' href='../../irsc/message/struct.Message.html' title='irsc::message::Message'>Message</a></code></h4>
+<h4 id='method.to_static' class='method'><code>fn <a href='#method.to_static' class='fnname'>to_static</a>(&amp;self) -&gt; <a class='enum' href='../../irsc/reply/enum.Reply.html' title='irsc::reply::Reply'>Reply</a>&lt;'static&gt;</code></h4>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='enum' href='../../irsc/reply/enum.Reply.html' title='irsc::reply::Reply'>Reply</a>&lt;'a&gt;</code></h3><div class='impl-items'></div><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='enum' href='../../irsc/reply/enum.Reply.html' title='irsc::reply::Reply'>Reply</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.eq' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../../irsc/reply/enum.Reply.html' title='irsc::reply::Reply'>Reply</a>&lt;'a&gt;) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.ne' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../../irsc/reply/enum.Reply.html' title='irsc::reply::Reply'>Reply</a>&lt;'a&gt;) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+</div><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='enum' href='../../irsc/reply/enum.Reply.html' title='irsc::reply::Reply'>Reply</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.clone' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='enum' href='../../irsc/reply/enum.Reply.html' title='irsc::reply::Reply'>Reply</a>&lt;'a&gt;</code></h4>
+<h4 id='method.clone_from' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
+</div><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/hash/trait.Hash.html' title='core::hash::Hash'>Hash</a> for <a class='enum' href='../../irsc/reply/enum.Reply.html' title='irsc::reply::Reply'>Reply</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.hash' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/hash/trait.Hash.html#method.hash' class='fnname'>hash</a>&lt;__H: <a class='trait' href='http://doc.rust-lang.org/nightly/core/hash/trait.Hasher.html' title='core::hash::Hasher'>Hasher</a>&gt;(&amp;self, __arg_0: &amp;mut __H)</code></h4>
+<h4 id='method.hash_slice' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/hash/trait.Hash.html#method.hash_slice' class='fnname'>hash_slice</a>&lt;H&gt;(data: <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[Self]</a>, state: &amp;mut H) <span class='where'>where H: <a class='trait' href='http://doc.rust-lang.org/nightly/core/hash/trait.Hasher.html' title='core::hash::Hasher'>Hasher</a></span></code></h4>
+</div><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../../irsc/reply/enum.Reply.html' title='irsc::reply::Reply'>Reply</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='http://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='http://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <div id="help" class="hidden">
+        <div class="shortcuts">
+            <h1>Keyboard shortcuts</h1>
+            <dl>
+                <dt>?</dt>
+                <dd>Show this help dialog</dd>
+                <dt>S</dt>
+                <dd>Focus the search field</dd>
+                <dt>&larrb;</dt>
+                <dd>Move up in search results</dd>
+                <dt>&rarrb;</dt>
+                <dd>Move down in search results</dd>
+                <dt>&#9166;</dt>
+                <dd>Go to active search result</dd>
+            </dl>
+        </div>
+        <div class="infos">
+            <h1>Search tricks</h1>
+            <p>
+                Prefix searches with a type followed by a colon (e.g.
+                <code>fn:</code>) to restrict the search to a given type.
+            </p>
+            <p>
+                Accepted types are: <code>fn</code>, <code>mod</code>,
+                <code>struct</code>, <code>enum</code>,
+                <code>trait</code>, <code>typedef</code> (or
+                <code>tdef</code>).
+            </p>
+            <p>
+                Search functions by type signature (e.g.
+                <code>vec -> usize</code>)
+            </p>
+        </div>
+    </div>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "irsc";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script async src="../../search-index.js"></script>
+</body>
+</html>

@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Command` enum in crate `irsc`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Command">
+
+    <title>irsc::command::Command - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <section class="sidebar">
+        
+        <p class='location'><a href='../index.html'>irsc</a>::<wbr><a href='index.html'>command</a></p><script>window.sidebarCurrent = {name: 'Command', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </section>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press 'S' to search, '?' for more options..."
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content enum">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>irsc</a>::<wbr><a href='index.html'>command</a>::<wbr><a class='enum' href=''>Command</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-6183' class='srclink' href='../../src/irsc/command.rs.html#24-1591' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum Command&lt;'a&gt; {
+    PASS(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;),
+    NICK(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;),
+    USER(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;),
+    OPER(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;),
+    UMODE(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;),
+    SERVICE(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;),
+    QUIT(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    SQUIT(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;),
+    JOIN(<a class='struct' href='http://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;, <a class='struct' href='http://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    PART(<a class='struct' href='http://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    MODE(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='struct' href='http://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;)</a>&gt;),
+    TOPIC(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    NAMES(<a class='struct' href='http://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    LIST(<a class='struct' href='http://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    INVITE(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;),
+    KICK(<a class='struct' href='http://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;, <a class='struct' href='http://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    PRIVMSG(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;),
+    NOTICE(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;),
+    MOTD(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    LUSERS(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;)</a>&gt;),
+    VERSION(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    STATS(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;)</a>&gt;),
+    LINKS(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;)</a>&gt;),
+    TIME(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    CONNECT(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a href='http://doc.rust-lang.org/nightly/std/primitive.i16.html'>i16</a>, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    TRACE(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    ADMIN(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    INFO(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    SERVLIST(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;)</a>&gt;),
+    SQUERY(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;),
+    WHO(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;, <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>),
+    WHOIS(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;, <a class='struct' href='http://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    WHOWAS(<a class='struct' href='http://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;)</a>&gt;),
+    KILL(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;),
+    PING(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    PONG(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    ERROR(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;),
+    AWAY(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    REHASH,
+    DIE,
+    RESTART,
+    SUMMON(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a href='http://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;, <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;)</a>&gt;),
+    USERS(<a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+    WALLOPS(<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;),
+    USERHOST(<a class='struct' href='http://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='type' href='../../irsc/command/type.CS.html' title='irsc::command::CS'>CS</a>&lt;'a&gt;&gt;),
+}</pre><h2 class='variants'>Variants</h2>
+<table><tr><td id='variant.PASS'><code>PASS</code></td><td><div class='docblock'><pre><code class="language-text">3.1.1 Password message
+
+Command: PASS
+Parameters: &lt;password&gt;
+
+The PASS command is used to set a &#39;connection password&#39;.  The
+optional password can and MUST be set before any attempt to register
+the connection is made.  Currently this requires that user send a
+PASS command before sending the NICK/USER combination.
+
+Numeric Replies:
+
+   ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
+
+Example:
+
+   PASS secretpasswordhere
+</code></pre>
+</div></td></tr><tr><td id='variant.NICK'><code>NICK</code></td><td><div class='docblock'><pre><code class="language-text">3.1.2 Nick message
+
+Command: NICK
+Parameters: &lt;nickname&gt;
+
+NICK command is used to give user a nickname or change the existing
+one.
+
+Numeric Replies:
+
+   ERR_NONICKNAMEGIVEN             ERR_ERRONEUSNICKNAME
+   ERR_NICKNAMEINUSE               ERR_NICKCOLLISION
+   ERR_UNAVAILRESOURCE             ERR_RESTRICTED
+
+Examples:
+
+   NICK Wiz                ; Introducing new nick &quot;Wiz&quot; if session is
+                           still unregistered, or user changing his
+                           nickname to &quot;Wiz&quot;
+
+   :WiZ!jto@tolsun.oulu.fi NICK Kilroy
+                           ; Server telling that WiZ changed his
+                           nickname to Kilroy.
+</code></pre>
+</div></td></tr><tr><td id='variant.USER'><code>USER</code></td><td><div class='docblock'><pre><code class="language-text">3.1.3 User message
+
+Command: USER
+Parameters: &lt;user&gt; &lt;mode&gt; &lt;unused&gt; &lt;realname&gt;
+
+The USER command is used at the beginning of connection to specify
+the username, hostname and realname of a new user.
+
+The &lt;mode&gt; parameter should be a numeric, and can be used to
+automatically set user modes when registering with the server.  This
+parameter is a bitmask, with only 2 bits having any signification: if
+the bit 2 is set, the user mode &#39;w&#39; will be set and if the bit 3 is
+set, the user mode &#39;i&#39; will be set.  (See Section 3.1.5 &quot;User
+Modes&quot;).
+
+The &lt;realname&gt; may contain space characters.
+
+Numeric Replies:
+
+   ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
+
+Example:
+
+   USER guest 0 * :Ronnie Reagan   ; User registering themselves with a
+                                   username of &quot;guest&quot; and real name
+                                   &quot;Ronnie Reagan&quot;.
+
+   USER guest 8 * :Ronnie Reagan   ; User registering themselves with a
+                                   username of &quot;guest&quot; and real name
+                                   &quot;Ronnie Reagan&quot;, and asking to be set
+                                   invisible.
+</code></pre>
+</div></td></tr><tr><td id='variant.OPER'><code>OPER</code></td><td><div class='docblock'><pre><code class="language-text">3.1.4 Oper message
+
+Command: OPER
+Parameters: &lt;name&gt; &lt;password&gt;
+
+A normal user uses the OPER command to obtain operator privileges.
+The combination of &lt;name&gt; and &lt;password&gt; are REQUIRED to gain
+Operator privileges.  Upon success, the user will receive a MODE
+message (see section 3.1.5) indicating the new user modes.
+
+Numeric Replies:
+
+   ERR_NEEDMOREPARAMS              RPL_YOUREOPER
+   ERR_NOOPERHOST                  ERR_PASSWDMISMATCH
+
+Example:
+
+   OPER foo bar                    ; Attempt to register as an operator
+                                   using a username of &quot;foo&quot; and &quot;bar&quot;
+                                   as the password.
+</code></pre>
+</div></td></tr><tr><td id='variant.UMODE'><code>UMODE</code></td><td><div class='docblock'><pre><code class="language-text">3.1.5 User mode message
+
+Command: MODE
+Parameters: &lt;nickname&gt;
+            *( ( &quot;+&quot; / &quot;-&quot; ) *( &quot;i&quot; / &quot;w&quot; / &quot;o&quot; / &quot;O&quot; / &quot;r&quot; ) )
+
+The user MODE&#39;s are typically changes which affect either how the
+client is seen by others or what &#39;extra&#39; messages the client is sent.
+
+A user MODE command MUST only be accepted if both the sender of the
+message and the nickname given as a parameter are both the same.  If
+no other parameter is given, then the server will return the current
+settings for the nick.
+
+The available modes are as follows:
+
+   a - user is flagged as away;
+   i - marks a users as invisible;
+   w - user receives wallops;
+   r - restricted user connection;
+   o - operator flag;
+   O - local operator flag;
+   s - marks a user for receipt of server notices.
+
+Additional modes may be available later on.
+
+The flag &#39;a&#39; SHALL NOT be toggled by the user using the MODE command,
+instead use of the AWAY command is REQUIRED.
+
+If a user attempts to make themselves an operator using the &quot;+o&quot; or
+&quot;+O&quot; flag, the attempt SHOULD be ignored as users could bypass the
+authentication mechanisms of the OPER command.  There is no
+restriction, however, on anyone `deopping&#39; themselves (using &quot;-o&quot; or
+&quot;-O&quot;).
+
+On the other hand, if a user attempts to make themselves unrestricted
+using the &quot;-r&quot; flag, the attempt SHOULD be ignored.  There is no
+restriction, however, on anyone `deopping&#39; themselves (using &quot;+r&quot;).
+This flag is typically set by the server upon connection for
+administrative reasons.  While the restrictions imposed are left up
+to the implementation, it is typical that a restricted user not be
+allowed to change nicknames, nor make use of the channel operator
+status on channels.
+
+The flag &#39;s&#39; is obsolete but MAY still be used.
+
+Numeric Replies:
+
+   ERR_NEEDMOREPARAMS              ERR_USERSDONTMATCH
+   ERR_UMODEUNKNOWNFLAG            RPL_UMODEIS
+
+Examples:
+
+   MODE WiZ -w                     ; Command by WiZ to turn off
+                                   reception of WALLOPS messages.
+
+   MODE Angel +i                   ; Command from Angel to make herself
+                                   invisible.
+
+   MODE WiZ -o                     ; WiZ &#39;deopping&#39; (removing operator
+                                   status).
+</code></pre>
+</div></td></tr><tr><td id='variant.SERVICE'><code>SERVICE</code></td><td><div class='docblock'><pre><code class="language-text">3.1.6 Service message
+
+Command: SERVICE
+Parameters: &lt;nickname&gt; &lt;reserved&gt; &lt;distribution&gt; &lt;type&gt;
+            &lt;reserved&gt; &lt;info&gt;
+
+The SERVICE command to register a new service.  Command parameters
+specify the service nickname, distribution, type and info of a new
+service.
+
+The &lt;distribution&gt; parameter is used to specify the visibility of a
+service.  The service may only be known to servers which have a name
+matching the distribution.  For a matching server to have knowledge
+of the service, the network path between that server and the server
+on which the service is connected MUST be composed of servers which
+names all match the mask.
+
+The &lt;type&gt; parameter is currently reserved for future usage.
+
+Numeric Replies:
+
+   ERR_ALREADYREGISTRED            ERR_NEEDMOREPARAMS
+   ERR_ERRONEUSNICKNAME
+   RPL_YOURESERVICE                RPL_YOURHOST
+   RPL_MYINFO
+
+Example:
+
+   SERVICE dict * *.fr 0 0 :French Dictionary ; Service registering
+                                   itself with a name of &quot;dict&quot;.  This
+                                   service will only be available on
+                                   servers which name matches &quot;*.fr&quot;.
+</code></pre>
+</div></td></tr><tr><td id='variant.QUIT'><code>QUIT</code></td><td><div class='docblock'><pre><code class="language-text">3.1.7 Quit
+
+Command: QUIT
+Parameters: [ &lt;Quit Message&gt; ]
+
+A client session is terminated with a quit message.  The server
+acknowledges this by sending an ERROR message to the client.
+
+Numeric Replies:
+
+   None.
+
+Example:
+
+   QUIT :Gone to have lunch        ; Preferred message format.
+
+   :syrk!kalt@millennium.stealth.net QUIT :Gone to have lunch ; User
+                                   syrk has quit IRC to have lunch.
+</code></pre>
+</div></td></tr><tr><td id='variant.SQUIT'><code>SQUIT</code></td><td><div class='docblock'><pre><code class="language-text">3.1.8 Squit
+
+Command: SQUIT
+Parameters: &lt;server&gt; &lt;comment&gt;
+
+The SQUIT command is available only to operators.  It is used to
+disconnect server links.  Also servers can generate SQUIT messages on
+error conditions.  A SQUIT message may also target a remote server
+connection.  In this case, the SQUIT message will simply be sent to
+the remote server without affecting the servers in between the
+operator and the remote server.
+
+The &lt;comment&gt; SHOULD be supplied by all operators who execute a SQUIT
+for a remote server.  The server ordered to disconnect its peer
+generates a WALLOPS message with &lt;comment&gt; included, so that other
+users may be aware of the reason of this action.
+
+Numeric replies:
+
+   ERR_NOPRIVILEGES                ERR_NOSUCHSERVER
+   ERR_NEEDMOREPARAMS
+
+Examples:
+
+   SQUIT tolsun.oulu.fi :Bad Link ?  ; Command to uplink of the server
+                                   tolson.oulu.fi to terminate its
+                                   connection with comment &quot;Bad Link&quot;.
+
+   :Trillian SQUIT cm22.eng.umd.edu :Server out of control ; Command
+                                   from Trillian from to disconnect
+                                   &quot;cm22.eng.umd.edu&quot; from the net with
+                                   comment &quot;Server out of control&quot;.
+</code></pre>
+</div></td></tr><tr><td id='variant.JOIN'><code>JOIN</code></td><td><div class='docblock'><pre><code class="language-text">3.2.1 Join message
+
+Command: JOIN
+Parameters: ( &lt;channel&gt; *( &quot;,&quot; &lt;channel&gt; ) [ &lt;key&gt; *( &quot;,&quot; &lt;key&gt; ) ] )
+            / &quot;0&quot;
+
+The JOIN command is used by a user to request to start listening to
+the specific channel.  Servers MUST be able to parse arguments in the
+form of a list of target, but SHOULD NOT use lists when sending JOIN
+messages to clients.
+
+Once a user has joined a channel, he receives information about
+all commands his server receives affecting the channel.  This
+includes JOIN, MODE, KICK, PART, QUIT and of course PRIVMSG/NOTICE.
+This allows channel members to keep track of the other channel
+members, as well as channel modes.
+
+If a JOIN is successful, the user receives a JOIN message as
+confirmation and is then sent the channel&#39;s topic (using RPL_TOPIC) and
+the list of users who are on the channel (using RPL_NAMREPLY), which
+MUST include the user joining.
+
+Note that this message accepts a special argument (&quot;0&quot;), which is
+a special request to leave all channels the user is currently a member
+of.  The server will process this message as if the user had sent
+a PART command (See Section 3.2.2) for each channel he is a member
+of.
+
+Numeric Replies:
+
+   ERR_NEEDMOREPARAMS              ERR_BANNEDFROMCHAN
+   ERR_INVITEONLYCHAN              ERR_BADCHANNELKEY
+   ERR_CHANNELISFULL               ERR_BADCHANMASK
+   ERR_NOSUCHCHANNEL               ERR_TOOMANYCHANNELS
+   ERR_TOOMANYTARGETS              ERR_UNAVAILRESOURCE
+   RPL_TOPIC
+
+Examples:
+
+   JOIN #foobar                    ; Command to join channel #foobar.
+
+   JOIN &amp;foo fubar                 ; Command to join channel &amp;foo using
+                                   key &quot;fubar&quot;.
+
+   JOIN #foo,&amp;bar fubar            ; Command to join channel #foo using
+                                   key &quot;fubar&quot; and &amp;bar using no key.
+
+   JOIN #foo,#bar fubar,foobar     ; Command to join channel #foo using
+                                   key &quot;fubar&quot;, and channel #bar using
+                                   key &quot;foobar&quot;.
+
+   JOIN #foo,#bar                  ; Command to join channels #foo and
+                                   #bar.
+
+   JOIN 0                          ; Leave all currently joined
+                                   channels.
+
+   :WiZ!jto@tolsun.oulu.fi JOIN #Twilight_zone ; JOIN message from WiZ
+                                   on channel #Twilight_zone
+</code></pre>
+</div></td></tr><tr><td id='variant.PART'><code>PART</code></td><td><div class='docblock'><pre><code class="language-text">3.2.2 Part message
+
+Command: PART
+Parameters: &lt;channel&gt; *( &quot;,&quot; &lt;channel&gt; ) [ &lt;Part Message&gt; ]
+
+The PART command causes the user sending the message to be removed
+from the list of active members for all given channels listed in the
+parameter string.  If a &quot;Part Message&quot; is given, this will be sent
+instead of the default message, the nickname.  This request is always
+granted by the server.
+
+Servers MUST be able to parse arguments in the form of a list of
+target, but SHOULD NOT use lists when sending PART messages to
+clients.
+
+Numeric Replies:
+
+   ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
+   ERR_NOTONCHANNEL
+
+Examples:
+
+   PART #twilight_zone             ; Command to leave channel
+                                   &quot;#twilight_zone&quot;
+
+   PART #oz-ops,&amp;group5            ; Command to leave both channels
+                                   &quot;&amp;group5&quot; and &quot;#oz-ops&quot;.
+
+   :WiZ!jto@tolsun.oulu.fi PART #playzone :I lost
+                                   ; User WiZ leaving channel
+                                   &quot;#playzone&quot; with the message &quot;I
+                                   lost&quot;.
+</code></pre>
+</div></td></tr><tr><td id='variant.MODE'><code>MODE</code></td><td><div class='docblock'><pre><code class="language-text">3.2.3 Channel mode message
+
+Command: MODE
+Parameters: &lt;channel&gt; *( ( &quot;-&quot; / &quot;+&quot; ) *&lt;modes&gt; *&lt;modeparams&gt; )
+
+The MODE command is provided so that users may query and change the
+characteristics of a channel.  For more details on available modes
+and their uses, see &quot;Internet Relay Chat: Channel Management&quot; [IRC-
+CHAN].  Note that there is a maximum limit of three (3) changes per
+command for modes that take a parameter.
+
+Numeric Replies:
+
+   ERR_NEEDMOREPARAMS              ERR_KEYSET
+   ERR_NOCHANMODES                 ERR_CHANOPRIVSNEEDED
+   ERR_USERNOTINCHANNEL            ERR_UNKNOWNMODE
+   RPL_CHANNELMODEIS
+   RPL_BANLIST                     RPL_ENDOFBANLIST
+   RPL_EXCEPTLIST                  RPL_ENDOFEXCEPTLIST
+   RPL_INVITELIST                  RPL_ENDOFINVITELIST
+   RPL_UNIQOPIS
+
+The following examples are given to help understanding the syntax of
+the MODE command, but refer to modes defined in &quot;Internet Relay Chat:
+Channel Management&quot; [IRC-CHAN].
+
+Examples:
+
+   MODE #Finnish +imI *!*@*.fi     ; Command to make #Finnish channel
+                                   moderated and &#39;invite-only&#39; with user
+                                   with a hostname matching *.fi
+                                   automatically invited.
+
+   MODE #Finnish +o Kilroy         ; Command to give &#39;chanop&#39; privileges
+                                   to Kilroy on channel #Finnish.
+
+   MODE #Finnish +v Wiz            ; Command to allow WiZ to speak on
+                                   #Finnish.
+
+   MODE #Fins -s                   ; Command to remove &#39;secret&#39; flag
+                                   from channel #Fins.
+
+   MODE #42 +k oulu                ; Command to set the channel key to
+                                   &quot;oulu&quot;.
+
+   MODE #42 -k oulu                ; Command to remove the &quot;oulu&quot;
+                                   channel key on channel &quot;#42&quot;.
+
+   MODE #eu-opers +l 10            ; Command to set the limit for the
+                                   number of users on channel
+                                   &quot;#eu-opers&quot; to 10.
+
+   :WiZ!jto@tolsun.oulu.fi MODE #eu-opers -l
+                                   ; User &quot;WiZ&quot; removing the limit for
+                                   the number of users on channel &quot;#eu-
+                                   opers&quot;.
+
+   MODE &amp;oulu +b                   ; Command to list ban masks set for
+                                   the channel &quot;&amp;oulu&quot;.
+
+   MODE &amp;oulu +b *!*@*             ; Command to prevent all users from
+                                   joining.
+
+   MODE &amp;oulu +b *!*@*.edu +e *!*@*.bu.edu
+                                   ; Command to prevent any user from a
+                                   hostname matching *.edu from joining,
+                                   except if matching *.bu.edu
+
+   MODE #bu +be *!*@*.edu *!*@*.bu.edu
+                                   ; Comment to prevent any user from a
+                                   hostname matching *.edu from joining,
+                                   except if matching *.bu.edu
+
+   MODE #meditation e              ; Command to list exception masks set
+                                   for the channel &quot;#meditation&quot;.
+
+   MODE #meditation I              ; Command to list invitations masks
+                                   set for the channel &quot;#meditation&quot;.
+
+   MODE !12345ircd O               ; Command to ask who the channel
+                                   creator for &quot;!12345ircd&quot; is
+</code></pre>
+</div></td></tr><tr><td id='variant.TOPIC'><code>TOPIC</code></td><td><div class='docblock'><pre><code class="language-text```">3.2.4 Topic message
+
+Command: TOPIC
+Parameters: &lt;channel&gt; [ &lt;topic&gt; ]
+
+The TOPIC command is used to change or view the topic of a channel.
+The topic for channel &lt;channel&gt; is returned if there is no &lt;topic&gt;
+given.  If the &lt;topic&gt; parameter is present, the topic for that
+channel will be changed, if this action is allowed for the user
+requesting it.  If the &lt;topic&gt; parameter is an empty string, the
+topic for that channel will be removed.
+
+Numeric Replies:
+
+   ERR_NEEDMOREPARAMS              ERR_NOTONCHANNEL
+   RPL_NOTOPIC                     RPL_TOPIC
+   ERR_CHANOPRIVSNEEDED            ERR_NOCHANMODES
+
+Examples:
+
+   :WiZ!jto@tolsun.oulu.fi TOPIC #test :New topic ; User Wiz setting the
+                                   topic.
+
+   TOPIC #test :another topic      ; Command to set the topic on #test
+                                   to &quot;another topic&quot;.
+
+   TOPIC #test :                   ; Command to clear the topic on
+                                   #test.
+
+   TOPIC #test                     ; Command to check the topic for
+                                   #test.
+</code></pre>
+</div></td></tr><tr><td id='variant.NAMES'><code>NAMES</code></td><td><div class='docblock'><pre><code class="language-text">3.2.5 Names message
+
+Command: NAMES
+Parameters: [ &lt;channel&gt; *( &quot;,&quot; &lt;channel&gt; ) [ &lt;target&gt; ] ]
+
+By using the NAMES command, a user can list all nicknames that are
+visible to him. For more details on what is visible and what is not,
+see &quot;Internet Relay Chat: Channel Management&quot; [IRC-CHAN].  The
+&lt;channel&gt; parameter specifies which channel(s) to return information
+about.  There is no error reply for bad channel names.
+
+If no &lt;channel&gt; parameter is given, a list of all channels and their
+occupants is returned.  At the end of this list, a list of users who
+are visible but either not on any channel or not on a visible channel
+are listed as being on `channel&#39; &quot;*&quot;.
+
+If the &lt;target&gt; parameter is specified, the request is forwarded to
+that server which will generate the reply.
+
+Wildcards are allowed in the &lt;target&gt; parameter.
+
+Numerics:
+
+   ERR_TOOMANYMATCHES              ERR_NOSUCHSERVER
+   RPL_NAMREPLY                    RPL_ENDOFNAMES
+
+Examples:
+
+   NAMES #twilight_zone,#42        ; Command to list visible users on
+                                   #twilight_zone and #42
+
+   NAMES                           ; Command to list all visible
+                                   channels and users
+</code></pre>
+</div></td></tr><tr><td id='variant.LIST'><code>LIST</code></td><td><div class='docblock'><pre><code class="language-text">3.2.6 List message
+
+Command: LIST
+Parameters: [ &lt;channel&gt; *( &quot;,&quot; &lt;channel&gt; ) [ &lt;target&gt; ] ]
+
+The list command is used to list channels and their topics.  If the
+&lt;channel&gt; parameter is used, only the status of that channel is
+displayed.
+
+If the &lt;target&gt; parameter is specified, the request is forwarded to
+that server which will generate the reply.
+
+Wildcards are allowed in the &lt;target&gt; parameter.
+
+Numeric Replies:
+
+   ERR_TOOMANYMATCHES              ERR_NOSUCHSERVER
+   RPL_LIST                        RPL_LISTEND
+
+Examples:
+
+   LIST                            ; Command to list all channels.
+
+   LIST #twilight_zone,#42         ; Command to list channels
+                                   #twilight_zone and #42
+</code></pre>
+</div></td></tr><tr><td id='variant.INVITE'><code>INVITE</code></td><td><div class='docblock'><pre><code class="language-text">3.2.7 Invite message
+
+Command: INVITE
+Parameters: &lt;nickname&gt; &lt;channel&gt;
+
+The INVITE command is used to invite a user to a channel.  The
+parameter &lt;nickname&gt; is the nickname of the person to be invited to
+the target channel &lt;channel&gt;.  There is no requirement that the
+channel the target user is being invited to must exist or be a valid
+channel.  However, if the channel exists, only members of the channel
+are allowed to invite other users.  When the channel has invite-only
+flag set, only channel operators may issue INVITE command.
+
+Only the user inviting and the user being invited will receive
+notification of the invitation.  Other channel members are not
+notified.  (This is unlike the MODE changes, and is occasionally the
+source of trouble for users.)
+
+Numeric Replies:
+
+   ERR_NEEDMOREPARAMS              ERR_NOSUCHNICK
+   ERR_NOTONCHANNEL                ERR_USERONCHANNEL
+   ERR_CHANOPRIVSNEEDED
+   RPL_INVITING                    RPL_AWAY
+
+Examples:
+
+   :Angel!wings@irc.org INVITE Wiz #Dust
+                                   ; Message to WiZ when he has been
+                                   invited by user Angel to channel
+                                   #Dust
+
+   INVITE Wiz #Twilight_Zone       ; Command to invite WiZ to
+                                   #Twilight_zone
+</code></pre>
+</div></td></tr><tr><td id='variant.KICK'><code>KICK</code></td><td><div class='docblock'><pre><code class="language-text">3.2.8 Kick command
+
+Command: KICK
+Parameters: &lt;channel&gt; *( &quot;,&quot; &lt;channel&gt; ) &lt;user&gt; *( &quot;,&quot; &lt;user&gt; )
+            [&lt;comment&gt;]
+
+The KICK command can be used to request the forced removal of a user
+from a channel.  It causes the &lt;user&gt; to PART from the &lt;channel&gt; by
+force.  For the message to be syntactically correct, there MUST be
+either one channel parameter and multiple user parameter, or as many
+channel parameters as there are user parameters.  If a &quot;comment&quot; is
+given, this will be sent instead of the default message, the nickname
+of the user issuing the KICK.
+
+The server MUST NOT send KICK messages with multiple channels or
+users to clients.  This is necessarily to maintain backward
+compatibility with old client software.
+
+Numeric Replies:
+
+   ERR_NEEDMOREPARAMS              ERR_NOSUCHCHANNEL
+   ERR_BADCHANMASK                 ERR_CHANOPRIVSNEEDED
+   ERR_USERNOTINCHANNEL            ERR_NOTONCHANNEL
+
+Examples:
+
+   KICK &amp;Melbourne Matthew         ; Command to kick Matthew from
+                                   &amp;Melbourne
+
+   KICK #Finnish John :Speaking English
+                                   ; Command to kick John from #Finnish
+                                   using &quot;Speaking English&quot; as the
+                                   reason (comment).
+
+   :WiZ!jto@tolsun.oulu.fi KICK #Finnish John
+                                   ; KICK message on channel #Finnish
+                                   from WiZ to remove John from channel
+</code></pre>
+</div></td></tr><tr><td id='variant.PRIVMSG'><code>PRIVMSG</code></td><td><div class='docblock'><pre><code class="language-text">3.3.1 Private messages
+
+Command: PRIVMSG
+Parameters: &lt;msgtarget&gt; &lt;text to be sent&gt;
+
+PRIVMSG is used to send private messages between users, as well as to
+send messages to channels.  &lt;msgtarget&gt; is usually the nickname of
+the recipient of the message, or a channel name.
+
+The &lt;msgtarget&gt; parameter may also be a host mask (#&lt;mask&gt;) or server
+mask ($&lt;mask&gt;).  In both cases the server will only send the PRIVMSG
+to those who have a server or host matching the mask.  The mask MUST
+have at least 1 (one) &quot;.&quot; in it and no wildcards following the last
+&quot;.&quot;.  This requirement exists to prevent people sending messages to
+&quot;#*&quot; or &quot;$*&quot;, which would broadcast to all users.  Wildcards are the
+&#39;*&#39; and &#39;?&#39;  characters.  This extension to the PRIVMSG command is
+only available to operators.
+
+Numeric Replies:
+
+   ERR_NORECIPIENT                 ERR_NOTEXTTOSEND
+   ERR_CANNOTSENDTOCHAN            ERR_NOTOPLEVEL
+   ERR_WILDTOPLEVEL                ERR_TOOMANYTARGETS
+   ERR_NOSUCHNICK
+   RPL_AWAY
+
+Examples:
+
+   :Angel!wings@irc.org PRIVMSG Wiz :Are you receiving this message ?
+                                   ; Message from Angel to Wiz.
+
+   PRIVMSG Angel :yes I&#39;m receiving it !
+                                   ; Command to send a message to Angel.
+
+   PRIVMSG jto@tolsun.oulu.fi :Hello !
+                                   ; Command to send a message to a user
+                                   on server tolsun.oulu.fi with
+                                   username of &quot;jto&quot;.
+
+   PRIVMSG kalt%millennium.stealth.net@irc.stealth.net :Are you a frog?
+                                   ; Message to a user on server
+                                   irc.stealth.net with username of
+                                   &quot;kalt&quot;, and connected from the host
+                                   millennium.stealth.net.
+
+   PRIVMSG kalt%millennium.stealth.net :Do you like cheese?
+                                   ; Message to a user on the local
+                                   server with username of &quot;kalt&quot;, and
+                                   connected from the host
+                                   millennium.stealth.net.
+
+   PRIVMSG Wiz!jto@tolsun.oulu.fi :Hello !
+                                   ; Message to the user with nickname
+                                   Wiz who is connected from the host
+                                   tolsun.oulu.fi and has the username
+                                   &quot;jto&quot;.
+
+   PRIVMSG $*.fi :Server tolsun.oulu.fi rebooting.
+                                   ; Message to everyone on a server
+                                   which has a name matching *.fi.
+
+   PRIVMSG #*.edu :NSFNet is undergoing work, expect interruptions
+                                   ; Message to all users who come from
+                                   a host which has a name matching
+                                   *.edu.
+</code></pre>
+</div></td></tr><tr><td id='variant.NOTICE'><code>NOTICE</code></td><td><div class='docblock'><pre><code class="language-text">3.3.2 Notice
+
+Command: NOTICE
+Parameters: &lt;msgtarget&gt; &lt;text&gt;
+
+The NOTICE command is used similarly to PRIVMSG.  The difference
+between NOTICE and PRIVMSG is that automatic replies MUST NEVER be
+sent in response to a NOTICE message.  This rule applies to servers
+too - they MUST NOT send any error reply back to the client on
+receipt of a notice.  The object of this rule is to avoid loops
+between clients automatically sending something in response to
+something it received.
+
+This command is available to services as well as users.
+
+This is typically used by services, and automatons (clients with
+either an AI or other interactive program controlling their actions).
+
+See PRIVMSG for more details on replies and examples.
+</code></pre>
+</div></td></tr><tr><td id='variant.MOTD'><code>MOTD</code></td><td><div class='docblock'><pre><code class="language-text">3.4.1 Motd message
+
+Command: MOTD
+Parameters: [ &lt;target&gt; ]
+
+The MOTD command is used to get the &quot;Message Of The Day&quot; of the given
+server, or current server if &lt;target&gt; is omitted.
+
+Wildcards are allowed in the &lt;target&gt; parameter.
+
+Numeric Replies:
+   RPL_MOTDSTART                   RPL_MOTD
+   RPL_ENDOFMOTD                   ERR_NOMOTD
+</code></pre>
+</div></td></tr><tr><td id='variant.LUSERS'><code>LUSERS</code></td><td><div class='docblock'><pre><code class="language-text">3.4.2 Lusers message
+
+Command: LUSERS
+Parameters: [ &lt;mask&gt; [ &lt;target&gt; ] ]
+
+The LUSERS command is used to get statistics about the size of the
+IRC network.  If no parameter is given, the reply will be about the
+whole net.  If a &lt;mask&gt; is specified, then the reply will only
+concern the part of the network formed by the servers matching the
+mask.  Finally, if the &lt;target&gt; parameter is specified, the request
+is forwarded to that server which will generate the reply.
+
+Wildcards are allowed in the &lt;target&gt; parameter.
+
+Numeric Replies:
+
+   RPL_LUSERCLIENT                 RPL_LUSEROP
+   RPL_LUSERUNKOWN                 RPL_LUSERCHANNELS
+   RPL_LUSERME                     ERR_NOSUCHSERVER
+</code></pre>
+</div></td></tr><tr><td id='variant.VERSION'><code>VERSION</code></td><td><div class='docblock'><pre><code class="language-text">3.4.3 Version message
+
+Command: VERSION
+Parameters: [ &lt;target&gt; ]
+
+The VERSION command is used to query the version of the server
+program.  An optional parameter &lt;target&gt; is used to query the version
+of the server program which a client is not directly connected to.
+
+Wildcards are allowed in the &lt;target&gt; parameter.
+
+Numeric Replies:
+
+   ERR_NOSUCHSERVER                RPL_VERSION
+
+Examples:
+
+   VERSION tolsun.oulu.fi          ; Command to check the version of
+                                   server &quot;tolsun.oulu.fi&quot;.
+</code></pre>
+</div></td></tr><tr><td id='variant.STATS'><code>STATS</code></td><td><div class='docblock'><pre><code class="language-text">3.4.4 Stats message
+
+Command: STATS
+Parameters: [ &lt;query&gt; [ &lt;target&gt; ] ]
+
+The stats command is used to query statistics of certain server.  If
+&lt;query&gt; parameter is omitted, only the end of stats reply is sent
+back.
+
+A query may be given for any single letter which is only checked by
+the destination server and is otherwise passed on by intermediate
+servers, ignored and unaltered.
+
+Wildcards are allowed in the &lt;target&gt; parameter.
+
+Except for the ones below, the list of valid queries is
+implementation dependent.  The standard queries below SHOULD be
+supported by the server:
+
+   l - returns a list of the server&#39;s connections, showing how
+       long each connection has been established and the
+       traffic over that connection in Kbytes and messages for
+       each direction;
+   m - returns the usage count for each of commands supported
+       by the server; commands for which the usage count is
+       zero MAY be omitted;
+   o - returns a list of configured privileged users,
+       operators;
+   u - returns a string showing how long the server has been
+       up.
+
+It is also RECOMMENDED that client and server access configuration be
+published this way.
+
+Numeric Replies:
+
+   ERR_NOSUCHSERVER
+   RPL_STATSLINKINFO                RPL_STATSUPTIME
+   RPL_STATSCOMMANDS                RPL_STATSOLINE
+   RPL_ENDOFSTATS
+
+Examples:
+
+   STATS m      ; Command to check the command usage
+                  for the server you are connected to
+</code></pre>
+</div></td></tr><tr><td id='variant.LINKS'><code>LINKS</code></td><td><div class='docblock'><pre><code class="language-text">3.4.5 Links message
+
+Command: LINKS
+Parameters: [ [ &lt;remote server&gt; ] &lt;server mask&gt; ]
+
+With LINKS, a user can list all servernames, which are known by the
+server answering the query.  The returned list of servers MUST match
+the mask, or if no mask is given, the full list is returned.
+
+If &lt;remote server&gt; is given in addition to &lt;server mask&gt;, the LINKS
+command is forwarded to the first server found that matches that name
+(if any), and that server is then required to answer the query.
+
+Numeric Replies:
+
+   ERR_NOSUCHSERVER
+   RPL_LINKS                        RPL_ENDOFLINKS
+
+Examples:
+
+   LINKS *.au                      ; Command to list all servers which
+                                   have a name that matches *.au;
+
+   LINKS *.edu *.bu.edu            ; Command to list servers matching
+                                   *.bu.edu as seen by the first server
+                                   matching *.edu.
+</code></pre>
+</div></td></tr><tr><td id='variant.TIME'><code>TIME</code></td><td><div class='docblock'><pre><code class="language-text">3.4.6 Time message
+
+Command: TIME
+Parameters: [ &lt;target&gt; ]
+
+The time command is used to query local time from the specified
+server. If the &lt;target&gt; parameter is not given, the server receiving
+the command must reply to the query.
+
+Wildcards are allowed in the &lt;target&gt; parameter.
+
+Numeric Replies:
+
+   ERR_NOSUCHSERVER              RPL_TIME
+
+Examples:
+   TIME tolsun.oulu.fi             ; check the time on the server
+                                   &quot;tolson.oulu.fi&quot;
+</code></pre>
+</div></td></tr><tr><td id='variant.CONNECT'><code>CONNECT</code></td><td><div class='docblock'><pre><code class="language-text">3.4.7 Connect message
+
+Command: CONNECT
+Parameters: &lt;target server&gt; &lt;port&gt; [ &lt;remote server&gt; ]
+
+The CONNECT command can be used to request a server to try to
+establish a new connection to another server immediately.  CONNECT is
+a privileged command and SHOULD be available only to IRC Operators.
+If a &lt;remote server&gt; is given and its mask doesn&#39;t match name of the
+parsing server, the CONNECT attempt is sent to the first match of
+remote server. Otherwise the CONNECT attempt is made by the server
+processing the request.
+
+The server receiving a remote CONNECT command SHOULD generate a
+WALLOPS message describing the source and target of the request.
+
+Numeric Replies:
+
+   ERR_NOSUCHSERVER              ERR_NOPRIVILEGES
+   ERR_NEEDMOREPARAMS
+
+Examples:
+
+   CONNECT tolsun.oulu.fi 6667     ; Command to attempt to connect local
+                                   server to tolsun.oulu.fi on port 6667
+</code></pre>
+</div></td></tr><tr><td id='variant.TRACE'><code>TRACE</code></td><td><div class='docblock'><pre><code class="language-text">3.4.8 Trace message
+
+Command: TRACE
+Parameters: [ &lt;target&gt; ]
+
+TRACE command is used to find the route to specific server and
+information about its peers.  Each server that processes this command
+MUST report to the sender about it.  The replies from pass-through
+links form a chain, which shows route to destination.  After sending
+this reply back, the query MUST be sent to the next server until
+given &lt;target&gt; server is reached.
+
+TRACE command is used to find the route to specific server.  Each
+server that processes this message MUST tell the sender about it by
+sending a reply indicating it is a pass-through link, forming a chain
+of replies.  After sending this reply back, it MUST then send the
+TRACE message to the next server until given server is reached.  If
+the &lt;target&gt; parameter is omitted, it is RECOMMENDED that TRACE
+command sends a message to the sender telling which servers the local
+server has direct connection to.
+
+If the destination given by &lt;target&gt; is an actual server, the
+destination server is REQUIRED to report all servers, services and
+operators which are connected to it; if the command was issued by an
+operator, the server MAY also report all users which are connected to
+it.  If the destination given by &lt;target&gt; is a nickname, then only a
+reply for that nickname is given.  If the &lt;target&gt; parameter is
+omitted, it is RECOMMENDED that the TRACE command is parsed as
+targeted to the processing server.
+
+Wildcards are allowed in the &lt;target&gt; parameter.
+
+Numeric Replies:
+
+   ERR_NOSUCHSERVER
+
+If the TRACE message is destined for another server, all
+intermediate servers must return a RPL_TRACELINK reply to indicate
+that the TRACE passed through it and where it is going next.
+
+   RPL_TRACELINK
+
+A TRACE reply may be composed of any number of the following
+numeric replies.
+
+   RPL_TRACECONNECTING           RPL_TRACEHANDSHAKE
+   RPL_TRACEUNKNOWN              RPL_TRACEOPERATOR
+   RPL_TRACEUSER                 RPL_TRACESERVER
+   RPL_TRACESERVICE              RPL_TRACENEWTYPE
+   RPL_TRACECLASS                RPL_TRACELOG
+   RPL_TRACEEND
+
+Examples:
+
+   TRACE *.oulu.fi                 ; TRACE to a server matching
+                                   *.oulu.fi
+</code></pre>
+</div></td></tr><tr><td id='variant.ADMIN'><code>ADMIN</code></td><td><div class='docblock'><pre><code class="language-text">3.4.9 Admin command
+
+Command: ADMIN
+Parameters: [ &lt;target&gt; ]
+
+The admin command is used to find information about the administrator
+of the given server, or current server if &lt;target&gt; parameter is
+omitted.  Each server MUST have the ability to forward ADMIN messages
+to other servers.
+
+Wildcards are allowed in the &lt;target&gt; parameter.
+
+Numeric Replies:
+
+   ERR_NOSUCHSERVER
+   RPL_ADMINME                   RPL_ADMINLOC1
+   RPL_ADMINLOC2                 RPL_ADMINEMAIL
+
+Examples:
+
+   ADMIN tolsun.oulu.fi            ; request an ADMIN reply from
+                                   tolsun.oulu.fi
+
+   ADMIN syrk                      ; ADMIN request for the server to
+                                   which the user syrk is connected
+</code></pre>
+</div></td></tr><tr><td id='variant.INFO'><code>INFO</code></td><td><div class='docblock'><pre><code class="language-text">3.4.10 Info command
+
+Command: INFO
+Parameters: [ &lt;target&gt; ]
+
+The INFO command is REQUIRED to return information describing the
+server: its version, when it was compiled, the patchlevel, when it
+was started, and any other miscellaneous information which may be
+considered to be relevant.
+
+Wildcards are allowed in the &lt;target&gt; parameter.
+
+Numeric Replies:
+
+   ERR_NOSUCHSERVER
+   RPL_INFO                      RPL_ENDOFINFO
+
+Examples:
+
+   INFO csd.bu.edu                 ; request an INFO reply from
+                                   csd.bu.edu
+
+   INFO Angel                      ; request info from the server that
+                                   Angel is connected to.
+</code></pre>
+</div></td></tr><tr><td id='variant.SERVLIST'><code>SERVLIST</code></td><td><div class='docblock'><pre><code class="language-text">3.5.1 Servlist message
+
+Command: SERVLIST
+Parameters: [ &lt;mask&gt; [ &lt;type&gt; ] ]
+
+The SERVLIST command is used to list services currently connected to
+the network and visible to the user issuing the command.  The
+optional parameters may be used to restrict the result of the query
+(to matching services names, and services type).
+
+Numeric Replies:
+
+   RPL_SERVLIST                  RPL_SERVLISTEND
+</code></pre>
+</div></td></tr><tr><td id='variant.SQUERY'><code>SQUERY</code></td><td><div class='docblock'><pre><code class="language-text">3.5.2 Squery
+
+Command: SQUERY
+Parameters: &lt;servicename&gt; &lt;text&gt;
+
+The SQUERY command is used similarly to PRIVMSG.  The only difference
+is that the recipient MUST be a service.  This is the only way for a
+text message to be delivered to a service.
+
+See PRIVMSG for more details on replies and example.
+
+Examples:
+
+   SQUERY irchelp :HELP privmsg
+                                   ; Message to the service with
+                                   nickname irchelp.
+
+   SQUERY dict@irc.fr :fr2en blaireau
+                                   ; Message to the service with name
+                                   dict@irc.fr.
+</code></pre>
+</div></td></tr><tr><td id='variant.WHO'><code>WHO</code></td><td><div class='docblock'><pre><code class="language-text">3.6.1 Who query
+
+Command: WHO
+Parameters: [ &lt;mask&gt; [ &quot;o&quot; ] ]
+
+The WHO command is used by a client to generate a query which returns
+a list of information which &#39;matches&#39; the &lt;mask&gt; parameter given by
+the client.  In the absence of the &lt;mask&gt; parameter, all visible
+(users who aren&#39;t invisible (user mode +i) and who don&#39;t have a
+common channel with the requesting client) are listed.  The same
+result can be achieved by using a &lt;mask&gt; of &quot;0&quot; or any wildcard which
+will end up matching every visible user.
+
+The &lt;mask&gt; passed to WHO is matched against users&#39; host, server, real
+name and nickname if the channel &lt;mask&gt; cannot be found.
+
+If the &quot;o&quot; parameter is passed only operators are returned according
+to the &lt;mask&gt; supplied.
+
+Numeric Replies:
+
+   ERR_NOSUCHSERVER
+   RPL_WHOREPLY                  RPL_ENDOFWHO
+
+Examples:
+
+   WHO *.fi                        ; Command to list all users who match
+                                   against &quot;*.fi&quot;.
+
+   WHO jto* o                      ; Command to list all users with a
+                                   match against &quot;jto*&quot; if they are an
+                                   operator.
+</code></pre>
+</div></td></tr><tr><td id='variant.WHOIS'><code>WHOIS</code></td><td><div class='docblock'><pre><code class="language-text">3.6.2 Whois query
+
+Command: WHOIS
+Parameters: [ &lt;target&gt; ] &lt;mask&gt; *( &quot;,&quot; &lt;mask&gt; )
+
+This command is used to query information about particular user.
+The server will answer this command with several numeric messages
+indicating different statuses of each user which matches the mask (if
+you are entitled to see them).  If no wildcard is present in the
+&lt;mask&gt;, any information about that nick which you are allowed to see
+is presented.
+
+If the &lt;target&gt; parameter is specified, it sends the query to a
+specific server.  It is useful if you want to know how long the user
+in question has been idle as only local server (i.e., the server the
+user is directly connected to) knows that information, while
+everything else is globally known.
+
+Wildcards are allowed in the &lt;target&gt; parameter.
+
+Numeric Replies:
+
+   ERR_NOSUCHSERVER              ERR_NONICKNAMEGIVEN
+   RPL_WHOISUSER                 RPL_WHOISCHANNELS
+   RPL_WHOISCHANNELS             RPL_WHOISSERVER
+   RPL_AWAY                      RPL_WHOISOPERATOR
+   RPL_WHOISIDLE                 ERR_NOSUCHNICK
+   RPL_ENDOFWHOIS
+
+ Examples:
+
+   WHOIS wiz                       ; return available user information
+                                   about nick WiZ
+
+   WHOIS eff.org trillian          ; ask server eff.org for user
+                                   information  about trillian
+</code></pre>
+</div></td></tr><tr><td id='variant.WHOWAS'><code>WHOWAS</code></td><td><div class='docblock'><pre><code class="language-text">3.6.3 Whowas
+
+Command: WHOWAS
+Parameters: &lt;nickname&gt; *( &quot;,&quot; &lt;nickname&gt; ) [ &lt;count&gt; [ &lt;target&gt; ] ]
+
+Whowas asks for information about a nickname which no longer exists.
+This may either be due to a nickname change or the user leaving IRC.
+In response to this query, the server searches through its nickname
+history, looking for any nicks which are lexically the same (no wild
+card matching here).  The history is searched backward, returning the
+most recent entry first.  If there are multiple entries, up to
+&lt;count&gt; replies will be returned (or all of them if no &lt;count&gt;
+parameter is given).  If a non-positive number is passed as being
+&lt;count&gt;, then a full search is done.
+
+Wildcards are allowed in the &lt;target&gt; parameter.
+
+Numeric Replies:
+
+   ERR_NONICKNAMEGIVEN           ERR_WASNOSUCHNICK
+   RPL_WHOWASUSER                RPL_WHOISSERVER
+   RPL_ENDOFWHOWAS
+
+Examples:
+
+   WHOWAS Wiz                      ; return all information in the nick
+                                   history about nick &quot;WiZ&quot;;
+
+   WHOWAS Mermaid 9                ; return at most, the 9 most recent
+                                   entries in the nick history for
+                                   &quot;Mermaid&quot;;
+
+   WHOWAS Trillian 1 *.edu         ; return the most recent history for
+                                   &quot;Trillian&quot; from the first server
+                                   found to match &quot;*.edu&quot;.
+</code></pre>
+</div></td></tr><tr><td id='variant.KILL'><code>KILL</code></td><td><div class='docblock'><pre><code class="language-text">3.7.1 Kill message
+
+Command: KILL
+Parameters: &lt;nickname&gt; &lt;comment&gt;
+
+The KILL command is used to cause a client-server connection to be
+closed by the server which has the actual connection.  Servers
+generate KILL messages on nickname collisions.  It MAY also be
+available available to users who have the operator status.
+
+Clients which have automatic reconnect algorithms effectively make
+this command useless since the disconnection is only brief.  It does
+however break the flow of data and can be used to stop large amounts
+of &#39;flooding&#39; from abusive users or accidents.  Abusive users usually
+don&#39;t care as they will reconnect promptly and resume their abusive
+behaviour.  To prevent this command from being abused, any user may
+elect to receive KILL messages generated for others to keep an &#39;eye&#39;
+on would be trouble spots.
+
+In an arena where nicknames are REQUIRED to be globally unique at all
+times, KILL messages are sent whenever &#39;duplicates&#39; are detected
+(that is an attempt to register two users with the same nickname) in
+the hope that both of them will disappear and only 1 reappear.
+
+When a client is removed as the result of a KILL message, the server
+SHOULD add the nickname to the list of unavailable nicknames in an
+attempt to avoid clients to reuse this name immediately which is
+usually the pattern of abusive behaviour often leading to useless
+&quot;KILL loops&quot;.  See the &quot;IRC Server Protocol&quot; document [IRC-SERVER]
+for more information on this procedure.
+
+The comment given MUST reflect the actual reason for the KILL.  For
+server-generated KILLs it usually is made up of details concerning
+the origins of the two conflicting nicknames.  For users it is left
+up to them to provide an adequate reason to satisfy others who see
+it.  To prevent/discourage fake KILLs from being generated to hide
+the identify of the KILLer, the comment also shows a &#39;kill-path&#39;
+which is updated by each server it passes through, each prepending
+its name to the path.
+
+Numeric Replies:
+
+   ERR_NOPRIVILEGES              ERR_NEEDMOREPARAMS
+   ERR_NOSUCHNICK                ERR_CANTKILLSERVER
+
+NOTE:
+   It is RECOMMENDED that only Operators be allowed to kill other users
+   with KILL command.  This command has been the subject of many
+   controversies over the years, and along with the above
+   recommendation, it is also widely recognized that not even operators
+   should be allowed to kill users on remote servers.
+</code></pre>
+</div></td></tr><tr><td id='variant.PING'><code>PING</code></td><td><div class='docblock'><pre><code class="language-text">3.7.2 Ping message
+
+Command: PING
+Parameters: &lt;server1&gt; [ &lt;server2&gt; ]
+
+The PING command is used to test the presence of an active client or
+server at the other end of the connection.  Servers send a PING
+message at regular intervals if no other activity detected coming
+from a connection.  If a connection fails to respond to a PING
+message within a set amount of time, that connection is closed.  A
+PING message MAY be sent even if the connection is active.
+
+When a PING message is received, the appropriate PONG message MUST be
+sent as reply to &lt;server1&gt; (server which sent the PING message out)
+as soon as possible.  If the &lt;server2&gt; parameter is specified, it
+represents the target of the ping, and the message gets forwarded
+there.
+
+Numeric Replies:
+
+   ERR_NOORIGIN                  ERR_NOSUCHSERVER
+
+Examples:
+
+   PING tolsun.oulu.fi             ; Command to send a PING message to
+                                   server
+
+   PING WiZ tolsun.oulu.fi         ; Command from WiZ to send a PING
+                                   message to server &quot;tolsun.oulu.fi&quot;
+
+   PING :irc.funet.fi              ; Ping message sent by server
+                                   &quot;irc.funet.fi&quot;
+</code></pre>
+</div></td></tr><tr><td id='variant.PONG'><code>PONG</code></td><td><div class='docblock'><pre><code class="language-text">3.7.3 Pong message
+
+Command: PONG
+Parameters: &lt;server&gt; [ &lt;server2&gt; ]
+
+PONG message is a reply to ping message.  If parameter &lt;server2&gt; is
+given, this message MUST be forwarded to given target.  The &lt;server&gt;
+parameter is the name of the entity who has responded to PING message
+and generated this message.
+
+Numeric Replies:
+
+   ERR_NOORIGIN                  ERR_NOSUCHSERVER
+
+Example:
+
+   PONG csd.bu.edu tolsun.oulu.fi  ; PONG message from csd.bu.edu to
+                                   tolsun.oulu.fi
+</code></pre>
+</div></td></tr><tr><td id='variant.ERROR'><code>ERROR</code></td><td><div class='docblock'><pre><code class="language-text">3.7.4 Error
+
+Command: ERROR
+Parameters: &lt;error message&gt;
+
+The ERROR command is for use by servers when reporting a serious or
+fatal error to its peers.  It may also be sent from one server to
+another but MUST NOT be accepted from any normal unknown clients.
+
+Only an ERROR message SHOULD be used for reporting errors which occur
+with a server-to-server link.  An ERROR message is sent to the server
+at the other end (which reports it to appropriate local users and
+logs) and to appropriate local users and logs.  It is not to be
+passed onto any other servers by a server if it is received from a
+server.
+
+The ERROR message is also used before terminating a client
+connection.
+
+When a server sends a received ERROR message to its operators, the
+message SHOULD be encapsulated inside a NOTICE message, indicating
+that the client was not responsible for the error.
+
+Numerics:
+
+   None.
+
+Examples:
+
+   ERROR :Server *.fi already exists ; ERROR message to the other server
+                                   which caused this error.
+
+   NOTICE WiZ :ERROR from csd.bu.edu -- Server *.fi already exists
+                                   ; Same ERROR message as above but
+                                   sent to user WiZ on the other server.
+</code></pre>
+</div></td></tr><tr><td id='variant.AWAY'><code>AWAY</code></td><td><div class='docblock'><pre><code class="language-text">4.1 Away
+
+Command: AWAY
+Parameters: [ &lt;text&gt; ]
+
+With the AWAY command, clients can set an automatic reply string for
+any PRIVMSG commands directed at them (not to a channel they are on).
+The server sends an automatic reply to the client sending the PRIVMSG
+command.  The only replying server is the one to which the sending
+client is connected to.
+
+The AWAY command is used either with one parameter, to set an AWAY
+message, or with no parameters, to remove the AWAY message.
+
+Because of its high cost (memory and bandwidth wise), the AWAY
+message SHOULD only be used for client-server communication.  A
+server MAY choose to silently ignore AWAY messages received from
+other servers.  To update the away status of a client across servers,
+the user mode &#39;a&#39; SHOULD be used instead.  (See Section 3.1.5)
+
+Numeric Replies:
+
+   RPL_UNAWAY                    RPL_NOWAWAY
+
+Example:
+
+   AWAY :Gone to lunch.  Back in 5 ; Command to set away message to
+                                   &quot;Gone to lunch.  Back in 5&quot;.
+</code></pre>
+</div></td></tr><tr><td id='variant.REHASH'><code>REHASH</code></td><td><div class='docblock'><pre><code class="language-text">4.2 Rehash message
+
+Command: REHASH
+Parameters: None
+
+The rehash command is an administrative command which can be used by
+an operator to force the server to re-read and process its
+configuration file.
+
+Numeric Replies:
+
+   RPL_REHASHING                 ERR_NOPRIVILEGES
+
+Example:
+
+   REHASH                          ; message from user with operator
+                                   status to server asking it to reread
+                                   its configuration file.
+</code></pre>
+</div></td></tr><tr><td id='variant.DIE'><code>DIE</code></td><td><div class='docblock'><pre><code class="language-text">4.3 Die message
+
+Command: DIE
+Parameters: None
+
+An operator can use the DIE command to shutdown the server.  This
+message is optional since it may be viewed as a risk to allow
+arbitrary people to connect to a server as an operator and execute
+this command.
+
+The DIE command MUST always be fully processed by the server to which
+the sending client is connected and MUST NOT be passed onto other
+connected servers.
+
+Numeric Replies:
+
+   ERR_NOPRIVILEGES
+
+Example:
+
+   DIE                             ; no parameters required.
+</code></pre>
+</div></td></tr><tr><td id='variant.RESTART'><code>RESTART</code></td><td><div class='docblock'><pre><code class="language-text">4.4 Restart message
+
+Command: RESTART
+Parameters: None
+
+An operator can use the restart command to force the server to
+restart itself.  This message is optional since it may be viewed as a
+risk to allow arbitrary people to connect to a server as an operator
+and execute this command, causing (at least) a disruption to service.
+
+The RESTART command MUST always be fully processed by the server to
+which the sending client is connected and MUST NOT be passed onto
+other connected servers.
+
+Numeric Replies:
+
+   ERR_NOPRIVILEGES
+
+Example:
+
+   RESTART                         ; no parameters required.
+</code></pre>
+</div></td></tr><tr><td id='variant.SUMMON'><code>SUMMON</code></td><td><div class='docblock'><pre><code class="language-text">4.5 Summon message
+
+Command: SUMMON
+Parameters: &lt;user&gt; [ &lt;target&gt; [ &lt;channel&gt; ] ]
+
+The SUMMON command can be used to give users who are on a host
+running an IRC server a message asking them to please join IRC.  This
+message is only sent if the target server (a) has SUMMON enabled, (b)
+the user is logged in and (c) the server process can write to the
+user&#39;s tty (or similar).
+
+If no &lt;server&gt; parameter is given it tries to summon &lt;user&gt; from the
+server the client is connected to is assumed as the target.
+
+If summon is not enabled in a server, it MUST return the
+ERR_SUMMONDISABLED numeric.
+
+Numeric Replies:
+
+   ERR_NORECIPIENT               ERR_FILEERROR
+   ERR_NOLOGIN                   ERR_NOSUCHSERVER
+   ERR_SUMMONDISABLED            RPL_SUMMONING
+
+Examples:
+
+   SUMMON jto                      ; summon user jto on the server&#39;s
+                                   host
+
+   SUMMON jto tolsun.oulu.fi       ; summon user jto on the host which a
+                                   server named &quot;tolsun.oulu.fi&quot; is
+                                   running.
+</code></pre>
+</div></td></tr><tr><td id='variant.USERS'><code>USERS</code></td><td><div class='docblock'><pre><code class="language-text">4.6 Users
+
+Command: USERS
+Parameters: [ &lt;target&gt; ]
+
+The USERS command returns a list of users logged into the server in a
+format similar to the UNIX commands who(1), rusers(1) and finger(1).
+If disabled, the correct numeric MUST be returned to indicate this.
+
+Because of the security implications of such a command, it SHOULD be
+disabled by default in server implementations.  Enabling it SHOULD
+require recompiling the server or some equivalent change rather than
+simply toggling an option and restarting the server.  The procedure
+to enable this command SHOULD also include suitable large comments.
+
+Numeric Replies:
+
+   ERR_NOSUCHSERVER              ERR_FILEERROR
+   RPL_USERSSTART                RPL_USERS
+   RPL_NOUSERS                   RPL_ENDOFUSERS
+   ERR_USERSDISABLED
+
+Disabled Reply:
+
+   ERR_USERSDISABLED
+
+Example:
+
+   USERS eff.org                   ; request a list of users logged in
+                                   on server eff.org
+</code></pre>
+</div></td></tr><tr><td id='variant.WALLOPS'><code>WALLOPS</code></td><td><div class='docblock'><pre><code class="language-text">4.7 Operwall message
+
+Command: WALLOPS
+Parameters: &lt;Text to be sent&gt;
+
+The WALLOPS command is used to send a message to all currently
+connected users who have set the &#39;w&#39; user mode for themselves.  (See
+Section 3.1.5 &quot;User modes&quot;).
+
+After implementing WALLOPS as a user command it was found that it was
+often and commonly abused as a means of sending a message to a lot of
+people.  Due to this, it is RECOMMENDED that the implementation of
+WALLOPS allows and recognizes only servers as the originators of
+WALLOPS.
+
+Numeric Replies:
+
+   ERR_NEEDMOREPARAMS
+
+Example:
+
+   :csd.bu.edu WALLOPS :Connect &#39;*.uiuc.edu 6667&#39; from Joshua ; WALLOPS
+                                   message from csd.bu.edu announcing a
+                                   CONNECT message it received from
+                                   Joshua and acted upon.
+</code></pre>
+</div></td></tr><tr><td id='variant.USERHOST'><code>USERHOST</code></td><td><div class='docblock'><pre><code class="language-text">4.8 Userhost message
+
+Command: USERHOST
+Parameters: &lt;nickname&gt; *( SPACE &lt;nickname&gt; )
+
+The USERHOST command takes a list of up to 5 nicknames, each
+separated by a space character and returns a list of information
+about each nickname that it found.  The returned list has each reply
+separated by a space.
+
+Numeric Replies:
+
+   RPL_USERHOST                  ERR_NEEDMOREPARAMS
+
+Example:
+
+   USERHOST Wiz Michael syrk       ; USERHOST request for information on
+                                   nicks &quot;Wiz&quot;, &quot;Michael&quot;, and &quot;syrk&quot;
+
+   :ircd.stealth.net 302 yournick :syrk=+syrk@millennium.stealth.net
+                                   ; Reply for user syrk
+</code></pre>
+</div></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl&lt;'a&gt; <a class='enum' href='../../irsc/command/enum.Command.html' title='irsc::command::Command'>Command</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.from_message' class='method'><code>fn <a href='#method.from_message' class='fnname'>from_message</a>(msg: &amp;'a <a class='struct' href='../../irsc/message/struct.Message.html' title='irsc::message::Message'>Message</a>) -&gt; <a class='enum' href='http://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='enum' href='../../irsc/command/enum.Command.html' title='irsc::command::Command'>Command</a>&lt;'a&gt;&gt;</code></h4>
+<h4 id='method.to_message' class='method'><code>fn <a href='#method.to_message' class='fnname'>to_message</a>(&amp;'a self) -&gt; <a class='struct' href='../../irsc/message/struct.Message.html' title='irsc::message::Message'>Message</a></code></h4>
+<div class='docblock'><p>It started out pretty, but was quickly infested with <code>ref</code> and cloning.
+I&#39;m sorry, this one might not make it.</p>
+</div><h4 id='method.to_static' class='method'><code>fn <a href='#method.to_static' class='fnname'>to_static</a>(&amp;self) -&gt; <a class='enum' href='../../irsc/command/enum.Command.html' title='irsc::command::Command'>Command</a>&lt;'static&gt;</code></h4>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html' title='core::cmp::Eq'>Eq</a> for <a class='enum' href='../../irsc/command/enum.Command.html' title='irsc::command::Command'>Command</a>&lt;'a&gt;</code></h3><div class='impl-items'></div><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='enum' href='../../irsc/command/enum.Command.html' title='irsc::command::Command'>Command</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.eq' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../../irsc/command/enum.Command.html' title='irsc::command::Command'>Command</a>&lt;'a&gt;) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.ne' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='enum' href='../../irsc/command/enum.Command.html' title='irsc::command::Command'>Command</a>&lt;'a&gt;) -&gt; <a href='http://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+</div><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='enum' href='../../irsc/command/enum.Command.html' title='irsc::command::Command'>Command</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.clone' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='enum' href='../../irsc/command/enum.Command.html' title='irsc::command::Command'>Command</a>&lt;'a&gt;</code></h4>
+<h4 id='method.clone_from' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code></h4>
+</div><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/hash/trait.Hash.html' title='core::hash::Hash'>Hash</a> for <a class='enum' href='../../irsc/command/enum.Command.html' title='irsc::command::Command'>Command</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.hash' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/hash/trait.Hash.html#method.hash' class='fnname'>hash</a>&lt;__H: <a class='trait' href='http://doc.rust-lang.org/nightly/core/hash/trait.Hasher.html' title='core::hash::Hasher'>Hasher</a>&gt;(&amp;self, __arg_0: &amp;mut __H)</code></h4>
+<h4 id='method.hash_slice' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/hash/trait.Hash.html#method.hash_slice' class='fnname'>hash_slice</a>&lt;H&gt;(data: <a href='http://doc.rust-lang.org/nightly/std/primitive.slice.html'>&amp;[Self]</a>, state: &amp;mut H) <span class='where'>where H: <a class='trait' href='http://doc.rust-lang.org/nightly/core/hash/trait.Hasher.html' title='core::hash::Hasher'>Hasher</a></span></code></h4>
+</div><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='http://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../../irsc/command/enum.Command.html' title='irsc::command::Command'>Command</a>&lt;'a&gt;</code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='http://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='http://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='http://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <div id="help" class="hidden">
+        <div class="shortcuts">
+            <h1>Keyboard shortcuts</h1>
+            <dl>
+                <dt>?</dt>
+                <dd>Show this help dialog</dd>
+                <dt>S</dt>
+                <dd>Focus the search field</dd>
+                <dt>&larrb;</dt>
+                <dd>Move up in search results</dd>
+                <dt>&rarrb;</dt>
+                <dd>Move down in search results</dd>
+                <dt>&#9166;</dt>
+                <dd>Go to active search result</dd>
+            </dl>
+        </div>
+        <div class="infos">
+            <h1>Search tricks</h1>
+            <p>
+                Prefix searches with a type followed by a colon (e.g.
+                <code>fn:</code>) to restrict the search to a given type.
+            </p>
+            <p>
+                Accepted types are: <code>fn</code>, <code>mod</code>,
+                <code>struct</code>, <code>enum</code>,
+                <code>trait</code>, <code>typedef</code> (or
+                <code>tdef</code>).
+            </p>
+            <p>
+                Search functions by type signature (e.g.
+                <code>vec -> usize</code>)
+            </p>
+        </div>
+    </div>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "irsc";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script async src="../../search-index.js"></script>
+</body>
+</html>
