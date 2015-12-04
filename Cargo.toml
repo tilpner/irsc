@@ -14,7 +14,8 @@ log = "^0.3"
 regex = "^0.1"
 regex_macros = "^0.1"
 openssl = "^0.6"
-carboxyl = "^0.1"
+encoding = "^0.2"
+linear-map = "^0.0"
 
 [features]
 lints = ["clippy"]

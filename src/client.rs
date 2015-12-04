@@ -11,13 +11,12 @@ use std::sync::{ Arc, RwLock };
 use std::mem;
 use std::cell::UnsafeCell;
 
-use carboxyl::{ Stream, Sink };
-
 use message::Message;
 use command::Command;
 use command::Command::*;
 use reply::Reply;
 use event::Event;
+use text::*;
 use ::{ DEBUG, Result, IrscError };
 
 use openssl::ssl::{ Ssl, SslContext, SslMethod, SslStream };
@@ -53,60 +52,14 @@ impl Read for StreamKind {
     }
 }
 
-pub trait Client {
-    fn send_message(&mut self, msg: Message) -> Result<()>;
-    fn join(&mut self, channel: &str, password: Option<&str>) -> Result<()> {
-        self.send_message(JOIN(vec![channel.into()], password.iter().map(|&p| p.into()).collect()).to_message())
-    }
 
-    fn msg(&mut self, to: &str, message: &str) -> Result<()> {
-        self.send_message(PRIVMSG(to.into(), message.into()).to_message())
-    }
-
-    fn msg_many(&mut self, to: &str, message: &[&str]) -> Result<()> {
-        for m in message {
-            self.msg(to, m);
-        }
-        Result(Ok(()))
-    }
-
-    fn msg_word_wrap(&mut self, to: &str, message: &str, limit: u16) -> Result<()> {
-        let mut line = String::new();
-        for word in message.split_whitespace() {
-            if line.len() + word.len() < limit as usize {
-                line.push_str(" ");
-                line.push_str(word);
-            } else {
-                debug!("Sending {}", line);
-                self.msg(to, &line);
-                line.clear();
-            }
-        }
-        self.msg(to, &line)
-    }
-
-    fn register(&mut self, nick: &str, user: &str, desc: &str, pass: Option<&str>) -> Result<()> {
-        Result(if let Some(pass) = pass {
-            self.send_message(PASS(pass.into()).to_message()).inner()
-        } else { Ok(()) }
-            .and_then(|_| self.send_message(NICK(nick.into()).to_message()).inner())
-            .and_then(|_| self.send_message(USER(user.into(), Borrowed("0"), Borrowed("*"), desc.into()).to_message()).inner())
-        )
-    }
-
-}
-
-pub struct OwnedClient {
+pub struct Client {
     stream: Option<StreamKind>,
-    sink: Sink<Message>
 }
 
-impl OwnedClient {
-    pub fn new() -> OwnedClient {
-        OwnedClient {
-            stream: None,
-            sink: Sink::new()
-        }
+impl Client {
+    pub fn new() -> Client {
+        Client { stream: None }
     }
 
     fn handle_event(&mut self, msg: &Message) {
@@ -146,25 +99,27 @@ impl OwnedClient {
     }
 
     #[inline]
-    fn send_raw(&mut self, s: &str) -> Result<()> {
-        info!(">> {}", s);
-        if DEBUG && s.len() > 512 {
-            panic!("Message too long, kittens will die if this runs in release mode. Msg: {}", s)
+    fn send_raw(&mut self, s: &[u8]) -> Result<()> {
+        if DEBUG && s.len() > 1024 {
+            panic!("Message too long, kittens will die if this runs in release mode.")
         }
 
         Result(self.stream.as_mut()
             .ok_or(IrscError::NotConnected)
-            .and_then(|mut stream| stream.write_all(s.as_bytes())
+            .and_then(|mut stream| stream.write_all(s)
                                          .and_then(|_| stream.flush())
                                          .map_err(IrscError::Io)))
     }
 
+    fn send_message(&mut self, msg: Message) -> Result<()> {
+        self.send_raw(msg.bytes())
+    }
 
     pub fn send(&mut self, cmd: Command) -> Result<()> {
         self.send_message(cmd.to_message())
     }
 
-    pub fn listen_with_callback<F>(&mut self, on_event: F) -> Result<()>
+    pub fn listen<F>(&mut self, on_event: F) -> Result<()>
     where F: Fn(&mut Client, &Message, Option<Event>) {
         let reader = BufReader::new(match self.stream {
             Some(StreamKind::Plain(ref s)) => StreamKind::Plain((*s).try_clone().unwrap()),
@@ -173,7 +128,7 @@ impl OwnedClient {
         });
 
         for raw_line in reader.lines() {
-            let line = raw_line.as_ref().unwrap().parse();
+            let line = Message::parse(raw_line.as_ref().unwrap().as_bytes());
             info!("<< {}", raw_line.unwrap());
 
             if let Ok(msg) = line {
@@ -193,88 +148,42 @@ impl OwnedClient {
         Result(Ok(()))
     }
 
-    #[allow(mutable_transmutes)]
-    fn listen_with_events(&self) -> Result<()> {
-        let mut s: &mut OwnedClient = unsafe { mem::transmute(self) };
-        let reader = BufReader::new(match self.stream {
-            Some(StreamKind::Plain(ref s)) => StreamKind::Plain((*s).try_clone().unwrap()),
-            Some(StreamKind::Ssl(ref s)) => StreamKind::Ssl((*s).try_clone().unwrap()),
-            None => return Result(Err(IrscError::NotConnected))
-        });
+    fn join(&mut self, channel: &str, password: Option<&str>) -> Result<()> {
+        self.send_message(JOIN(vec![channel.into()], password.iter().map(|&p| p.into()).collect()).to_message())
+    }
 
-        for raw_line in reader.lines() {
-            let line = raw_line.as_ref().unwrap().parse();
-            info!("<< {}", raw_line.unwrap());
+    fn msg(&mut self, to: &str, message: &str) -> Result<()> {
+        self.send_message(PRIVMSG(to.into(), message.into()).to_message())
+    }
 
-            if let Ok(msg) = line {
-                s.handle_event(&msg);
-                self.sink.send(msg);
-            }
+    fn msg_many(&mut self, to: &str, message: &[&str]) -> Result<()> {
+        for m in message {
+            self.msg(to, m);
         }
         Result(Ok(()))
     }
 
-    pub fn into_shared(self) -> SharedClient {
-        SharedClient {
-            client: Arc::new(OwnedClientCell(UnsafeCell::new(self))),
-        }
-    }
-
-    pub fn messages(&self) -> Stream<Message> { self.sink.stream() }
-}
-
-struct OwnedClientCell(UnsafeCell<OwnedClient>);
-unsafe impl Sync for OwnedClientCell {}
-
-impl Client for OwnedClient {
-    fn send_message(&mut self, msg: Message) -> Result<()> {
-        self.send_raw(&msg.to_string())
-    }
-}
-
-#[derive(Clone)]
-pub struct SharedClient {
-    client: Arc<OwnedClientCell>,
-}
-
-impl SharedClient {
-    pub fn messages(&self) -> Stream<(SharedClient, Message)> {
-        let cl = SharedClient { client: self.client.clone() };
-        unsafe { &*self.client.0.get() }.messages()
-            .map(move |m| (cl.clone(), m))
-    }
-
-    pub fn events(&self) -> Stream<(SharedClient, Message, Event<'static>)> {
-        self.messages().filter_map(|(cl, msg)| match Command::from_message(&msg) {
-            Some(m) => Some((cl, msg.clone(), Event::Command(m.clone()).to_static())),
-            None => match Reply::from_message(&msg) {
-                Some(r) => Some((cl, msg.clone(), Event::Reply(r).to_static())),
-                None => None
+    fn msg_word_wrap(&mut self, to: &str, message: &str, limit: u16) -> Result<()> {
+        let mut line = String::new();
+        for word in message.split_whitespace() {
+            if line.len() + word.len() < limit as usize {
+                line.push_str(" ");
+                line.push_str(word);
+            } else {
+                debug!("Sending {}", line);
+                self.msg(to, &line);
+                line.clear();
             }
-        })
+        }
+        self.msg(to, &line)
     }
 
-    pub fn listen_with_events(&mut self) -> Result<()> {
-        unsafe { &*self.client.0.get() }.listen_with_events()
-    }
-
-    pub fn commands(&self) -> Stream<(SharedClient, Message, Command<'static>)> {
-        self.messages().filter_map(|(cl, msg)| match Command::from_message(&msg) {
-            Some(m) => Some((cl, msg.clone(), m.to_static())),
-            None => None
-        })
-    }
-
-    pub fn replies(&self) -> Stream<(SharedClient, Message, Reply<'static>)> {
-        self.messages().filter_map(|(cl, msg)| match Reply::from_message(&msg) {
-            Some(m) => Some((cl, msg.clone(), m.to_static())),
-            None => None
-        })
-    }
-}
-
-impl Client for SharedClient {
-    fn send_message(&mut self, msg: Message) -> Result<()> {
-        unsafe { &mut *self.client.0.get() }.send_raw(&msg.to_string())
+    fn register(&mut self, nick: &str, user: &str, desc: &str, pass: Option<&str>) -> Result<()> {
+        Result(if let Some(pass) = pass {
+            self.send_message(PASS(pass.into()).to_message()).inner()
+        } else { Ok(()) }
+            .and_then(|_| self.send_message(NICK(nick.into()).to_message()).inner())
+            .and_then(|_| self.send_message(USER(user.into(), tsu("0"), tsu("*"), desc.into()).to_message()).inner())
+        )
     }
 }

@@ -4,7 +4,8 @@ use std::borrow::{ Cow, IntoCow, Borrow, ToOwned };
 use std::borrow::Cow::*;
 use std::iter::Extend;
 
-use message::{ Message, MsgType };
+use message::Message;
+use text::{ Text, TextSlice };
 
 pub type CS<'a> = Cow<'a, str>;
 
@@ -20,89 +21,241 @@ pub type CS<'a> = Cow<'a, str>;
 //
 // Please don't cry.
 
-#[derive(Debug, Hash, Clone, PartialEq, Eq)]
-pub enum Command<'a> {
-    /// ```text
-    /// 3.1.1 Password message
-    ///
-    /// Command: PASS
-    /// Parameters: <password>
-    ///
-    /// The PASS command is used to set a 'connection password'.  The
-    /// optional password can and MUST be set before any attempt to register
-    /// the connection is made.  Currently this requires that user send a
-    /// PASS command before sending the NICK/USER combination.
-    ///
-    /// Numeric Replies:
-    ///
-    ///    ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
-    ///
-    /// Example:
-    ///
-    ///    PASS secretpasswordhere
-    /// ```
-    PASS(CS<'a>),
+macro_rules! commands {
+    ($( $name: ident {
+        $id: expr, $doc: meta
+        b $($borrowed_items: ty),*
+        o $($owned_items: ty),*
+        t $($to_names: ident),+ => $($to_exprs: expr),+
+    }),+) => (
+        #[allow(non_camel_case_types)]
+        #[derive(Debug, Hash, Clone, PartialEq)]
+        pub enum Command<'a> {
+            $(
+                #[$doc]
+                $name($($borrowed_items),*)
+            ),+
+        }
 
-    /// ```text
-    /// 3.1.2 Nick message
-    ///
-    /// Command: NICK
-    /// Parameters: <nickname>
-    ///
-    /// NICK command is used to give user a nickname or change the existing
-    /// one.
-    ///
-    /// Numeric Replies:
-    ///
-    ///    ERR_NONICKNAMEGIVEN             ERR_ERRONEUSNICKNAME
-    ///    ERR_NICKNAMEINUSE               ERR_NICKCOLLISION
-    ///    ERR_UNAVAILRESOURCE             ERR_RESTRICTED
-    ///
-    /// Examples:
-    ///
-    ///    NICK Wiz                ; Introducing new nick "Wiz" if session is
-    ///                            still unregistered, or user changing his
-    ///                            nickname to "Wiz"
-    ///
-    ///    :WiZ!jto@tolsun.oulu.fi NICK Kilroy
-    ///                            ; Server telling that WiZ changed his
-    ///                            nickname to Kilroy.
-    /// ```
-    NICK(CS<'a>),
+        #[allow(non_camel_case_types)]
+        #[derive(Debug, Hash, Clone, PartialEq)]
+        pub enum OwnedCommand {
+            $(
+                #[$doc]
+                $name($($owned_items),*)
+            ),+
+        }
 
-    /// ```text
-    /// 3.1.3 User message
-    ///
-    /// Command: USER
-    /// Parameters: <user> <mode> <unused> <realname>
-    ///
-    /// The USER command is used at the beginning of connection to specify
-    /// the username, hostname and realname of a new user.
-    ///
-    /// The <mode> parameter should be a numeric, and can be used to
-    /// automatically set user modes when registering with the server.  This
-    /// parameter is a bitmask, with only 2 bits having any signification: if
-    /// the bit 2 is set, the user mode 'w' will be set and if the bit 3 is
-    /// set, the user mode 'i' will be set.  (See Section 3.1.5 "User
-    /// Modes").
-    ///
-    /// The <realname> may contain space characters.
-    ///
-    /// Numeric Replies:
-    ///
-    ///    ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
-    ///
-    /// Example:
-    ///
-    ///    USER guest 0 * :Ronnie Reagan   ; User registering themselves with a
-    ///                                    username of "guest" and real name
-    ///                                    "Ronnie Reagan".
-    ///
-    ///    USER guest 8 * :Ronnie Reagan   ; User registering themselves with a
-    ///                                    username of "guest" and real name
-    ///                                    "Ronnie Reagan", and asking to be set
-    ///                                    invisible.
-    /// ```
+        impl<'a> Command<'a> {
+            pub fn to_owned(self) -> OwnedCommand {
+                match self {
+                    $(
+                        Command::$name($($to_names),*) => OwnedCommand::$name($($to_exprs),*)
+                    ),+
+                }
+            }
+
+            pub fn from_message(msg: &'a Message) -> Option<Command<'a>> {
+                use Command::*;
+                match msg.command() {
+                    $(
+                        $id => msg.last().map(|&e| $name(e))
+                    ),+
+                }
+            }
+
+            pub fn to_message(&self) -> Message {
+                use Command::*;
+                match self {
+                    $(
+                        &$name(ref s) => Message::format(None, $id, Vec::new(), s)
+                    ),+
+                }
+            }
+        }
+    )
+}
+
+commands! {
+    PASS {
+        "PASS", doc = r#"```text
+        3.1.1 Password message
+
+        Command: PASS
+        Parameters: <password>
+
+        The PASS command is used to set a 'connection password'.  The
+        optional password can and MUST be set before any attempt to register
+        the connection is made.  Currently this requires that user send a
+        PASS command before sending the NICK/USER combination.
+
+        Numeric Replies:
+
+           ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
+
+        Example:
+
+           PASS secretpasswordhere
+        ```"#
+        b TextSlice<'a>
+        o Text
+        t t => t.into()
+    },
+    NICK {
+        "NICK", doc = r#"```text
+        3.1.2 Nick message
+
+        Command: NICK
+        Parameters: <nickname>
+
+        NICK command is used to give user a nickname or change the existing
+        one.
+
+        Numeric Replies:
+
+           ERR_NONICKNAMEGIVEN             ERR_ERRONEUSNICKNAME
+           ERR_NICKNAMEINUSE               ERR_NICKCOLLISION
+           ERR_UNAVAILRESOURCE             ERR_RESTRICTED
+
+        Examples:
+
+           NICK Wiz                ; Introducing new nick "Wiz" if session is
+                                   still unregistered, or user changing his
+                                   nickname to "Wiz"
+
+           :WiZ!jto@tolsun.oulu.fi NICK Kilroy
+                                   ; Server telling that WiZ changed his
+                                   nickname to Kilroy.
+        ```"#
+        b TextSlice<'a>
+        o Text
+        t t => t.into()
+    },
+    USER {
+        "USER", doc = r#"```text
+        3.1.3 User message
+
+        Command: USER
+        Parameters: <user> <mode> <unused> <realname>
+
+        The USER command is used at the beginning of connection to specify
+        the username, hostname and realname of a new user.
+
+        The <mode> parameter should be a numeric, and can be used to
+        automatically set user modes when registering with the server.  This
+        parameter is a bitmask, with only 2 bits having any signification: if
+        the bit 2 is set, the user mode 'w' will be set and if the bit 3 is
+        set, the user mode 'i' will be set.  (See Section 3.1.5 "User
+        Modes").
+
+        The <realname> may contain space characters.
+
+        Numeric Replies:
+
+           ERR_NEEDMOREPARAMS              ERR_ALREADYREGISTRED
+
+        Example:
+
+           USER guest 0 * :Ronnie Reagan   ; User registering themselves with a
+                                           username of "guest" and real name
+                                           "Ronnie Reagan".
+
+           USER guest 8 * :Ronnie Reagan   ; User registering themselves with a
+                                           username of "guest" and real name
+                                           "Ronnie Reagan", and asking to be set
+                                           invisible.
+        ```"#
+        b TextSlice<'a>, TextSlice<'a>, TextSlice<'a>, TextSlice<'a>
+        o Text, Text, Text, Text
+        t r, s, t, u => r.into(), s.into(), t.into(), u.into()
+    },
+    JOIN {
+        "JOIN", doc = r#"```text
+        3.2.1 Join message
+
+        Command: JOIN
+        Parameters: ( <channel> *( "," <channel> ) [ <key> *( "," <key> ) ] )
+                    / "0"
+
+        The JOIN command is used by a user to request to start listening to
+        the specific channel.  Servers MUST be able to parse arguments in the
+        form of a list of target, but SHOULD NOT use lists when sending JOIN
+        messages to clients.
+
+        Once a user has joined a channel, he receives information about
+        all commands his server receives affecting the channel.  This
+        includes JOIN, MODE, KICK, PART, QUIT and of course PRIVMSG/NOTICE.
+        This allows channel members to keep track of the other channel
+        members, as well as channel modes.
+
+        If a JOIN is successful, the user receives a JOIN message as
+        confirmation and is then sent the channel's topic (using RPL_TOPIC) and
+        the list of users who are on the channel (using RPL_NAMREPLY), which
+        MUST include the user joining.
+
+        Note that this message accepts a special argument ("0"), which is
+        a special request to leave all channels the user is currently a member
+        of.  The server will process this message as if the user had sent
+        a PART command (See Section 3.2.2) for each channel he is a member
+        of.
+
+        Numeric Replies:
+
+           ERR_NEEDMOREPARAMS              ERR_BANNEDFROMCHAN
+           ERR_INVITEONLYCHAN              ERR_BADCHANNELKEY
+           ERR_CHANNELISFULL               ERR_BADCHANMASK
+           ERR_NOSUCHCHANNEL               ERR_TOOMANYCHANNELS
+           ERR_TOOMANYTARGETS              ERR_UNAVAILRESOURCE
+           RPL_TOPIC
+
+        Examples:
+
+           JOIN #foobar                    ; Command to join channel #foobar.
+
+           JOIN &foo fubar                 ; Command to join channel &foo using
+                                           key "fubar".
+
+           JOIN #foo,&bar fubar            ; Command to join channel #foo using
+                                           key "fubar" and &bar using no key.
+
+           JOIN #foo,#bar fubar,foobar     ; Command to join channel #foo using
+                                           key "fubar", and channel #bar using
+                                           key "foobar".
+
+           JOIN #foo,#bar                  ; Command to join channels #foo and
+                                           #bar.
+
+           JOIN 0                          ; Leave all currently joined
+                                           channels.
+
+           :WiZ!jto@tolsun.oulu.fi JOIN #Twilight_zone ; JOIN message from WiZ
+                                           on channel #Twilight_zone
+        ```"#
+        b Vec<TextSlice<'a>>, Vec<TextSlice<'a>>
+        o Vec<Text>, Vec<Text>
+        t c, p => c.into_iter().map(Into::into).collect(),
+                  p.into_iter().map(Into::into).collect()
+    },
+    PRIVMSG {
+        "PRIVMSG", doc = ""
+        b TextSlice<'a>, TextSlice<'a>
+        o Text, Text
+        t target, content => target.into(), content.into()
+    },
+    PING {
+        "PING", doc = ""
+        b TextSlice<'a>, Option<TextSlice<'a>>
+        o Text, Option<Text>
+        t s1, s2 => s1.into(), s2.map(Into::into)
+    },
+    PONG {
+        "PONG", doc = ""
+        b TextSlice<'a>, Option<TextSlice<'a>>
+        o Text, Option<Text>
+        t s1, s2 => s1.into(), s2.into()
+    }
+}
+/*
     USER(CS<'a>, CS<'a>, CS<'a>, CS<'a>),
 
     /// ```text
@@ -288,68 +441,6 @@ pub enum Command<'a> {
     /// ```
     SQUIT(CS<'a>, CS<'a>),
 
-    /// ```text
-    /// 3.2.1 Join message
-    ///
-    /// Command: JOIN
-    /// Parameters: ( <channel> *( "," <channel> ) [ <key> *( "," <key> ) ] )
-    ///             / "0"
-    ///
-    /// The JOIN command is used by a user to request to start listening to
-    /// the specific channel.  Servers MUST be able to parse arguments in the
-    /// form of a list of target, but SHOULD NOT use lists when sending JOIN
-    /// messages to clients.
-    ///
-    /// Once a user has joined a channel, he receives information about
-    /// all commands his server receives affecting the channel.  This
-    /// includes JOIN, MODE, KICK, PART, QUIT and of course PRIVMSG/NOTICE.
-    /// This allows channel members to keep track of the other channel
-    /// members, as well as channel modes.
-    ///
-    /// If a JOIN is successful, the user receives a JOIN message as
-    /// confirmation and is then sent the channel's topic (using RPL_TOPIC) and
-    /// the list of users who are on the channel (using RPL_NAMREPLY), which
-    /// MUST include the user joining.
-    ///
-    /// Note that this message accepts a special argument ("0"), which is
-    /// a special request to leave all channels the user is currently a member
-    /// of.  The server will process this message as if the user had sent
-    /// a PART command (See Section 3.2.2) for each channel he is a member
-    /// of.
-    ///
-    /// Numeric Replies:
-    ///
-    ///    ERR_NEEDMOREPARAMS              ERR_BANNEDFROMCHAN
-    ///    ERR_INVITEONLYCHAN              ERR_BADCHANNELKEY
-    ///    ERR_CHANNELISFULL               ERR_BADCHANMASK
-    ///    ERR_NOSUCHCHANNEL               ERR_TOOMANYCHANNELS
-    ///    ERR_TOOMANYTARGETS              ERR_UNAVAILRESOURCE
-    ///    RPL_TOPIC
-    ///
-    /// Examples:
-    ///
-    ///    JOIN #foobar                    ; Command to join channel #foobar.
-    ///
-    ///    JOIN &foo fubar                 ; Command to join channel &foo using
-    ///                                    key "fubar".
-    ///
-    ///    JOIN #foo,&bar fubar            ; Command to join channel #foo using
-    ///                                    key "fubar" and &bar using no key.
-    ///
-    ///    JOIN #foo,#bar fubar,foobar     ; Command to join channel #foo using
-    ///                                    key "fubar", and channel #bar using
-    ///                                    key "foobar".
-    ///
-    ///    JOIN #foo,#bar                  ; Command to join channels #foo and
-    ///                                    #bar.
-    ///
-    ///    JOIN 0                          ; Leave all currently joined
-    ///                                    channels.
-    ///
-    ///    :WiZ!jto@tolsun.oulu.fi JOIN #Twilight_zone ; JOIN message from WiZ
-    ///                                    on channel #Twilight_zone
-    /// ```
-    JOIN(Vec<CS<'a>>, Vec<CS<'a>>),
 
     /// ```text
     /// 3.2.2 Part message
@@ -1596,31 +1687,31 @@ pub enum Command<'a> {
         match self {
             &PASS(ref pw) => PASS(pw.to_owned().clone()),
             /*&NICK(ref nick) =>
-                Message::format(None, Borrowed("NICK"), vec![], Some(nick.clone()), MsgType::Irc),
+                Message::format(None, Borrowed("NICK"), vec![], Some(nick.clone())),
             &USER(ref user, ref mode, ref unused, ref realname) =>
                 Message::format(None, Borrowed("USER"),
                     vec![user.clone(), mode.clone(), unused.clone()],
-                    Some(realname.clone()), MsgType::Irc),
+                    Some(realname.clone())),
             &OPER(ref name, ref pw) =>
                 Message::format(None, Borrowed("OPER"),
-                    vec![name.clone(), pw.clone()], None, MsgType::Irc),
+                    vec![name.clone(), pw.clone()], None),
             &UMODE(ref mode) =>
-                Message::format(None, Borrowed("MODE"), vec![], Some(mode.clone()), MsgType::Irc),
+                Message::format(None, Borrowed("MODE"), vec![], Some(mode.clone())),
             &SERVICE(ref nick, ref reserved, ref distribution, ref type_, ref reserved2, ref info) =>
                 Message::format(None, Borrowed("SERVICE"),
                     vec![nick.clone(), reserved.clone(), distribution.clone(),
-                    type_.clone(), reserved2.clone()], Some(info.clone()), MsgType::Irc),
+                    type_.clone(), reserved2.clone()], Some(info.clone())),
             &QUIT(ref msg) =>
-                Message::format(None, Borrowed("QUIT"), vec![], msg.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("QUIT"), vec![], msg.clone()),
             &SQUIT(ref server, ref comment) =>
                 Message::format(None, Borrowed("SQUIT"),
-                    vec![server.clone()], Some(comment.clone()), MsgType::Irc),
+                    vec![server.clone()], Some(comment.clone())),
             &JOIN(ref ch, ref pw) =>
                 Message::format(None, Borrowed("JOIN"),
-                    vec![Owned(ch.connect(",")), Owned(pw.connect(","))], None, MsgType::Irc),
+                    vec![Owned(ch.connect(",")), Owned(pw.connect(","))], None),
             &PART(ref ch, ref reason) =>
                 Message::format(None, Borrowed("PART"),
-                    vec![Owned(ch.connect(","))], reason.clone(), MsgType::Irc),
+                    vec![Owned(ch.connect(","))], reason.clone()),
             &MODE(ref channel, ref modes) =>
                 // Screw this, folding will have to do.
                 Message::format(None, Borrowed("MODE"),
@@ -1628,98 +1719,98 @@ pub enum Command<'a> {
                         v.push(a.clone());
                         v.push(b.clone());
                         v
-                    }), None, MsgType::Irc),
+                    }), None),
             &TOPIC(ref channel, ref topic) =>
                 Message::format(None, Borrowed("TOPIC"),
-                    vec![channel.clone()], topic.clone(), MsgType::Irc),
+                    vec![channel.clone()], topic.clone()),
             &NAMES(ref ch, ref target) =>
                 Message::format(None, Borrowed("NAMES"),
-                    vec![Owned(ch.connect(","))], target.clone(), MsgType::Irc),
+                    vec![Owned(ch.connect(","))], target.clone()),
             &LIST(ref ch, ref target) =>
                 Message::format(None, Borrowed("LIST"),
-                    vec![Owned(ch.connect(","))], target.clone(), MsgType::Irc),
+                    vec![Owned(ch.connect(","))], target.clone()),
             &INVITE(ref nick, ref channel) =>
                 Message::format(None, Borrowed("INVITE"),
-                    vec![nick.clone()], Some(channel.clone()), MsgType::Irc),
+                    vec![nick.clone()], Some(channel.clone())),
             &KICK(ref ch, ref users, ref comment) =>
                 Message::format(None, Borrowed("KICK"),
                     vec![Owned(ch.connect(",")), Owned(users.connect(","))],
-                    comment.clone(), MsgType::Irc),
+                    comment.clone()),
             &PRIVMSG(ref target, ref msg) =>
                 Message::format(None, Borrowed("PRIVMSG"),
-                    vec![target.clone()], Some(msg.clone()), MsgType::Irc),
+                    vec![target.clone()], Some(msg.clone())),
             &NOTICE(ref target, ref text) =>
                 Message::format(None, Borrowed("NOTICE"),
-                    vec![target.clone()], Some(text.clone()), MsgType::Irc),
+                    vec![target.clone()], Some(text.clone())),
             &MOTD(ref target) =>
-                Message::format(None, Borrowed("MOTD"), vec![], target.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("MOTD"), vec![], target.clone()),
             &LUSERS(ref lu) =>
                 Message::format(None, Borrowed("LUSERS"),
                     lu.as_ref().map(|&(ref mask, _)| vec![mask.clone()]).unwrap_or(vec![]),
-                    lu.as_ref().and_then(|&(_, ref target)| target.clone()), MsgType::Irc),
+                    lu.as_ref().and_then(|&(_, ref target)| target.clone())),
             &VERSION(ref target) =>
-                Message::format(None, Borrowed("VERSION"), vec![], target.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("VERSION"), vec![], target.clone()),
             &STATS(ref st) =>
                 Message::format(None, Borrowed("STATS"),
                     st.as_ref().map(|&(ref query, _)| vec![query.clone()]).unwrap_or(vec![]),
-                    st.as_ref().and_then(|&(_, ref target)| target.clone()), MsgType::Irc),
+                    st.as_ref().and_then(|&(_, ref target)| target.clone())),
             &LINKS(ref l) =>
                 Message::format(None, Borrowed("LINKS"),
                     l.as_ref().map(|&(ref remote, ref mask)| if remote.is_some() {
                     vec![remote.clone().unwrap(), mask.clone()] } else { vec![mask.clone()] }).unwrap_or(vec![]),
-                    None, MsgType::Irc),
+                    None),
             &TIME(ref target) =>
-                Message::format(None, Borrowed("TIME"), vec![], target.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("TIME"), vec![], target.clone()),
             &CONNECT(ref server, ref port, ref remote) =>
                 Message::format(None, Borrowed("CONNECT"),
-                    vec![server.clone(), Owned(format!("{}", port))], remote.clone(), MsgType::Irc),
+                    vec![server.clone(), Owned(format!("{}", port))], remote.clone()),
             &TRACE(ref target) =>
-                Message::format(None, Borrowed("TRACE"), vec![], target.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("TRACE"), vec![], target.clone()),
             &ADMIN(ref target) =>
-                Message::format(None, Borrowed("ADMIN"), vec![], target.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("ADMIN"), vec![], target.clone()),
             &INFO(ref target) =>
-                Message::format(None, Borrowed("INFO"), vec![], target.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("INFO"), vec![], target.clone()),
             &SERVLIST(ref sl) =>
                 Message::format(None, Borrowed("SERVLIST"),
                     sl.as_ref().map(|&(ref mask, ref target)| target.as_ref()
                     .map(|t| vec![mask.clone(), t.clone()])
                     .unwrap_or_else(|| vec![mask.clone()]))
-                    .unwrap_or(vec![]), None, MsgType::Irc),
+                    .unwrap_or(vec![]), None),
             &SQUERY(ref name, ref text) =>
                 Message::format(None, Borrowed("SQUERY"),
-                    vec![name.clone()], Some(text.clone()), MsgType::Irc),
+                    vec![name.clone()], Some(text.clone())),
             &WHO(ref mask, o) =>
                 Message::format(None, Borrowed("WHO"),
                     match (mask, o) {
                         (&Some(ref m), true) => vec![m.clone(), Borrowed("o")],
                         (&Some(ref m), false) => vec![m.clone()],
                         (&None, _) => vec![]
-                    }, None, MsgType::Irc),
+                    }, None),
             &WHOIS(ref target,  ref masks) =>
                 Message::format(None, Borrowed("WHOIS"),
                     target.as_ref().map(|t| vec![t.clone(), Owned(masks.connect(","))])
-                    .unwrap_or_else(|| vec![Owned(masks.connect(","))]), None, MsgType::Irc),
+                    .unwrap_or_else(|| vec![Owned(masks.connect(","))]), None),
             &WHOWAS(ref nick, ref count) =>
                 Message::format(None, Borrowed("WHOWAS"), match count {
                         &Some((ref c, Some(ref t))) => vec![Owned(nick.connect(",")), c.clone(), t.clone()],
                         &Some((ref c, None)) => vec![Owned(nick.connect(",")), c.clone()],
                         &None => vec![Owned(nick.connect(","))]
-                    }, None, MsgType::Irc),
+                    }, None),
             &PING(ref s1, ref s2) =>
-                Message::format(None, Borrowed("PING"), vec![s1.clone()], s2.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("PING"), vec![s1.clone()], s2.clone()),
             &PONG(ref s1, ref s2) =>
-                Message::format(None, Borrowed("PONG"), vec![s1.clone()], s2.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("PONG"), vec![s1.clone()], s2.clone()),
              */           /*&Command::PING(ref server1, ref server2) => {
                 let mut c = Vec::new();
                 c.push(server1.clone());
                 if let &Some(ref s) = server2 { c.push(s.clone()) }
-                Message::format(None, "PING", c, None, MsgType::Irc)
+                Message::format(None, "PING", c, None)
             },
             &Command::PONG(ref server1, ref server2) => {
                 let mut c = Vec::new();
                 c.push(server1.clone());
                 if let &Some(ref s) = server2 { c.push(s.clone()) }
-                Message::format(None, "PONG", c, None, MsgType::Irc)
+                Message::format(None, "PONG", c, None)
             },*/
             _ => unimplemented!()
         }
@@ -1773,33 +1864,33 @@ impl<'a> Command<'a> {
         use self::Command::*;
         match self {
             &PASS(ref pw) =>
-                Message::format(None, Borrowed("PASS"), vec![], Some(pw.clone()), MsgType::Irc),
+                Message::format(None, Borrowed("PASS"), vec![], Some(pw.clone())),
             &NICK(ref nick) =>
-                Message::format(None, Borrowed("NICK"), vec![], Some(nick.clone()), MsgType::Irc),
+                Message::format(None, Borrowed("NICK"), vec![], Some(nick.clone())),
             &USER(ref user, ref mode, ref unused, ref realname) =>
                 Message::format(None, Borrowed("USER"),
                     vec![user.clone(), mode.clone(), unused.clone()],
-                    Some(realname.clone()), MsgType::Irc),
+                    Some(realname.clone())),
             &OPER(ref name, ref pw) =>
                 Message::format(None, Borrowed("OPER"),
-                    vec![name.clone(), pw.clone()], None, MsgType::Irc),
+                    vec![name.clone(), pw.clone()], None),
             &UMODE(ref mode) =>
-                Message::format(None, Borrowed("MODE"), vec![], Some(mode.clone()), MsgType::Irc),
+                Message::format(None, Borrowed("MODE"), vec![], Some(mode.clone())),
             &SERVICE(ref nick, ref reserved, ref distribution, ref type_, ref reserved2, ref info) =>
                 Message::format(None, Borrowed("SERVICE"),
                     vec![nick.clone(), reserved.clone(), distribution.clone(),
-                    type_.clone(), reserved2.clone()], Some(info.clone()), MsgType::Irc),
+                    type_.clone(), reserved2.clone()], Some(info.clone())),
             &QUIT(ref msg) =>
-                Message::format(None, Borrowed("QUIT"), vec![], msg.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("QUIT"), vec![], msg.clone()),
             &SQUIT(ref server, ref comment) =>
                 Message::format(None, Borrowed("SQUIT"),
-                    vec![server.clone()], Some(comment.clone()), MsgType::Irc),
+                    vec![server.clone()], Some(comment.clone())),
             &JOIN(ref ch, ref pw) =>
                 Message::format(None, Borrowed("JOIN"),
-                    vec![Owned(ch.connect(",")), Owned(pw.connect(","))], None, MsgType::Irc),
+                    vec![Owned(ch.connect(",")), Owned(pw.connect(","))], None),
             &PART(ref ch, ref reason) =>
                 Message::format(None, Borrowed("PART"),
-                    vec![Owned(ch.connect(","))], reason.clone(), MsgType::Irc),
+                    vec![Owned(ch.connect(","))], reason.clone()),
             &MODE(ref channel, ref modes) =>
                 // Screw this, folding will have to do.
                 Message::format(None, Borrowed("MODE"),
@@ -1807,87 +1898,87 @@ impl<'a> Command<'a> {
                         v.push(a.clone());
                         v.push(b.clone());
                         v
-                    }), None, MsgType::Irc),
+                    }), None),
             &TOPIC(ref channel, ref topic) =>
                 Message::format(None, Borrowed("TOPIC"),
-                    vec![channel.clone()], topic.clone(), MsgType::Irc),
+                    vec![channel.clone()], topic.clone()),
             &NAMES(ref ch, ref target) =>
                 Message::format(None, Borrowed("NAMES"),
-                    vec![Owned(ch.connect(","))], target.clone(), MsgType::Irc),
+                    vec![Owned(ch.connect(","))], target.clone()),
             &LIST(ref ch, ref target) =>
                 Message::format(None, Borrowed("LIST"),
-                    vec![Owned(ch.connect(","))], target.clone(), MsgType::Irc),
+                    vec![Owned(ch.connect(","))], target.clone()),
             &INVITE(ref nick, ref channel) =>
                 Message::format(None, Borrowed("INVITE"),
-                    vec![nick.clone()], Some(channel.clone()), MsgType::Irc),
+                    vec![nick.clone()], Some(channel.clone())),
             &KICK(ref ch, ref users, ref comment) =>
                 Message::format(None, Borrowed("KICK"),
                     vec![Owned(ch.connect(",")), Owned(users.connect(","))],
-                    comment.clone(), MsgType::Irc),
+                    comment.clone()),
             &PRIVMSG(ref target, ref msg) =>
                 Message::format(None, Borrowed("PRIVMSG"),
-                    vec![target.clone()], Some(msg.clone()), MsgType::Irc),
+                    vec![target.clone()], Some(msg.clone())),
             &NOTICE(ref target, ref text) =>
                 Message::format(None, Borrowed("NOTICE"),
-                    vec![target.clone()], Some(text.clone()), MsgType::Irc),
+                    vec![target.clone()], Some(text.clone())),
             &MOTD(ref target) =>
-                Message::format(None, Borrowed("MOTD"), vec![], target.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("MOTD"), vec![], target.clone()),
             &LUSERS(ref lu) =>
                 Message::format(None, Borrowed("LUSERS"),
                     lu.as_ref().map(|&(ref mask, _)| vec![mask.clone()]).unwrap_or(vec![]),
-                    lu.as_ref().and_then(|&(_, ref target)| target.clone()), MsgType::Irc),
+                    lu.as_ref().and_then(|&(_, ref target)| target.clone())),
             &VERSION(ref target) =>
-                Message::format(None, Borrowed("VERSION"), vec![], target.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("VERSION"), vec![], target.clone()),
             &STATS(ref st) =>
                 Message::format(None, Borrowed("STATS"),
                     st.as_ref().map(|&(ref query, _)| vec![query.clone()]).unwrap_or(vec![]),
-                    st.as_ref().and_then(|&(_, ref target)| target.clone()), MsgType::Irc),
+                    st.as_ref().and_then(|&(_, ref target)| target.clone())),
             &LINKS(ref l) =>
                 Message::format(None, Borrowed("LINKS"),
                     l.as_ref().map(|&(ref remote, ref mask)| if remote.is_some() {
                     vec![remote.clone().unwrap(), mask.clone()] } else { vec![mask.clone()] }).unwrap_or(vec![]),
-                    None, MsgType::Irc),
+                    None),
             &TIME(ref target) =>
-                Message::format(None, Borrowed("TIME"), vec![], target.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("TIME"), vec![], target.clone()),
             &CONNECT(ref server, ref port, ref remote) =>
                 Message::format(None, Borrowed("CONNECT"),
-                    vec![server.clone(), Owned(format!("{}", port))], remote.clone(), MsgType::Irc),
+                    vec![server.clone(), Owned(format!("{}", port))], remote.clone()),
             &TRACE(ref target) =>
-                Message::format(None, Borrowed("TRACE"), vec![], target.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("TRACE"), vec![], target.clone()),
             &ADMIN(ref target) =>
-                Message::format(None, Borrowed("ADMIN"), vec![], target.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("ADMIN"), vec![], target.clone()),
             &INFO(ref target) =>
-                Message::format(None, Borrowed("INFO"), vec![], target.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("INFO"), vec![], target.clone()),
             &SERVLIST(ref sl) =>
                 Message::format(None, Borrowed("SERVLIST"),
                     sl.as_ref().map(|&(ref mask, ref target)| target.as_ref()
                     .map(|t| vec![mask.clone(), t.clone()])
                     .unwrap_or_else(|| vec![mask.clone()]))
-                    .unwrap_or(vec![]), None, MsgType::Irc),
+                    .unwrap_or(vec![]), None),
             &SQUERY(ref name, ref text) =>
                 Message::format(None, Borrowed("SQUERY"),
-                    vec![name.clone()], Some(text.clone()), MsgType::Irc),
+                    vec![name.clone()], Some(text.clone())),
             &WHO(ref mask, o) =>
                 Message::format(None, Borrowed("WHO"),
                     match (mask, o) {
                         (&Some(ref m), true) => vec![m.clone(), Borrowed("o")],
                         (&Some(ref m), false) => vec![m.clone()],
                         (&None, _) => vec![]
-                    }, None, MsgType::Irc),
+                    }, None),
             &WHOIS(ref target,  ref masks) =>
                 Message::format(None, Borrowed("WHOIS"),
                     target.as_ref().map(|t| vec![t.clone(), Owned(masks.connect(","))])
-                    .unwrap_or_else(|| vec![Owned(masks.connect(","))]), None, MsgType::Irc),
+                    .unwrap_or_else(|| vec![Owned(masks.connect(","))]), None),
             &WHOWAS(ref nick, ref count) =>
                 Message::format(None, Borrowed("WHOWAS"), match count {
                         &Some((ref c, Some(ref t))) => vec![Owned(nick.connect(",")), c.clone(), t.clone()],
                         &Some((ref c, None)) => vec![Owned(nick.connect(",")), c.clone()],
                         &None => vec![Owned(nick.connect(","))]
-                    }, None, MsgType::Irc),
+                    }, None),
             &PING(ref s1, ref s2) =>
-                Message::format(None, Borrowed("PING"), vec![s1.clone()], s2.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("PING"), vec![s1.clone()], s2.clone()),
             &PONG(ref s1, ref s2) =>
-                Message::format(None, Borrowed("PONG"), vec![s1.clone()], s2.clone(), MsgType::Irc),
+                Message::format(None, Borrowed("PONG"), vec![s1.clone()], s2.clone()),
             _ => unimplemented!()
         }
     }
@@ -1947,4 +2038,4 @@ impl<'a> Command<'a> {
         }
     }
 }
-
+*/

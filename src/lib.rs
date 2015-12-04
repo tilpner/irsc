@@ -9,7 +9,8 @@ extern crate regex;
 #[macro_use]
 extern crate log;
 extern crate openssl;
-extern crate carboxyl;
+extern crate encoding;
+extern crate linear_map;
 
 pub mod client;
 pub mod color;
@@ -19,6 +20,7 @@ pub mod message;
 pub mod command;
 pub mod reply;
 pub mod event;
+pub mod text;
 
 use std::io;
 use std::result;
@@ -26,12 +28,14 @@ use std::ops::{ Deref, DerefMut };
 
 use openssl::ssl::error::SslError;
 
+use encoding::EncodingRef;
+
 pub use ident::Ident;
-pub use message::{ Message, MsgType };
+pub use message::Message;
 pub use command::Command;
 pub use reply::Reply;
 pub use event::Event;
-pub use client::{ Client, OwnedClient, SharedClient };
+pub use client::Client;
 
 #[derive(Debug)]
 pub enum IrscError {
@@ -60,3 +64,4 @@ impl<T> DerefMut for Result<T> {
 impl<T> Result<T> { fn inner(self) -> result::Result<T, IrscError> { self.0 } }
 
 pub const DEBUG: bool = cfg!(debug_assertions);
+pub static ENCODING: EncodingRef = encoding::all::UTF_8;
